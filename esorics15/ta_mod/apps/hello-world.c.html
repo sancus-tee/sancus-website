@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/apps/hello-world.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span>
+<span class="lnr"> 2 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 3 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr"> 4 </span><span class="PreProc">#include </span><span class="Constant">&quot;sys/mt.h&quot;</span>
+<span class="lnr"> 5 </span>
+<span class="lnr"> 6 </span><span class="PreProc">#include </span><span class="Constant">&quot;../config.h&quot;</span>
+<span class="lnr"> 7 </span><span class="PreProc">#include </span><span class="Constant">&quot;hello-world.h&quot;</span>
+<span class="lnr"> 8 </span>
+<span class="lnr"> 9 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">10 </span><span class="PreProc">  #include </span><span class="Constant">&lt;stdlib.h&gt;</span>
+<span class="lnr">11 </span><span class="PreProc">#endif</span>
+<span class="lnr">12 </span>
+<span class="lnr">13 </span>
+<span class="lnr">14 </span>PROCESS(hello_world_process, <span class="Constant">&quot;Hello world process&quot;</span>);
+<span class="lnr">15 </span>
+<span class="lnr">16 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">17 </span>PROCESS_THREAD(hello_world_process, ev, data)
+<span class="lnr">18 </span>{
+<span class="lnr">19 </span>  PROCESS_BEGIN();
+<span class="lnr">20 </span>
+<span class="lnr">21 </span>
+<span class="lnr">22 </span>  <span class="Type">static</span> <span class="Type">struct</span> etimer timer;
+<span class="lnr">23 </span>  <span class="Type">static</span> <span class="Type">int</span>    rounds = <span class="Constant">0</span>;
+<span class="lnr">24 </span>
+<span class="lnr">25 </span>  etimer_set(&amp;timer, CLOCK_SECOND / CLOCK_DIV);
+<span class="lnr">26 </span>
+<span class="lnr">27 </span><span class="Comment">//  printf (&quot;wait time = %lu\n&quot;, CLOCK_SECOND/10);</span>
+<span class="lnr">28 </span>
+<span class="lnr">29 </span>  <span class="cRepeat">while</span> (<span class="Constant">1</span>) {
+<span class="lnr">30 </span><span class="Comment">//    puts(&quot;D: hello_world_process...suspended.&quot;);</span>
+<span class="lnr">31 </span>    PROCESS_WAIT_EVENT();
+<span class="lnr">32 </span><span class="Comment">//    puts(&quot;D: hello_world_process...continued.&quot;);</span>
+<span class="lnr">33 </span>
+<span class="lnr">34 </span>    puts(<span class="Constant">&quot;--- Hello, world.&quot;</span>);
+<span class="lnr">35 </span>
+<span class="lnr">36 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">37 </span>    rounds++;
+<span class="lnr">38 </span>    <span class="cConditional">if</span> (rounds &lt; <span class="Constant">0</span>) { rounds = <span class="Constant">0</span>; }
+<span class="lnr">39 </span>    <span class="cConditional">if</span> (rounds == ROUNDS) { exit(<span class="Constant">0</span>); }
+<span class="lnr">40 </span><span class="PreProc">#endif</span>
+<span class="lnr">41 </span>
+<span class="lnr">42 </span>    etimer_reset(&amp;timer);
+<span class="lnr">43 </span>  }
+<span class="lnr">44 </span>
+<span class="lnr">45 </span>  PROCESS_END();
+<span class="lnr">46 </span>}
+<span class="lnr">47 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">48 </span>
+<span class="lnr">49 </span>
+</pre>
+</body>
+</html>

@@ -1,0 +1,4 @@
+screen bash -l -i -c "make runmote-n1 ; sleep 10s"
+split
+focus
+screen bash -l -i -c "make runmote-n2 ; sleep 10s"

@@ -1,0 +1,90 @@
+{
+    "nodes": [
+        {
+            "type": "sancus",
+            "name": "node1",
+            "ip_address": "192.168.0.2",
+            "vendor_id": 4660,
+            "vendor_key": "4078d505d82099ba"
+        },
+        {
+            "type": "sancus",
+            "name": "node2",
+            "ip_address": "192.168.0.3",
+            "vendor_id": 4660,
+            "vendor_key": "4078d505d82099ba"
+        }
+    ],
+    "modules" : [
+        {
+            "type": "sancus",
+            "name": "CS",
+            "files": ["central_system.c"],
+            "node": "node1"
+        },
+        {
+            "type": "sancus",
+            "name": "HAN",
+            "files": ["han-if.c", "ihd.c"],
+            "node": "node1"
+        },
+        {
+            "type": "sancus",
+            "name": "ESME_LS",
+            "files": ["esme_load_switch.c"],
+            "node": "node2"
+        },
+        {
+            "type": "sancus",
+            "name": "ESME",
+            "files": ["esme.c"],
+            "cflags": ["-I../contiki-support/contiki/core/lib/"],
+            "node": "node2"
+        }
+    ],
+    "connections": [
+        {
+            "from_module": "CS",
+            "from_output": "load_switch_out",
+            "to_module": "ESME_LS",
+            "to_input": "central_system_in"
+        },
+        {
+            "from_module": "ESME_LS",
+            "from_output": "central_system_out",
+            "to_module": "CS",
+            "to_input": "load_switch_in"
+        },
+        {
+            "from_module": "CS",
+            "from_output": "esme_out",
+            "to_module": "ESME",
+            "to_input": "central_system_in"
+        },
+        {
+            "from_module": "ESME",
+            "from_output": "central_system_out",
+            "to_module": "CS",
+            "to_input": "esme_in"
+        },
+        {
+            "from_module": "ESME",
+            "from_output": "load_switch_out",
+            "to_module": "ESME_LS",
+            "to_input": "esme_in"
+        },
+        {
+            "from_module": "ESME_LS",
+            "from_output": "esme_out",
+            "to_module": "ESME",
+            "to_input": "load_switch_in"
+        },
+        {
+            "from_module": "ESME",
+            "from_output": "han_if_out",
+            "to_module": "HAN",
+            "to_input": "esme_in"
+        }
+    ]
+}
+

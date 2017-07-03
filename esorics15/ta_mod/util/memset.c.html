@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/util/memset.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span><span class="Comment">-</span>
+<span class="lnr">  2 </span><span class="Comment"> * Copyright (c) 1990, 1993</span>
+<span class="lnr">  3 </span><span class="Comment"> *      The Regents of the University of California.  All rights reserved.</span>
+<span class="lnr">  4 </span><span class="Comment"> *</span>
+<span class="lnr">  5 </span><span class="Comment"> * This code is derived from software contributed to Berkeley by</span>
+<span class="lnr">  6 </span><span class="Comment"> * Mike Hibler and Chris Torek.</span>
+<span class="lnr">  7 </span><span class="Comment"> *</span>
+<span class="lnr">  8 </span><span class="Comment"> * Redistribution and use in source and binary forms, with or without</span>
+<span class="lnr">  9 </span><span class="Comment"> * modification, are permitted provided that the following conditions</span>
+<span class="lnr"> 10 </span><span class="Comment"> * are met:</span>
+<span class="lnr"> 11 </span><span class="Comment"> * 1. Redistributions of source code must retain the above copyright</span>
+<span class="lnr"> 12 </span><span class="Comment"> *    notice, this list of conditions and the following disclaimer.</span>
+<span class="lnr"> 13 </span><span class="Comment"> * 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="lnr"> 14 </span><span class="Comment"> *    notice, this list of conditions and the following disclaimer in the</span>
+<span class="lnr"> 15 </span><span class="Comment"> *    documentation and/or other materials provided with the distribution.</span>
+<span class="lnr"> 16 </span><span class="Comment"> * 3. Neither the name of the University nor the names of its contributors</span>
+<span class="lnr"> 17 </span><span class="Comment"> *    may be used to endorse or promote products derived from this software</span>
+<span class="lnr"> 18 </span><span class="Comment"> *    without specific prior written permission.</span>
+<span class="lnr"> 19 </span><span class="Comment"> *</span>
+<span class="lnr"> 20 </span><span class="Comment"> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND</span>
+<span class="lnr"> 21 </span><span class="Comment"> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="lnr"> 22 </span><span class="Comment"> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="lnr"> 23 </span><span class="Comment"> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE</span>
+<span class="lnr"> 24 </span><span class="Comment"> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="lnr"> 25 </span><span class="Comment"> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span class="lnr"> 26 </span><span class="Comment"> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span class="lnr"> 27 </span><span class="Comment"> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<span class="lnr"> 28 </span><span class="Comment"> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span>
+<span class="lnr"> 29 </span><span class="Comment"> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span>
+<span class="lnr"> 30 </span><span class="Comment"> * SUCH DAMAGE.</span>
+<span class="lnr"> 31 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 32 </span>
+<span class="lnr"> 33 </span>
+<span class="lnr"> 34 </span><span class="PreProc">#include </span><span class="Constant">&lt;sys/types.h&gt;</span>
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span><span class="PreProc">#include </span><span class="Constant">&lt;limits.h&gt;</span>
+<span class="lnr"> 37 </span><span class="PreProc">#include </span><span class="Constant">&lt;string.h&gt;</span>
+<span class="lnr"> 38 </span>
+<span class="lnr"> 39 </span><span class="PreProc">#undef  wsize</span>
+<span class="lnr"> 40 </span><span class="PreProc">#define wsize   </span><span class="Statement">sizeof</span><span class="PreProc">(u_int)</span>
+<span class="lnr"> 41 </span><span class="PreProc">#undef  wmask</span>
+<span class="lnr"> 42 </span><span class="PreProc">#define wmask   (wsize - </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 43 </span>
+<span class="lnr"> 44 </span><span class="PreProc">#ifdef TABZERO</span>
+<span class="lnr"> 45 </span><span class="PreProc">#define RETURN  </span><span class="cStatement">return</span>
+<span class="lnr"> 46 </span><span class="PreProc">#define VAL     </span><span class="Constant">0</span>
+<span class="lnr"> 47 </span><span class="PreProc">#define WIDEVAL </span><span class="Constant">0</span>
+<span class="lnr"> 48 </span><span class="Type">void</span> SM_FUNC(TA_SM_NAME)
+<span class="lnr"> 49 </span>  TAbzero(<span class="Type">void</span> *dst0, <span class="Type">size_t</span> length)
+<span class="lnr"> 50 </span><span class="PreProc">#else</span>
+<span class="lnr"> 51 </span><span class="PreProc">#define RETURN  </span><span class="cStatement">return</span><span class="PreProc"> (dst0)</span>
+<span class="lnr"> 52 </span><span class="PreProc">#define VAL     c0</span>
+<span class="lnr"> 53 </span><span class="PreProc">#define WIDEVAL c</span>
+<span class="lnr"> 54 </span>
+<span class="lnr"> 55 </span><span class="Type">void</span> * SM_FUNC(TA_SM_NAME)
+<span class="lnr"> 56 </span>  TAmemset(<span class="Type">void</span> *dst0, <span class="Type">int</span> c0, <span class="Type">size_t</span> length)
+<span class="lnr"> 57 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 58 </span>{
+<span class="lnr"> 59 </span>    <span class="Type">register</span> <span class="Type">uintptr_t</span> t;
+<span class="lnr"> 60 </span><span class="PreProc">#ifndef TABZERO</span>
+<span class="lnr"> 61 </span>    <span class="Type">register</span> u_int c;
+<span class="lnr"> 62 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 63 </span>    <span class="Type">register</span> u_char *dst;
+<span class="lnr"> 64 </span>
+<span class="lnr"> 65 </span>    dst = dst0;
+<span class="lnr"> 66 </span>    <span class="Comment">/*</span>
+<span class="lnr"> 67 </span><span class="Comment">     * If not enough words, just fill bytes.  A length &gt;= 2 words</span>
+<span class="lnr"> 68 </span><span class="Comment">     * guarantees that at least one of them is `complete' after</span>
+<span class="lnr"> 69 </span><span class="Comment">     * any necessary alignment.  For instance:</span>
+<span class="lnr"> 70 </span><span class="Comment">     *</span>
+<span class="lnr"> 71 </span><span class="Comment">     *  |-----------|-----------|-----------|</span>
+<span class="lnr"> 72 </span><span class="Comment">     *  |00|01|02|03|04|05|06|07|08|09|0A|00|</span>
+<span class="lnr"> 73 </span><span class="Comment">     *            ^---------------------^</span>
+<span class="lnr"> 74 </span><span class="Comment">     *           dst             dst+length-1</span>
+<span class="lnr"> 75 </span><span class="Comment">     *</span>
+<span class="lnr"> 76 </span><span class="Comment">     * but we use a minimum of 3 here since the overhead of the code</span>
+<span class="lnr"> 77 </span><span class="Comment">     * to do word writes is substantial.</span>
+<span class="lnr"> 78 </span><span class="Comment">     </span><span class="Comment">*/</span>
+<span class="lnr"> 79 </span>    <span class="cConditional">if</span> (length &lt; <span class="Constant">3</span> * wsize)
+<span class="lnr"> 80 </span>    {
+<span class="lnr"> 81 </span>        <span class="cRepeat">while</span> (length != <span class="Constant">0</span>)
+<span class="lnr"> 82 </span>        {
+<span class="lnr"> 83 </span>            *dst++ = VAL;
+<span class="lnr"> 84 </span>            --length;
+<span class="lnr"> 85 </span>        }
+<span class="lnr"> 86 </span>        RETURN;
+<span class="lnr"> 87 </span>    }
+<span class="lnr"> 88 </span>
+<span class="lnr"> 89 </span><span class="PreProc">#ifndef TABZERO</span>
+<span class="lnr"> 90 </span>    <span class="cConditional">if</span> ((c = (u_char)c0) != <span class="Constant">0</span>)
+<span class="lnr"> 91 </span>    {   <span class="Comment">/*</span><span class="Comment"> Fill the word. </span><span class="Comment">*/</span>
+<span class="lnr"> 92 </span>        c = (c &lt;&lt; <span class="Constant">8</span>) | c;       <span class="Comment">/*</span><span class="Comment"> u_int is 16 bits. </span><span class="Comment">*/</span>
+<span class="lnr"> 93 </span><span class="PreProc">#if UINT_MAX &gt; </span><span class="Constant">0xffff</span>
+<span class="lnr"> 94 </span>        c = (c &lt;&lt; <span class="Constant">16</span>) | c;      <span class="Comment">/*</span><span class="Comment"> u_int is 32 bits. </span><span class="Comment">*/</span>
+<span class="lnr"> 95 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 96 </span><span class="PreProc">#if UINT_MAX &gt; </span><span class="Constant">0xffffffff</span>
+<span class="lnr"> 97 </span>        c = (c &lt;&lt; <span class="Constant">32</span>) | c;      <span class="Comment">/*</span><span class="Comment"> u_int is 64 bits. </span><span class="Comment">*/</span>
+<span class="lnr"> 98 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 99 </span>    }
+<span class="lnr">100 </span><span class="PreProc">#endif</span>
+<span class="lnr">101 </span>    <span class="Comment">/*</span><span class="Comment"> Align destination by filling in bytes. </span><span class="Comment">*/</span>
+<span class="lnr">102 </span>    <span class="cConditional">if</span> ((t = (<span class="Type">uintptr_t</span>)dst &amp; wmask) != <span class="Constant">0</span>)
+<span class="lnr">103 </span>    {
+<span class="lnr">104 </span>        t = wsize - t;
+<span class="lnr">105 </span>        length -= t;
+<span class="lnr">106 </span>        <span class="cRepeat">do</span>
+<span class="lnr">107 </span>        {
+<span class="lnr">108 </span>            *dst++ = VAL;
+<span class="lnr">109 </span>        }
+<span class="lnr">110 </span>        <span class="cRepeat">while</span> (--t != <span class="Constant">0</span>);
+<span class="lnr">111 </span>    }
+<span class="lnr">112 </span>
+<span class="lnr">113 </span>    <span class="Comment">/*</span><span class="Comment"> Fill words.  Length was &gt;= 2*words so we know t &gt;= 1 here. </span><span class="Comment">*/</span>
+<span class="lnr">114 </span>    t = length / wsize;
+<span class="lnr">115 </span>    <span class="cRepeat">do</span>
+<span class="lnr">116 </span>    {
+<span class="lnr">117 </span>        *(u_int *)dst = WIDEVAL;
+<span class="lnr">118 </span>        dst += wsize;
+<span class="lnr">119 </span>    }
+<span class="lnr">120 </span>    <span class="cRepeat">while</span> (--t != <span class="Constant">0</span>);
+<span class="lnr">121 </span>
+<span class="lnr">122 </span>    <span class="Comment">/*</span><span class="Comment"> Mop up trailing bytes, if any. </span><span class="Comment">*/</span>
+<span class="lnr">123 </span>    t = length &amp; wmask;
+<span class="lnr">124 </span>    <span class="cConditional">if</span> (t != <span class="Constant">0</span>)
+<span class="lnr">125 </span>        <span class="cRepeat">do</span>
+<span class="lnr">126 </span>        {
+<span class="lnr">127 </span>            *dst++ = VAL;
+<span class="lnr">128 </span>        }
+<span class="lnr">129 </span>        <span class="cRepeat">while</span> (--t != <span class="Constant">0</span>);
+<span class="lnr">130 </span>    RETURN;
+<span class="lnr">131 </span>}
+</pre>
+</body>
+</html>

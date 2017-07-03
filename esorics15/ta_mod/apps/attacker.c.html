@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/apps/attacker.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span>
+<span class="lnr">  2 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr">  3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdlib.h&gt;</span>
+<span class="lnr">  4 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr">  5 </span><span class="PreProc">#include </span><span class="Constant">&quot;sys/mt.h&quot;</span>
+<span class="lnr">  6 </span>
+<span class="lnr">  7 </span><span class="PreProc">#include </span><span class="Constant">&quot;../config.h&quot;</span>
+<span class="lnr">  8 </span><span class="PreProc">#include </span><span class="Constant">&quot;attacker.h&quot;</span>
+<span class="lnr">  9 </span>
+<span class="lnr"> 10 </span><span class="PreProc">#include </span><span class="Constant">&lt;string.h&gt;</span>
+<span class="lnr"> 11 </span>
+<span class="lnr"> 12 </span>
+<span class="lnr"> 13 </span>PROCESS(attacker_process, <span class="Constant">&quot;Attacker process&quot;</span>);
+<span class="lnr"> 14 </span>
+<span class="lnr"> 15 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 16 </span><span class="PreProc">#define ATTACKER_STUB_SIZE  </span><span class="Constant">10</span>
+<span class="lnr"> 17 </span><span class="Type">static</span> <span class="Type">void</span> attacker_stub (<span class="Type">void</span>)
+<span class="lnr"> 18 </span>{
+<span class="lnr"> 19 </span>  puts(<span class="Constant">&quot;A was here!&quot;</span>);
+<span class="lnr"> 20 </span>  <span class="cStatement">return</span>;
+<span class="lnr"> 21 </span>}
+<span class="lnr"> 22 </span>
+<span class="lnr"> 23 </span>
+<span class="lnr"> 24 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 25 </span>PROCESS_THREAD(attacker_process, ev, data)
+<span class="lnr"> 26 </span>{
+<span class="lnr"> 27 </span>  PROCESS_BEGIN();
+<span class="lnr"> 28 </span>
+<span class="lnr"> 29 </span>
+<span class="lnr"> 30 </span>  <span class="Type">static</span> <span class="Type">struct</span> etimer timer;
+<span class="lnr"> 31 </span>  <span class="Type">static</span> <span class="Type">int</span> r;
+<span class="lnr"> 32 </span>  <span class="Type">static</span> <span class="Type">int</span> i;
+<span class="lnr"> 33 </span>
+<span class="lnr"> 34 </span>  etimer_set(&amp;timer, CLOCK_SECOND / CLOCK_DIV);
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span>
+<span class="lnr"> 37 </span>  <span class="cRepeat">while</span> (<span class="Constant">1</span>) {
+<span class="lnr"> 38 </span>    PROCESS_WAIT_EVENT();
+<span class="lnr"> 39 </span>
+<span class="lnr"> 40 </span>
+<span class="lnr"> 41 </span>    dint();
+<span class="lnr"> 42 </span>    r = abs(rand() % <span class="Constant">11</span>);
+<span class="lnr"> 43 </span>    i = <span class="Constant">0</span>;
+<span class="lnr"> 44 </span>    printf(<span class="Constant">&quot;--- Attacker (</span><span class="Special">%i</span><span class="Constant">).</span><span class="Special">\n</span><span class="Constant">&quot;</span>, r);
+<span class="lnr"> 45 </span>    <span class="cConditional">switch</span> (r) {
+<span class="lnr"> 46 </span>      <span class="Comment">// hijack user proccess pointer</span>
+<span class="lnr"> 47 </span>      <span class="Statement">case</span> <span class="Constant">0</span>: {
+<span class="lnr"> 48 </span>        <span class="Type">struct</span> process *p;
+<span class="lnr"> 49 </span>        p = process_list;
+<span class="lnr"> 50 </span>        <span class="cRepeat">while</span> (p) {
+<span class="lnr"> 51 </span>          <span class="cConditional">if</span> (attacker_process.thread == p-&gt;thread) {
+<span class="lnr"> 52 </span>            p = p-&gt;next;
+<span class="lnr"> 53 </span>            i++;
+<span class="lnr"> 54 </span>          } <span class="cConditional">else</span> {
+<span class="lnr"> 55 </span>            printf(<span class="Constant">&quot;    hijacking p.</span><span class="Special">%i</span><span class="Constant">: </span><span class="Special">%s</span><span class="Special">\n</span><span class="Constant">&quot;</span>, i, p-&gt;name);
+<span class="lnr"> 56 </span>            p-&gt;thread = attacker_process.thread; <span class="Comment">// overwrite process ptr</span>
+<span class="lnr"> 57 </span>            <span class="cStatement">break</span>;
+<span class="lnr"> 58 </span>          }
+<span class="lnr"> 59 </span>        }
+<span class="lnr"> 60 </span>        <span class="cStatement">break</span>;
+<span class="lnr"> 61 </span>      }
+<span class="lnr"> 62 </span>      <span class="Comment">// remove process</span>
+<span class="lnr"> 63 </span>      <span class="Statement">case</span> <span class="Constant">1</span>: {
+<span class="lnr"> 64 </span>        <span class="Type">struct</span> process *p;
+<span class="lnr"> 65 </span>        <span class="Type">struct</span> process *prev;
+<span class="lnr"> 66 </span>        p    = process_list;
+<span class="lnr"> 67 </span>        prev = <span class="Constant">NULL</span>;
+<span class="lnr"> 68 </span>        <span class="cRepeat">while</span> (p &amp;&amp; p-&gt;next) {
+<span class="lnr"> 69 </span>          <span class="cConditional">if</span> (attacker_process.thread == p-&gt;thread) {
+<span class="lnr"> 70 </span>            prev = p;
+<span class="lnr"> 71 </span>            p = p-&gt;next;
+<span class="lnr"> 72 </span>            i++;
+<span class="lnr"> 73 </span>          } <span class="cConditional">else</span> {
+<span class="lnr"> 74 </span>            <span class="cConditional">if</span> (! prev) {
+<span class="lnr"> 75 </span>              printf(<span class="Constant">&quot;    removing p.</span><span class="Special">%i</span><span class="Constant">: </span><span class="Special">%s</span><span class="Special">\n</span><span class="Constant">&quot;</span>, i, p-&gt;name);
+<span class="lnr"> 76 </span>              process_list = p;                  <span class="Comment">// remove process</span>
+<span class="lnr"> 77 </span>            } <span class="cConditional">else</span> {
+<span class="lnr"> 78 </span>              printf(<span class="Constant">&quot;    removing p.</span><span class="Special">%i</span><span class="Constant">: </span><span class="Special">%s</span><span class="Special">\n</span><span class="Constant">&quot;</span>, i, p-&gt;name);
+<span class="lnr"> 79 </span>              prev-&gt;next = p-&gt;next;              <span class="Comment">// remove process</span>
+<span class="lnr"> 80 </span>            }
+<span class="lnr"> 81 </span>            <span class="cStatement">break</span>;
+<span class="lnr"> 82 </span>          }
+<span class="lnr"> 83 </span>        }
+<span class="lnr"> 84 </span>        <span class="cStatement">break</span>;
+<span class="lnr"> 85 </span>      }
+<span class="lnr"> 86 </span>      <span class="Comment">// hijack user proccess code</span>
+<span class="lnr"> 87 </span>      <span class="Statement">case</span> <span class="Constant">2</span>: {
+<span class="lnr"> 88 </span>        <span class="Type">struct</span> process *p;
+<span class="lnr"> 89 </span>        p = process_list;
+<span class="lnr"> 90 </span>        <span class="cRepeat">while</span> (p) {
+<span class="lnr"> 91 </span>          <span class="cConditional">if</span> (attacker_process.thread == p-&gt;thread) {
+<span class="lnr"> 92 </span>            p = p-&gt;next;
+<span class="lnr"> 93 </span>            i++;
+<span class="lnr"> 94 </span>          } <span class="cConditional">else</span> {
+<span class="lnr"> 95 </span>            <span class="Comment">/*</span><span class="Comment"> overwrite process code </span><span class="Comment">*/</span>
+<span class="lnr"> 96 </span>            printf(<span class="Constant">&quot;    overwriting p.</span><span class="Special">%i</span><span class="Constant"> @ </span><span class="Special">%p</span><span class="Constant">: </span><span class="Special">%s</span><span class="Special">\n</span><span class="Constant">&quot;</span>, i, p-&gt;thread, p-&gt;name);
+<span class="lnr"> 97 </span>            memcpy(p-&gt;thread, &amp;attacker_stub, ATTACKER_STUB_SIZE);
+<span class="lnr"> 98 </span>            <span class="cStatement">break</span>;
+<span class="lnr"> 99 </span>          }
+<span class="lnr">100 </span>        }
+<span class="lnr">101 </span>        <span class="cStatement">break</span>;
+<span class="lnr">102 </span>      }
+<span class="lnr">103 </span>      <span class="Comment">// hijack ISRs</span>
+<span class="lnr">104 </span>      <span class="Statement">case</span> <span class="Constant">3</span>: {
+<span class="lnr">105 </span>        <span class="Comment">// 0000ffe0 &lt;__ivtbl_16&gt;: 32 bytes</span>
+<span class="lnr">106 </span>        printf(<span class="Constant">&quot;    messing with ivtbl</span><span class="Special">\n</span><span class="Constant">&quot;</span>);
+<span class="lnr">107 </span>        memcpy((<span class="Type">void</span> *) <span class="Constant">0xffe0</span>, &amp;r, <span class="Constant">2</span>);
+<span class="lnr">108 </span>        <span class="cStatement">break</span>;
+<span class="lnr">109 </span>      }
+<span class="lnr">110 </span>      <span class="Comment">// hang</span>
+<span class="lnr">111 </span>      <span class="Statement">case</span> <span class="Constant">4</span>: {
+<span class="lnr">112 </span>        <span class="cRepeat">while</span> ( <span class="Constant">1</span> ) { };
+<span class="lnr">113 </span>        <span class="cStatement">break</span>;
+<span class="lnr">114 </span>      }
+<span class="lnr">115 </span>      <span class="Statement">default</span>: {
+<span class="lnr">116 </span>        <span class="cStatement">break</span>;
+<span class="lnr">117 </span>      }
+<span class="lnr">118 </span>    }
+<span class="lnr">119 </span>    eint();
+<span class="lnr">120 </span>
+<span class="lnr">121 </span>
+<span class="lnr">122 </span>    etimer_reset(&amp;timer);
+<span class="lnr">123 </span>  }
+<span class="lnr">124 </span>
+<span class="lnr">125 </span>  PROCESS_END();
+<span class="lnr">126 </span>}
+<span class="lnr">127 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">128 </span>
+<span class="lnr">129 </span>
+</pre>
+</body>
+</html>

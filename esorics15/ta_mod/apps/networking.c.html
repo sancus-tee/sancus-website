@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/apps/networking.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span>
+<span class="lnr"> 2 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 3 </span><span class="PreProc">#include </span><span class="Constant">&lt;string.h&gt;</span>
+<span class="lnr"> 4 </span>
+<span class="lnr"> 5 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr"> 6 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki-net.h&quot;</span>
+<span class="lnr"> 7 </span>
+<span class="lnr"> 8 </span><span class="PreProc">#include </span><span class="Constant">&quot;../config.h&quot;</span>
+<span class="lnr"> 9 </span><span class="PreProc">#include </span><span class="Constant">&quot;networking.h&quot;</span>
+<span class="lnr">10 </span>
+<span class="lnr">11 </span>
+<span class="lnr">12 </span><span class="Comment">// <a href="http://senstools.gforge.inria.fr/doku.php?id=contiki:examples">http://senstools.gforge.inria.fr/doku.php?id=contiki:examples</a></span>
+<span class="lnr">13 </span>
+<span class="lnr">14 </span>
+<span class="lnr">15 </span><span class="Type">static</span> PT_THREAD(handle_connection(<span class="Type">struct</span> psock *p, <span class="Type">unsigned</span> <span class="Type">char</span> *buffer))
+<span class="lnr">16 </span>{
+<span class="lnr">17 </span>  PSOCK_BEGIN(p);
+<span class="lnr">18 </span>  PSOCK_SEND_STR(p, <span class="Constant">&quot;Welcome, please type something and press return.</span><span class="Special">\n</span><span class="Constant">&quot;</span>);
+<span class="lnr">19 </span>  PSOCK_READTO(p, <span class="Special">'\n'</span>);
+<span class="lnr">20 </span>  PSOCK_SEND_STR(p, <span class="Constant">&quot;Got the following data: &quot;</span>);
+<span class="lnr">21 </span>  PSOCK_SEND(p, buffer, PSOCK_DATALEN(p));
+<span class="lnr">22 </span>  PSOCK_SEND_STR(p, <span class="Constant">&quot;Good bye!</span><span class="Special">\r\n</span><span class="Constant">&quot;</span>);
+<span class="lnr">23 </span>  PSOCK_CLOSE(p);
+<span class="lnr">24 </span>  PSOCK_END(p);
+<span class="lnr">25 </span>}
+<span class="lnr">26 </span>
+<span class="lnr">27 </span>PROCESS(example_psock_server_process, <span class="Constant">&quot;Example protosocket server&quot;</span>);
+<span class="lnr">28 </span>
+<span class="lnr">29 </span>PROCESS_THREAD(example_psock_server_process, ev, data)
+<span class="lnr">30 </span>{
+<span class="lnr">31 </span>  PROCESS_BEGIN();
+<span class="lnr">32 </span>
+<span class="lnr">33 </span>  <span class="Type">static</span> <span class="Type">struct</span> psock net_ps;
+<span class="lnr">34 </span>  <span class="Type">static</span> <span class="Type">unsigned</span> <span class="Type">char</span> net_buffer[<span class="Constant">50</span>];
+<span class="lnr">35 </span>
+<span class="lnr">36 </span>  tcp_listen(UIP_HTONS(<span class="Constant">12345</span>));
+<span class="lnr">37 </span>  <span class="cRepeat">while</span>(<span class="Constant">1</span>) {
+<span class="lnr">38 </span>    PROCESS_WAIT_EVENT_UNTIL(ev == tcpip_event);
+<span class="lnr">39 </span>    <span class="cConditional">if</span>(uip_connected()) {
+<span class="lnr">40 </span>      PSOCK_INIT(&amp;net_ps, net_buffer, <span class="Statement">sizeof</span>(net_buffer));
+<span class="lnr">41 </span>      <span class="cRepeat">while</span>(!(uip_aborted() || uip_closed() || uip_timedout())) {
+<span class="lnr">42 </span>        PROCESS_WAIT_EVENT_UNTIL(ev == tcpip_event);
+<span class="lnr">43 </span>        puts(<span class="Constant">&quot;example psock: handling request.&quot;</span>);
+<span class="lnr">44 </span>        handle_connection(&amp;net_ps, net_buffer);
+<span class="lnr">45 </span>      }
+<span class="lnr">46 </span>    }
+<span class="lnr">47 </span>  }
+<span class="lnr">48 </span>  PROCESS_END();
+<span class="lnr">49 </span>}
+<span class="lnr">50 </span>
+<span class="lnr">51 </span>
+</pre>
+</body>
+</html>

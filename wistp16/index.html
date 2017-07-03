@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+ <title>
+  M&uuml;hlberg, Cleemput, Mustafa, Van Bulck, Preneel and Piessens:
+  An Implementation of a High Assurance Smart Meter
+  using Protected Module Architectures
+ </title>
+ <style type="text/css">
+div.pre { font-family:monospace; font-size:12px; white-space:pre; }
+ </style>
+
+</head>
+<body bgcolor="#FFFFFF">
+
+<center><table width="85%"><tr><td>
+<br>
+<h2>An Implementation of a High Assurance Smart Meter
+  using Protected Module Architectures</h2>
+<p><b><a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan Tobias
+   M&uuml;hlberg</a>,
+   Sara Cleemput, Mustafa A. Mustafa, Jo Van Bulck, Bart Preneel,
+   and Frank Piessens</b><br>
+   iMinds-DistriNet, KU Leuven, Celestijnenlaan 200A, B-3001
+   Belgium<br>
+   KU Leuven, ESAT-COSIC and iMinds, Kasteelpark Arenberg 10,
+   B-3001 Leuven-Heverlee, Belgium
+</p><br>
+
+<hr>
+
+<p><b>
+This page contains suplementary material for WISTP 2016 submission 15:
+&quot;An Implementation of a High Assurance Smart Meter
+using Protected Module Architectures&quot;
+</b></p>
+
+<hr>
+
+<p><b>Abstract.</b>
+Due to ongoing changes in the power grid towards decentralised and
+highly volatile energy production, smart electricity meters are required to
+provide
+fine-grained measurement
+and timely remote access to consumption and
+production data. This enables flexible tariffing and dynamic load
+optimisation. As the power grid forms part of the critical infrastructure
+of our society, increasing the resilience of the grid's software components
+against failures and attacks is vitally important.
+
+In this paper we explore the use of Protected Module Architectures (PMAs)
+to securely implement and deploy software for smart electricity meters.
+Outlining security challenges and an architectural solution in the light of
+security features provided by PMAs, we evaluate a proof-of-concept
+implementation of a security-focused smart metering scenario. Our
+implementation is based on Sancus, an embedded PMA for low-power
+microcontrollers. The evaluation of our prototype provides strong
+indication for the feasibility of implementing a PMA-based high assurance
+smart meter with a very small software Trusted Computing Base, which would
+be suitable for security certification and formal verification.
+</p>
+
+
+<p><b>Implementation and Evaluation Scenario.</b>
+Below we provide the source code for our smart electricity evaluation
+scenario as discussed in the paper. To compile the
+code you will need the <a
+href="http://distrinet.cs.kuleuven.be/software/sancus/">Sancus tools</a>
+and <a href="http://www.ti.com/tool/msp430-gcc-opensource">MSP430-GCC</a>
+installed on your system. Note that the demo scenario cannot be executed in
+the Sancus simulator (simulating the CPU behaviour at the gate level,
+the Sancus simulator is too slow to perform network operations) but must be
+run on an
+FPGA programmed with the Sancus core. In our experiments we used a Spartan
+6 FPGA: <a href="hasm.tar.gz">hasm.tar.gz</a> (3.4 KiB)
+</p>
+
+<p>For convenience we provide quick links to the source code and the
+deployment descriptor, as described in the paper. Drivers, scheduler
+and module loader are part of recent Sancus distributions.</p>
+
+<center>
+<table rules="rows" width="60%">
+<tr>
+ <th colspan="2">File</th>
+ <th colspan="2">Description</th>
+</tr>
+<tr>
+ <td><a href="hasm/esme-scenario.json.html">esme-scenario.json</a></td>
+ <td width="2%"></td>
+ <td>The deploymend descriptor.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/esme.c.html">esme.c</a></td>
+ <td width="2%"></td>
+ <td>The meter core, measurement and management of operational data.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/esme_load_switch.c.html">esme_load_switch.c</a></td>
+ <td width="2%"></td>
+ <td>The Load Switch component.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/central_system.c.html">central_system.c</a></td>
+ <td width="2%"></td>
+ <td>A simplified Central System to periodicly send rewuests to the meter
+and Load Switch.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/han-if.c.html">han-if.c</a></td>
+ <td width="2%"></td>
+ <td>Our Home Area Network Interface.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/ihd.c.html">ihd.c</a></td>
+ <td width="2%"></td>
+ <td>The untrusted In-Home Display component.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="hasm/wan_commands.h.html">wan_commands.h</a>,
+  <a href="hasm/ihd.h.html">ihd.h</a></td>
+ <td width="2%"></td>
+ <td>Supporting C header files.</td>
+ <td width="2%"></td>
+</tr>
+</table>
+</center>
+
+
+<br>
+<hr>
+<p align="right"><a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan
+ Tobias M&uuml;hlberg</a>, Wed, 13 Jul 2016 21:47:41 +0200
+</td></tr></table></center>
+</body>
+</html>
+

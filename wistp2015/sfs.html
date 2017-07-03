@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Resource Sharing for Embedded Protected Module Architectures</title>
+    <link href="stylesheet.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+<div class="content">
+
+<h1>sfs.h</h1>
+
+<p>Sancus File System (SFS) header file: a modified 
+<a href="https://github.com/contiki-os/contiki/blob/master/core/cfs/cfs.h">
+Contiki File System (CFS)</a> API to support Sancus-module-grained access control.</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#696969; '>/*</span>
+<span style='color:#696969; '>&#xa0;* Copyright (c) 2004, Swedish Institute of Computer Science.</span>
+<span style='color:#696969; '>&#xa0;* All rights reserved.</span>
+<span style='color:#696969; '>&#xa0;*</span>
+<span style='color:#696969; '>&#xa0;* Redistribution and use in source and binary forms, with or without</span>
+<span style='color:#696969; '>&#xa0;* modification, are permitted provided that the following conditions</span>
+<span style='color:#696969; '>&#xa0;* are met:</span>
+<span style='color:#696969; '>&#xa0;* 1. Redistributions of source code must retain the above copyright</span>
+<span style='color:#696969; '>&#xa0;*    notice, this list of conditions and the following disclaimer.</span>
+<span style='color:#696969; '>&#xa0;* 2. Redistributions in binary form must reproduce the above copyright</span>
+<span style='color:#696969; '>&#xa0;*    notice, this list of conditions and the following disclaimer in the</span>
+<span style='color:#696969; '>&#xa0;*    documentation and/or other materials provided with the distribution.</span>
+<span style='color:#696969; '>&#xa0;* 3. Neither the name of the Institute nor the names of its contributors</span>
+<span style='color:#696969; '>&#xa0;*    may be used to endorse or promote products derived from this software</span>
+<span style='color:#696969; '>&#xa0;*    without specific prior written permission.</span>
+<span style='color:#696969; '>&#xa0;*</span>
+<span style='color:#696969; '>&#xa0;* THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND</span>
+<span style='color:#696969; '>&#xa0;* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span style='color:#696969; '>&#xa0;* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span style='color:#696969; '>&#xa0;* ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE</span>
+<span style='color:#696969; '>&#xa0;* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span style='color:#696969; '>&#xa0;* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span style='color:#696969; '>&#xa0;* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span style='color:#696969; '>&#xa0;* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<span style='color:#696969; '>&#xa0;* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span>
+<span style='color:#696969; '>&#xa0;* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span>
+<span style='color:#696969; '>&#xa0;* SUCH DAMAGE.</span>
+<span style='color:#696969; '>&#xa0;*</span>
+<span style='color:#696969; '>&#xa0;* This file is part of the Contiki operating system.</span>
+<span style='color:#696969; '>&#xa0;*</span>
+<span style='color:#696969; '>&#xa0;* Author:  Adam Dunkels </span><span style='color:#0000e6; '>&lt;</span><span style='color:#7144c4; '>adam@sics.se</span><span style='color:#0000e6; '>></span><span style='color:#696969; '></span>
+<span style='color:#696969; '>&#xa0;*          Jo Van Bulck :</span>
+<span style='color:#696969; '>&#xa0;*              - renamed cfs_fct() to sfs_fct() to avoid naming conflicts when</span>
+<span style='color:#696969; '>&#xa0;*                  importing CFS back-end</span>
+<span style='color:#696969; '>&#xa0;*              - extended CFS interface with Sancus-module-grained</span>
+<span style='color:#696969; '>&#xa0;*                  access control functions: sfs_chmod(), sfs_attest()</span>
+<span style='color:#696969; '>&#xa0;*              - modified cfs_open semantics:</span>
+<span style='color:#696969; '>&#xa0;*                  - file permissions as the 2nd argument</span>
+<span style='color:#696969; '>&#xa0;*                  - requires a size argument to hint the intial size for a new file</span>
+<span style='color:#696969; '>&#xa0;*                  - replaced CFS_READ, CFS_WRITE, CFS_APPEND with SFS</span>
+<span style='color:#696969; '>&#xa0;*                      permission constants</span>
+<span style='color:#696969; '>&#xa0;*              - replaced cfs_read() and cfs_write() with sfs_getc() and sfs_putc()</span>
+<span style='color:#696969; '>&#xa0;*                  to transfer characters one at a time safely via CPU registers</span>
+<span style='color:#696969; '>&#xa0;*              - removed directory related functions</span>
+<span style='color:#696969; '>&#xa0;*              - annotated CFS functions with appropriate SM_ENTRY("sfs") tags</span>
+<span style='color:#696969; '>&#xa0;*</span>
+<span style='color:#696969; '>&#xa0;*/</span>
+ 
+ <span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* \file</span>
+<span style='color:#3f5fbf; '>&#xa0;*         Sancus File System (SFS) header file: a modified CFS interface </span>
+<span style='color:#3f5fbf; '>&#xa0;*         to support Sancus-module-grained access control.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \author</span>
+<span style='color:#3f5fbf; '>&#xa0;*         Adam Dunkels &lt;adam@sics.se> (CFS)</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*         Jo Van Bulck (SFS modifications)</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> SFS_H_</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_H_</span>
+
+<span style='color:#800000; font-weight:bold; '>extern</span> <span style='color:#800000; font-weight:bold; '>struct</span> SancusModule sfs<span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// ######################## CONFIG CONSTANTS ##########################</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Valid file permissions, used in access control lists assiciated with</span>
+<span style='color:#3f5fbf; '>&#xa0;*  a file and client/Sancus SM. Permissions can be combined by bitwise-inclusive</span>
+<span style='color:#3f5fbf; '>&#xa0;*  OR-ing the bit flags (in hex; 1 byte) below.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* SFS_NIL          no permissions at whole</span>
+<span style='color:#3f5fbf; '>&#xa0;* SFS_CREATOR      all permissions, automatically assigned to the SM that first</span>
+<span style='color:#3f5fbf; '>&#xa0;*                  created the file; non-assignable nor revocable (without deleting</span>
+<span style='color:#3f5fbf; '>&#xa0;*                  the file); has all the SFS_ROOT bits (permissions) plus one</span>
+<span style='color:#3f5fbf; '>&#xa0;* SFS_ROOT         all permissions, except SFS_CREATOR bit; revocable and assignable</span>
+<span style='color:#3f5fbf; '>&#xa0;* SFS_READ         read-only access to the file</span>
+<span style='color:#3f5fbf; '>&#xa0;* SFS_WRITE        write-only access to the file</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \note the permission set presented here can easily be extended to include for</span>
+<span style='color:#3f5fbf; '>&#xa0;* example SFS_REMOVE, SFS_APPEND_ONLY, etc. permissions</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_open(), sfs_chmod()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_NIL           0x00</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_CREATOR       0xFF</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_ROOT          0x7F</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_READ          0x01</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_WRITE         0x02</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* A typedef uniquely identifying a logical file; should be transfered safely through</span>
+<span style='color:#3f5fbf; '>&#xa0;* CPU registers.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \note cannot be a char* since such a pointer doesn't fit in a CPU register and</span>
+<span style='color:#3f5fbf; '>&#xa0;* should thus point to non-protected memory, allowing an attacker to control the</span>
+<span style='color:#3f5fbf; '>&#xa0;* filename argument arbitrarily.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_open() sfs_remove() sfs_chmod()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>typedef</span> <span style='color:#800000; font-weight:bold; '>char</span> filename_t<span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Specify that sfs_open() should not create a new file if the file doesn't exist.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_open()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_OPEN_EXISTING   </span><span style='color:#808030; '>-</span><span style='color:#004a43; '>1  </span><span style='color:#696969; '>// any negative value will do</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Specify that sfs_seek() should compute the offset from the beginning of the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_seek()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> SFS_SEEK_SET</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_SEEK_SET 0</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Specify that sfs_seek() should compute the offset from the current position of</span>
+<span style='color:#3f5fbf; '>&#xa0;* the file pointer.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_seek()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> SFS_SEEK_CUR</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_SEEK_CUR 1</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Specify that sfs_seek() should compute the offset from the end of the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa sfs_seek()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> SFS_SEEK_END</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SFS_SEEK_END 2</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+<span style='color:#696969; '>// ######################## SFS API ##########################</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* Used for testing: to substract the overhead of verifying the SFS SM first time</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_ping<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* Used for testing: to substract the overhead of initializing the data structures</span>
+<span style='color:#3f5fbf; '>&#xa0;* the first time; prints the time stamp count on stdout</span>
+<span style='color:#3f5fbf; '>&#xa0;*  </span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_init<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* Used for debugging: to print the current access control data structures</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_dump<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [MODIFIED SEMANTICS]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief       Open a new or existing file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param name  The name of the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param flags bitwise inclusive OR of the permission flags defined above</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param size  When wanting to open an existing file, SFS_OPEN_EXISTING flag; else</span>
+<span style='color:#3f5fbf; '>&#xa0;*              the desired intial file size (>=0) for the new back-end file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*              Note that the intial size is merely a hint, the SFS back-end</span>
+<span style='color:#3f5fbf; '>&#xa0;*              implementation is free to ignore this or not.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return      A file descriptor, if the file could be opened, or -1 if</span>
+<span style='color:#3f5fbf; '>&#xa0;*              the file could not be opened.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*              For a new file, the calling SM will be the owner (SFS_CREATOR perm)</span>
+<span style='color:#3f5fbf; '>&#xa0;*              of the newly created empty file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*              For an existing file, the specified permission flags are checked</span>
+<span style='color:#3f5fbf; '>&#xa0;*              against the associated file permissions for the calling SM.</span>
+<span style='color:#3f5fbf; '>&#xa0;*              </span>
+<span style='color:#3f5fbf; '>&#xa0;*              On successfull opening, the file descriptor can be used for future</span>
+<span style='color:#3f5fbf; '>&#xa0;*              accesses and the internal file_pos is at the start of the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \note        When the SFS_OPEN_EXISTING flag is provided through the size argument,</span>
+<span style='color:#3f5fbf; '>&#xa0;*              this function will return failure for a non-existing file. If the</span>
+<span style='color:#3f5fbf; '>&#xa0;*              caller wants to be sure a new file is created on success, he should</span>
+<span style='color:#3f5fbf; '>&#xa0;*              provide SFS_CREATOR through the flags argument and a positive size.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \note        When creating a new SFS file, any existing CFS file of the same name</span>
+<span style='color:#3f5fbf; '>&#xa0;*              is first removed in the back-end. This reflects the non-persistent</span>
+<span style='color:#3f5fbf; '>&#xa0;*              character of SFS files (i.e. remove any traces of previous runs).</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa          SFS_NIL, SFS_CREATOR, SFS_ROOT, SFS_READ, SFS_WRITE</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa          sfs_close()</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_open<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> flags<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> size<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [MODIFIED SEMANTICS]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief      Close an open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param fd   The file descriptor of the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return     A value >=0 on sucess; a negative value on failure (e.g. file</span>
+<span style='color:#3f5fbf; '>&#xa0;*             descriptor out of range, calling SM not owner of file descriptor).</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*             This function first performs access control on the calling SM and on</span>
+<span style='color:#3f5fbf; '>&#xa0;*             success closes a file that has previously been opened with sfs_open().</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_close<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief      Read a single byte from an open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param fd   The file descriptor of the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return     The read character (converted to an unsigned int);</span>
+<span style='color:#3f5fbf; '>&#xa0;*             else EOF if the request could not be satisfied.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*             The caller must have SFS_READ permission on the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*             Since the provided char is transfered via a CPU register,</span>
+<span style='color:#3f5fbf; '>&#xa0;*             this function can be used to safely (i.e. without 3th party</span>
+<span style='color:#3f5fbf; '>&#xa0;*             interference) read confidential data from a file. </span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_getc<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief      Write data to an open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param fd   The file descriptor of the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param c    The char to write into the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return     The character written (converted to an unsigned int)</span>
+<span style='color:#3f5fbf; '>&#xa0;*             else EOF if the request could not be satisfied.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*             The caller must have SFS_WRITE permission on the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*             Since the provided char is transfered via a CPU register,</span>
+<span style='color:#3f5fbf; '>&#xa0;*             this function can be used to safely (i.e. without 3th party</span>
+<span style='color:#3f5fbf; '>&#xa0;*             interference) write confidential data into a file.</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_putc<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>unsigned</span> <span style='color:#800000; font-weight:bold; '>char</span> c<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief      Seek to a specified position in an open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param fd   The file descriptor of the open file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param offset A position, either relative or absolute, in the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param whence Determines how to interpret the offset parameter.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return     The new position in the file, or EOF if the seek failed.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*             This function moves the file position to the specified</span>
+<span style='color:#3f5fbf; '>&#xa0;*             position in the file. The next byte that is read from</span>
+<span style='color:#3f5fbf; '>&#xa0;*             or written to the file will be at the position given </span>
+<span style='color:#3f5fbf; '>&#xa0;*             determined by the combination of the offset parameter </span>
+<span style='color:#3f5fbf; '>&#xa0;*             and the whence parameter.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa         SFS_SEEK_CUR</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa         SFS_SEEK_END</span>
+<span style='color:#3f5fbf; '>&#xa0;* \sa         SFS_SEEK_SET</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_seek<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> offset<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> whence<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [MODIFIED SEMANTICS]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief      Remove a file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param name The name of the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \retval 0   If the file was removed.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return -1  If the file could not be removed or if it doesn't exist.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*             Removes the file, associated with name in the back-end.</span>
+<span style='color:#3f5fbf; '>&#xa0;*             This function checks the calling SM's permissions and returns</span>
+<span style='color:#3f5fbf; '>&#xa0;*             unsuccessfully if either some client still has an open file</span>
+<span style='color:#3f5fbf; '>&#xa0;*             connection, the file doesn't exists or the caller doesn't</span>
+<span style='color:#3f5fbf; '>&#xa0;*             have the SFS_ROOT permission.</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_remove<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief       Change permissions of a SM to a file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param name          The name for the file to access.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param id            The id of the SM to change the permissions for.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param perm_flags    The permissions to assign.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return      A value >= 0 on success; a negative value if the</span>
+<span style='color:#3f5fbf; '>&#xa0;*              request could not be satisfied.</span>
+<span style='color:#3f5fbf; '>&#xa0;* </span>
+<span style='color:#3f5fbf; '>&#xa0;*              This function return unsuccessfully iff the specified file</span>
+<span style='color:#3f5fbf; '>&#xa0;*              doesn't exist or the caller doesn't have the SFS_ROOT permission.</span>
+<span style='color:#3f5fbf; '>&#xa0;*              The assigned permission_flags will replace any already existing</span>
+<span style='color:#3f5fbf; '>&#xa0;*              permissions for the SM on the file. On success, any future access by</span>
+<span style='color:#3f5fbf; '>&#xa0;*              the SM id on the file, not allowed by the specified permissions, will</span>
+<span style='color:#3f5fbf; '>&#xa0;*              be denied.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \note        Revoking/refining permissions on a file that is already opened by </span>
+<span style='color:#3f5fbf; '>&#xa0;*              the specified SM, still has direct effect.</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_chmod<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> sm_id id<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> perm_flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* [NEW FUNCTION]</span>
+<span style='color:#3f5fbf; '>&#xa0;* \brief        Check a file exists and is created by a specified SM.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param name   The name of the file to check.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \param owner  The id of the Sancus Module that should have created the file.</span>
+<span style='color:#3f5fbf; '>&#xa0;* \return       A value >= 0 on success; -1 on failure.</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;*               Looks up the file @p(name) and verifies it was created by @p(owner).</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_attest<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> sm_id owner<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span><span style='color:#004a43; '> </span><span style='color:#696969; '>/* SFS_H_ */</span>
+</pre>
+
+<hr>
+
+</div>
+</body>
+</html> 

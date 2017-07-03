@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/ta_invar.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span>
+<span class="lnr">  2 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr">  3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdlib.h&gt;</span>
+<span class="lnr">  4 </span>
+<span class="lnr">  5 </span><span class="PreProc">#include </span><span class="Constant">&quot;ta_internals.h&quot;</span>
+<span class="lnr">  6 </span>
+<span class="lnr">  7 </span>
+<span class="lnr">  8 </span>
+<span class="lnr">  9 </span><span class="Type">typedef</span> <span class="Type">struct</span> TAInvar {
+<span class="lnr"> 10 </span>  <span class="Type">int</span>           is_used;
+<span class="lnr"> 11 </span>  <span class="Type">void</span>          *data;
+<span class="lnr"> 12 </span>  <span class="Type">unsigned</span> <span class="Type">int</span>  size;
+<span class="lnr"> 13 </span>  <span class="Type">unsigned</span> <span class="Type">char</span> hash[HASH_SIZE];
+<span class="lnr"> 14 </span><span class="PreProc">#ifdef __SANCUS_MSP430</span>
+<span class="lnr"> 15 </span><span class="Comment">// struct size has to be a power of 2 so that bit shifting instead of</span>
+<span class="lnr"> 16 </span><span class="Comment">// multiplication is used to address elements of a struct array.</span>
+<span class="lnr"> 17 </span><span class="PreProc">#if   HASH_SIZE ==  </span><span class="Constant">8</span>
+<span class="lnr"> 18 </span>  <span class="Type">unsigned</span> <span class="Type">char</span> padding[<span class="Constant">2</span>];
+<span class="lnr"> 19 </span><span class="PreProc">#elif HASH_SIZE == </span><span class="Constant">16</span>
+<span class="lnr"> 20 </span>  <span class="Type">unsigned</span> <span class="Type">char</span> padding[<span class="Constant">10</span>];
+<span class="lnr"> 21 </span><span class="PreProc">#else</span>
+<span class="lnr"> 22 </span><span class="PreProc">  #error </span><span class="Constant">&quot;Padding undefined.&quot;</span>
+<span class="lnr"> 23 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 24 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 25 </span>} TAInvar;
+<span class="lnr"> 26 </span>
+<span class="lnr"> 27 </span>
+<span class="lnr"> 28 </span><span class="Type">static</span> TAInvar       SM_DATA(TA_SM_NAME) TAInvars[MAX_INVARS];
+<span class="lnr"> 29 </span>
+<span class="lnr"> 30 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr"> 31 </span><span class="Type">static</span> <span class="Type">unsigned</span> <span class="Type">char</span> hash_declas[HASH_SIZE];
+<span class="lnr"> 32 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 33 </span>
+<span class="lnr"> 34 </span>
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span><span class="Type">static</span> <span class="Type">int</span> SM_FUNC(TA_SM_NAME)
+<span class="lnr"> 37 </span>  TAHash (<span class="Type">void</span> *data, <span class="Type">unsigned</span> <span class="Type">int</span> dsize, <span class="Type">unsigned</span> <span class="Type">char</span> *hash,
+<span class="lnr"> 38 </span>    <span class="Type">unsigned</span> <span class="Type">int</span> hsize)
+<span class="lnr"> 39 </span>{
+<span class="lnr"> 40 </span>  <span class="cConditional">if</span> (data == <span class="Constant">NULL</span> || dsize &lt; <span class="Constant">1</span> ||
+<span class="lnr"> 41 </span>      hash == <span class="Constant">NULL</span> || hsize &lt; HASH_SIZE) {
+<span class="lnr"> 42 </span>    <span class="cStatement">return</span> (TA_FAILURE);
+<span class="lnr"> 43 </span>  }
+<span class="lnr"> 44 </span>  sancus_tag(data, dsize, hash);
+<span class="lnr"> 45 </span>
+<span class="lnr"> 46 </span>  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr"> 47 </span>}
+<span class="lnr"> 48 </span>
+<span class="lnr"> 49 </span><span class="Type">static</span> <span class="Type">int</span> SM_FUNC(TA_SM_NAME)
+<span class="lnr"> 50 </span>  TACompareHashes (<span class="Type">unsigned</span> <span class="Type">char</span> *h1, <span class="Type">unsigned</span> <span class="Type">char</span> *h2)
+<span class="lnr"> 51 </span>{
+<span class="lnr"> 52 </span>  <span class="Type">int</span> i;
+<span class="lnr"> 53 </span>
+<span class="lnr"> 54 </span>  <span class="cRepeat">for</span> (i = <span class="Constant">0</span>; i &lt; HASH_SIZE; i++) {
+<span class="lnr"> 55 </span>    <span class="cConditional">if</span> (h1[i] != h2[i]) {
+<span class="lnr"> 56 </span>      <span class="cStatement">return</span> (TA_FAILURE); }
+<span class="lnr"> 57 </span>  }
+<span class="lnr"> 58 </span>
+<span class="lnr"> 59 </span>  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr"> 60 </span>}
+<span class="lnr"> 61 </span>
+<span class="lnr"> 62 </span><span class="Type">int</span> SM_FUNC(TA_SM_NAME)
+<span class="lnr"> 63 </span>  TAInvarInit (<span class="Type">void</span>)
+<span class="lnr"> 64 </span>{
+<span class="lnr"> 65 </span>  <span class="Type">int</span> i;
+<span class="lnr"> 66 </span>
+<span class="lnr"> 67 </span>  <span class="cRepeat">for</span> (i = <span class="Constant">0</span>; i &lt; MAX_INVARS; i++) {
+<span class="lnr"> 68 </span>    TAInvars[i].is_used = <span class="Constant">0</span>;
+<span class="lnr"> 69 </span>  }
+<span class="lnr"> 70 </span>
+<span class="lnr"> 71 </span>  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr"> 72 </span>}
+<span class="lnr"> 73 </span>
+<span class="lnr"> 74 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 75 </span><span class="Comment">/*</span><span class="Comment"> Interface function: TARegisterInvar                                       </span><span class="Comment">*/</span>
+<span class="lnr"> 76 </span>
+<span class="lnr"> 77 </span><span class="Type">int</span> SM_ENTRY(TA_SM_NAME) TARegisterInvar (<span class="Type">void</span> *data, <span class="Type">unsigned</span> <span class="Type">int</span> size)
+<span class="lnr"> 78 </span>{
+<span class="lnr"> 79 </span>  <span class="Type">int</span> i;
+<span class="lnr"> 80 </span>
+<span class="lnr"> 81 </span>  __TIMING_INIT();
+<span class="lnr"> 82 </span>
+<span class="lnr"> 83 </span>  <span class="cConditional">if</span> (! TAInitialised) {
+<span class="lnr"> 84 </span>    <span class="cStatement">goto</span> FAIL;
+<span class="lnr"> 85 </span>  }
+<span class="lnr"> 86 </span>
+<span class="lnr"> 87 </span>  <span class="cRepeat">for</span> (i = <span class="Constant">0</span>; i &lt; MAX_INVARS; i++) {
+<span class="lnr"> 88 </span>    <span class="cConditional">if</span> (! TAInvars[i].is_used) {
+<span class="lnr"> 89 </span>      TAInvars[i].data = data;
+<span class="lnr"> 90 </span>      TAInvars[i].size = size;
+<span class="lnr"> 91 </span>      <span class="cConditional">if</span> (TAHash (data, size, TAInvars[i].hash, HASH_SIZE) != TA_SUCCESS)
+<span class="lnr"> 92 </span>       { <span class="cStatement">return</span> (TA_FAILURE); }
+<span class="lnr"> 93 </span>      TAInvars[i].is_used = <span class="Constant">1</span>;
+<span class="lnr"> 94 </span>
+<span class="lnr"> 95 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TARegisterInvar(): &quot;</span>);
+<span class="lnr"> 96 </span>
+<span class="lnr"> 97 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr"> 98 </span>      TAmemcpy(hash_declas, TAInvars[i].hash, HASH_SIZE);
+<span class="lnr"> 99 </span>      <span class="Type">char</span> *tmp = TAHashToString(hash_declas);
+<span class="lnr">100 </span>      <span class="cConditional">if</span> (tmp != <span class="Constant">NULL</span>) {
+<span class="lnr">101 </span>        printf3(<span class="Constant">&quot;TA: invar @ </span><span class="Special">%p</span><span class="Constant">+</span><span class="Special">%u</span><span class="Constant">: </span><span class="Special">%s</span><span class="Special">\n</span><span class="Constant">&quot;</span>,
+<span class="lnr">102 </span>          (<span class="Type">void</span> *) TAInvars[i].data, (<span class="Type">void</span> *) TAInvars[i].size, (<span class="Type">void</span> *) tmp);
+<span class="lnr">103 </span>        free (tmp);
+<span class="lnr">104 </span>      }
+<span class="lnr">105 </span><span class="PreProc">#endif</span>
+<span class="lnr">106 </span>
+<span class="lnr">107 </span>      <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr">108 </span>    }
+<span class="lnr">109 </span>  }
+<span class="lnr">110 </span>
+<span class="lnr">111 </span><span class="Statement">FAIL</span>:
+<span class="lnr">112 </span>  puts(<span class="Constant">&quot;*** TA: invar not registered.&quot;</span>);
+<span class="lnr">113 </span>  <span class="cStatement">return</span> (TA_FAILURE);  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr">114 </span>}
+<span class="lnr">115 </span>
+<span class="lnr">116 </span>
+<span class="lnr">117 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">118 </span><span class="Comment">/*</span><span class="Comment"> TACheckInvars                                                             </span><span class="Comment">*/</span>
+<span class="lnr">119 </span>
+<span class="lnr">120 </span><span class="Type">int</span> SM_FUNC(TA_SM_NAME) TACheckInvars (<span class="Type">void</span>)
+<span class="lnr">121 </span>{
+<span class="lnr">122 </span>  <span class="Type">unsigned</span> <span class="Type">char</span> hash[HASH_SIZE];
+<span class="lnr">123 </span>  <span class="Type">int</span> i, res = TA_SUCCESS;
+<span class="lnr">124 </span>
+<span class="lnr">125 </span>  <span class="cConditional">if</span> (! TAInitialised) {
+<span class="lnr">126 </span>    <span class="cStatement">return</span> (res);
+<span class="lnr">127 </span>  }
+<span class="lnr">128 </span>
+<span class="lnr">129 </span>  <span class="cRepeat">for</span> (i = <span class="Constant">0</span>; i &lt; MAX_INVARS; i++) {
+<span class="lnr">130 </span>    <span class="cConditional">if</span> (TAInvars[i].is_used) {
+<span class="lnr">131 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">132 </span>      printf2(<span class="Constant">&quot;TA: checking </span><span class="Special">%p</span><span class="Constant">+</span><span class="Special">%u</span><span class="Constant">...&quot;</span>,
+<span class="lnr">133 </span>        (<span class="Type">void</span> *) TAInvars[i].data, (<span class="Type">void</span> *) TAInvars[i].size);
+<span class="lnr">134 </span><span class="PreProc">#endif</span>
+<span class="lnr">135 </span>      <span class="cConditional">if</span> (TAHash (TAInvars[i].data, TAInvars[i].size, hash, HASH_SIZE)
+<span class="lnr">136 </span>          != TA_SUCCESS)
+<span class="lnr">137 </span>       {
+<span class="lnr">138 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">139 </span>         puts (<span class="Constant">&quot;failed.&quot;</span>);
+<span class="lnr">140 </span><span class="PreProc">#endif</span>
+<span class="lnr">141 </span>         res = TA_FAILURE;
+<span class="lnr">142 </span>         <span class="cStatement">continue</span>; }
+<span class="lnr">143 </span>      <span class="cConditional">if</span> (TACompareHashes(hash, TAInvars[i].hash) == TA_SUCCESS) {
+<span class="lnr">144 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">145 </span>        puts (<span class="Constant">&quot;ok.&quot;</span>);
+<span class="lnr">146 </span><span class="PreProc">#endif</span>
+<span class="lnr">147 </span>      } <span class="cConditional">else</span> {
+<span class="lnr">148 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr">149 </span>        puts (<span class="Constant">&quot;failed.&quot;</span>);
+<span class="lnr">150 </span><span class="PreProc">#endif</span>
+<span class="lnr">151 </span>        res = TA_FAILURE;
+<span class="lnr">152 </span>      }
+<span class="lnr">153 </span>    }
+<span class="lnr">154 </span>  }
+<span class="lnr">155 </span>
+<span class="lnr">156 </span>  <span class="cStatement">return</span> (res);
+<span class="lnr">157 </span>}
+<span class="lnr">158 </span>
+<span class="lnr">159 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">160 </span><span class="Comment">/*</span><span class="Comment"> TAInvarsStatus                                                            </span><span class="Comment">*/</span>
+<span class="lnr">161 </span>
+<span class="lnr">162 </span><span class="Type">unsigned</span> <span class="Type">char</span>* SM_ENTRY(TA_SM_NAME) TAInvarsStatus (<span class="Type">unsigned</span> <span class="Type">char</span> *nonce,
+<span class="lnr">163 </span>  <span class="Type">int</span> nonce_len, <span class="Type">int</span>* status_len)
+<span class="lnr">164 </span>{
+<span class="lnr">165 </span>  <span class="Type">static</span> <span class="Type">unsigned</span> <span class="Type">char</span> *InvarStatus = <span class="Constant">NULL</span>;
+<span class="lnr">166 </span>  <span class="Type">static</span> <span class="Type">int</span> sl;
+<span class="lnr">167 </span>
+<span class="lnr">168 </span>  __TIMING_INIT();
+<span class="lnr">169 </span>
+<span class="lnr">170 </span>  sl = (<span class="Statement">sizeof</span>(<span class="Type">struct</span> TAInvar) * MAX_INVARS) + nonce_len;
+<span class="lnr">171 </span>  *status_len = sl + HASH_SIZE;
+<span class="lnr">172 </span>  InvarStatus = malloc (*status_len);
+<span class="lnr">173 </span>  <span class="cConditional">if</span> (!InvarStatus) { <span class="cStatement">goto</span> FAIL; }
+<span class="lnr">174 </span>
+<span class="lnr">175 </span>  sancus_wrap(nonce, nonce_len, TAInvars, *status_len, InvarStatus,
+<span class="lnr">176 </span>    InvarStatus + sl);
+<span class="lnr">177 </span>
+<span class="lnr">178 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TAInvarsStatus(): &quot;</span>);
+<span class="lnr">179 </span>  <span class="cStatement">return</span> (InvarStatus);
+<span class="lnr">180 </span>
+<span class="lnr">181 </span><span class="Statement">FAIL</span>:
+<span class="lnr">182 </span>  *status_len = <span class="Constant">0</span>;
+<span class="lnr">183 </span>  <span class="cStatement">return</span> (<span class="Constant">NULL</span>);
+<span class="lnr">184 </span>}
+<span class="lnr">185 </span>
+<span class="lnr">186 </span>
+</pre>
+</body>
+</html>

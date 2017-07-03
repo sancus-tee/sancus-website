@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/apps/multi-threading.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span>
+<span class="lnr">  2 </span><span class="Comment"> * Copyright (c) 2007, Swedish Institute of Computer Science.</span>
+<span class="lnr">  3 </span><span class="Comment"> * All rights reserved. </span>
+<span class="lnr">  4 </span><span class="Comment"> *</span>
+<span class="lnr">  5 </span><span class="Comment"> * Redistribution and use in source and binary forms, with or without </span>
+<span class="lnr">  6 </span><span class="Comment"> * modification, are permitted provided that the following conditions </span>
+<span class="lnr">  7 </span><span class="Comment"> * are met: </span>
+<span class="lnr">  8 </span><span class="Comment"> * 1. Redistributions of source code must retain the above copyright </span>
+<span class="lnr">  9 </span><span class="Comment"> *    notice, this list of conditions and the following disclaimer. </span>
+<span class="lnr"> 10 </span><span class="Comment"> * 2. Redistributions in binary form must reproduce the above copyright </span>
+<span class="lnr"> 11 </span><span class="Comment"> *    notice, this list of conditions and the following disclaimer in the </span>
+<span class="lnr"> 12 </span><span class="Comment"> *    documentation and/or other materials provided with the distribution. </span>
+<span class="lnr"> 13 </span><span class="Comment"> * 3. Neither the name of the Institute nor the names of its contributors </span>
+<span class="lnr"> 14 </span><span class="Comment"> *    may be used to endorse or promote products derived from this software </span>
+<span class="lnr"> 15 </span><span class="Comment"> *    without specific prior written permission. </span>
+<span class="lnr"> 16 </span><span class="Comment"> *</span>
+<span class="lnr"> 17 </span><span class="Comment"> * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND </span>
+<span class="lnr"> 18 </span><span class="Comment"> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE </span>
+<span class="lnr"> 19 </span><span class="Comment"> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE </span>
+<span class="lnr"> 20 </span><span class="Comment"> * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE </span>
+<span class="lnr"> 21 </span><span class="Comment"> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL </span>
+<span class="lnr"> 22 </span><span class="Comment"> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS </span>
+<span class="lnr"> 23 </span><span class="Comment"> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) </span>
+<span class="lnr"> 24 </span><span class="Comment"> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT </span>
+<span class="lnr"> 25 </span><span class="Comment"> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY </span>
+<span class="lnr"> 26 </span><span class="Comment"> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF </span>
+<span class="lnr"> 27 </span><span class="Comment"> * SUCH DAMAGE. </span>
+<span class="lnr"> 28 </span><span class="Comment"> *</span>
+<span class="lnr"> 29 </span><span class="Comment"> * This file is part of the Contiki operating system.</span>
+<span class="lnr"> 30 </span><span class="Comment"> * </span>
+<span class="lnr"> 31 </span><span class="Comment"> * Author: Oliver Schmidt &lt;ol.sc@web.de&gt;</span>
+<span class="lnr"> 32 </span><span class="Comment"> *</span>
+<span class="lnr"> 33 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 34 </span>
+<span class="lnr"> 35 </span><span class="Comment">/*</span><span class="Comment">*</span>
+<span class="lnr"> 36 </span><span class="Comment"> * \file</span>
+<span class="lnr"> 37 </span><span class="Comment"> *         A very simple Contiki application showing how to use the Contiki</span>
+<span class="lnr"> 38 </span><span class="Comment"> *         Multi-threading library</span>
+<span class="lnr"> 39 </span><span class="Comment"> * \author</span>
+<span class="lnr"> 40 </span><span class="Comment"> *         Oliver Schmidt &lt;ol.sc@web.de&gt;</span>
+<span class="lnr"> 41 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 42 </span>
+<span class="lnr"> 43 </span><span class="Comment">/*</span><span class="Comment"> The Contiki Multi-threading library is on Windows implemented using</span>
+<span class="lnr"> 44 </span><span class="Comment"> * Win32 fibers. The Cygwin C-library implements Thread-Local-Storage</span>
+<span class="lnr"> 45 </span><span class="Comment"> * in a way that is incompatible with fibers. Therefore most Cygwin</span>
+<span class="lnr"> 46 </span><span class="Comment"> * C-library functions don't work when called from a Contiki thread. </span><span class="Comment">*/</span>
+<span class="lnr"> 47 </span>
+<span class="lnr"> 48 </span><span class="PreProc">#include </span><span class="Constant">&lt;string.h&gt;</span>
+<span class="lnr"> 49 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 50 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr"> 51 </span><span class="PreProc">#include </span><span class="Constant">&quot;sys/mt.h&quot;</span>
+<span class="lnr"> 52 </span>
+<span class="lnr"> 53 </span><span class="PreProc">#include </span><span class="Constant">&quot;../config.h&quot;</span>
+<span class="lnr"> 54 </span><span class="PreProc">#include </span><span class="Constant">&quot;../ta_mod_external.h&quot;</span>
+<span class="lnr"> 55 </span><span class="PreProc">#include </span><span class="Constant">&quot;multi-threading.h&quot;</span>
+<span class="lnr"> 56 </span>
+<span class="lnr"> 57 </span>PROCESS(multi_threading_process, <span class="Constant">&quot;Multi-threading process&quot;</span>);
+<span class="lnr"> 58 </span>
+<span class="lnr"> 59 </span>
+<span class="lnr"> 60 </span><span class="Type">static</span> <span class="Type">char</span> *ptr;
+<span class="lnr"> 61 </span>
+<span class="lnr"> 62 </span>
+<span class="lnr"> 63 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 64 </span><span class="Type">static</span> <span class="Type">void</span>
+<span class="lnr"> 65 </span>thread_func(<span class="Type">char</span> *str, <span class="Type">int</span> len)
+<span class="lnr"> 66 </span>{
+<span class="lnr"> 67 </span>  ptr = str + len;
+<span class="lnr"> 68 </span>  mt_yield();
+<span class="lnr"> 69 </span>
+<span class="lnr"> 70 </span>  <span class="cConditional">if</span>(len) {
+<span class="lnr"> 71 </span>    thread_func(str, len - <span class="Constant">1</span>);
+<span class="lnr"> 72 </span>    mt_yield();
+<span class="lnr"> 73 </span>  }
+<span class="lnr"> 74 </span>
+<span class="lnr"> 75 </span>  ptr = str + len;
+<span class="lnr"> 76 </span>}
+<span class="lnr"> 77 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 78 </span><span class="Type">static</span> <span class="Type">void</span>
+<span class="lnr"> 79 </span>thread_main(<span class="Type">void</span> *data)
+<span class="lnr"> 80 </span>{
+<span class="lnr"> 81 </span>  <span class="cRepeat">while</span>(<span class="Constant">1</span>) {
+<span class="lnr"> 82 </span>    thread_func((<span class="Type">char</span> *)data, <span class="Constant">9</span>);
+<span class="lnr"> 83 </span>  }
+<span class="lnr"> 84 </span>  mt_exit();
+<span class="lnr"> 85 </span>}
+<span class="lnr"> 86 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 87 </span>PROCESS_THREAD(multi_threading_process, ev, data)
+<span class="lnr"> 88 </span>{
+<span class="lnr"> 89 </span>  <span class="Type">static</span> <span class="Type">struct</span> mt_thread alpha_thread;
+<span class="lnr"> 90 </span>  <span class="Type">static</span> <span class="Type">struct</span> mt_thread count_thread;
+<span class="lnr"> 91 </span>
+<span class="lnr"> 92 </span>  <span class="Type">static</span> <span class="Type">struct</span> etimer timer;
+<span class="lnr"> 93 </span>  <span class="Type">static</span> <span class="Type">int</span> toggle;
+<span class="lnr"> 94 </span>
+<span class="lnr"> 95 </span>  PROCESS_BEGIN();
+<span class="lnr"> 96 </span>
+<span class="lnr"> 97 </span>
+<span class="lnr"> 98 </span>  <span class="Type">static</span> <span class="Type">char</span> *alpha = <span class="Constant">&quot;JIHGFEDCBA&quot;</span>;
+<span class="lnr"> 99 </span>  <span class="Type">static</span> <span class="Type">char</span> *count = <span class="Constant">&quot;9876543210&quot;</span>;
+<span class="lnr">100 </span>
+<span class="lnr">101 </span>
+<span class="lnr">102 </span>  mt_init();
+<span class="lnr">103 </span>  mt_start(&amp;alpha_thread, thread_main, alpha);
+<span class="lnr">104 </span>  mt_start(&amp;count_thread, thread_main, count);
+<span class="lnr">105 </span>
+<span class="lnr">106 </span><span class="Statement">RESET</span>:
+<span class="lnr">107 </span>  puts (<span class="Constant">&quot;Multi-threading process: attempting to register invariants.&quot;</span>);
+<span class="lnr">108 </span>  etimer_set(&amp;timer, CLOCK_SECOND / CLOCK_DIV);
+<span class="lnr">109 </span>
+<span class="lnr">110 </span>  <span class="cRepeat">while</span>(<span class="Constant">1</span>) {
+<span class="lnr">111 </span>    PROCESS_WAIT_EVENT();
+<span class="lnr">112 </span>
+<span class="lnr">113 </span>    {
+<span class="lnr">114 </span>      <span class="Type">static</span> <span class="Type">int</span> invars_registered = <span class="Constant">0</span>;
+<span class="lnr">115 </span>      <span class="Type">int</span> res;
+<span class="lnr">116 </span>      <span class="cConditional">if</span> (! invars_registered) {
+<span class="lnr">117 </span>        res = TARegInvar(alpha, strlen(alpha) + <span class="Constant">1</span>);
+<span class="lnr">118 </span>        <span class="cConditional">if</span> (res != TA_SUCCESS) { <span class="cStatement">goto</span> RESET; }
+<span class="lnr">119 </span>        res = TARegInvar(count, strlen(count) + <span class="Constant">1</span>);
+<span class="lnr">120 </span>        <span class="cConditional">if</span> (res != TA_SUCCESS) { <span class="cStatement">goto</span> RESET; }
+<span class="lnr">121 </span>        invars_registered = <span class="Constant">1</span>;
+<span class="lnr">122 </span>      }
+<span class="lnr">123 </span>    }
+<span class="lnr">124 </span>
+<span class="lnr">125 </span>    <span class="cConditional">if</span>(ev == PROCESS_EVENT_TIMER) {
+<span class="lnr">126 </span>      <span class="cConditional">if</span>(toggle) {
+<span class="lnr">127 </span>        mt_exec(&amp;alpha_thread);
+<span class="lnr">128 </span>        toggle--;
+<span class="lnr">129 </span>      } <span class="cConditional">else</span> {
+<span class="lnr">130 </span>        mt_exec(&amp;count_thread);
+<span class="lnr">131 </span>        toggle++;
+<span class="lnr">132 </span>      }
+<span class="lnr">133 </span>      puts(ptr);
+<span class="lnr">134 </span>
+<span class="lnr">135 </span>      etimer_set(&amp;timer, CLOCK_SECOND / CLOCK_DIV);
+<span class="lnr">136 </span>    }
+<span class="lnr">137 </span>  }
+<span class="lnr">138 </span>
+<span class="lnr">139 </span>  mt_stop(&amp;alpha_thread);
+<span class="lnr">140 </span>  mt_stop(&amp;count_thread);
+<span class="lnr">141 </span>  mt_remove();
+<span class="lnr">142 </span>
+<span class="lnr">143 </span>  PROCESS_END();
+<span class="lnr">144 </span>}
+<span class="lnr">145 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">146 </span>
+</pre>
+</body>
+</html>

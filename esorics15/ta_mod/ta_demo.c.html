@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/ta_demo.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span>
+<span class="lnr"> 2 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr"> 3 </span>
+<span class="lnr"> 4 </span><span class="PreProc">#include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr"> 5 </span>
+<span class="lnr"> 6 </span>
+<span class="lnr"> 7 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 8 </span><span class="Comment">/*</span><span class="Comment"> The Trust Assessment Process                                              </span><span class="Comment">*/</span>
+<span class="lnr"> 9 </span>
+<span class="lnr">10 </span><span class="PreProc">#include </span><span class="Constant">&quot;ta_mod.h&quot;</span>
+<span class="lnr">11 </span>
+<span class="lnr">12 </span>
+<span class="lnr">13 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">14 </span><span class="Comment">/*</span><span class="Comment"> Some processes and threads to keep the system busy:                       </span><span class="Comment">*/</span>
+<span class="lnr">15 </span>
+<span class="lnr">16 </span><span class="PreProc">#ifdef WITH_EXAMPLE_NET</span>
+<span class="lnr">17 </span><span class="PreProc">#include </span><span class="Constant">&quot;apps/networking.h&quot;</span>
+<span class="lnr">18 </span><span class="PreProc">#endif</span>
+<span class="lnr">19 </span>
+<span class="lnr">20 </span><span class="PreProc">#ifdef WITH_ANTELOPE</span>
+<span class="lnr">21 </span><span class="PreProc">#include </span><span class="Constant">&quot;apps/shell-db.h&quot;</span>
+<span class="lnr">22 </span><span class="PreProc">#endif</span>
+<span class="lnr">23 </span>
+<span class="lnr">24 </span><span class="PreProc">#include </span><span class="Constant">&quot;apps/hello-world.h&quot;</span>
+<span class="lnr">25 </span><span class="PreProc">#include </span><span class="Constant">&quot;apps/attacker.h&quot;</span>
+<span class="lnr">26 </span><span class="PreProc">#include </span><span class="Constant">&quot;apps/multi-threading.h&quot;</span>
+<span class="lnr">27 </span>
+<span class="lnr">28 </span>
+<span class="lnr">29 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">30 </span>
+<span class="lnr">31 </span>AUTOSTART_PROCESSES(
+<span class="lnr">32 </span>    &amp;ta_mod_process,
+<span class="lnr">33 </span><span class="PreProc">#ifdef WITH_EXAMPLE_NET</span>
+<span class="lnr">34 </span>    &amp;example_psock_server_process,
+<span class="lnr">35 </span><span class="PreProc">#endif</span>
+<span class="lnr">36 </span><span class="PreProc">#ifdef WITH_ANTELOPE</span>
+<span class="lnr">37 </span>    &amp;db_shell,
+<span class="lnr">38 </span><span class="PreProc">#endif</span>
+<span class="lnr">39 </span>    &amp;hello_world_process,
+<span class="lnr">40 </span>    &amp;attacker_process,
+<span class="lnr">41 </span>    &amp;multi_threading_process
+<span class="lnr">42 </span>  );
+<span class="lnr">43 </span>
+</pre>
+</body>
+</html>

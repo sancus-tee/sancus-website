@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Resource Sharing for Embedded Protected Module Architectures</title>
+    <link href="stylesheet.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+<div class="content">
+
+<h1>Secure Resource Sharing for Embedded Protected Module Architectures</h1>
+<center>
+<p>Jo Van Bulck, Job Noorman, Jan Tobias M&uuml;hlberg and Frank Piessens</p>
+</center>
+
+<p>This page provides the <a href="sfs-src.tar.gz">source code</a> and usage
+examples of the protected file system, presented at <em>Workshop in Information
+Security Theory and Practice</em> (WISTP'2015).</p>
+
+<p>
+Below, we repeat the abstract of the paper and provide an example program to
+demonstrate our protected file system API. Finally, we clarify the implementation of
+the access control layer by means of short code snippets.
+</p>
+
+<h2>Abstract</h2>
+
+<p>Low-end embedded devices and the Internet of Things (IoT) are becoming
+increasingly important for our lives. They are being used in domains such
+as infrastructure management, and medical and healthcare systems, where
+business interests and our security and privacy are at stake. Yet, security
+mechanisms have been appallingly neglected on many IoT platforms. In this
+paper we present a secure access control mechanism for extremely
+lightweight embedded microcontrollers. Being based on
+<a href="https://distrinet.cs.kuleuven.be/software/sancus/">Sancus</a>, a
+hardware-only Trusted Computing Base and Protected Module Architecture for
+the embedded domain, our mechanism allows for multiple software modules on
+an IoT-node to securely share resources. We implement and evaluate our
+approach for two application scenarios, a shared memory system and a shared
+flash drive. Our implementation is based on a Sancus-enabled TI MSP430
+microcontroller. We show that our mechanism can give high security
+guarantees at small runtime overheads and a moderately increased
+size of the Trusted Computing Base.</p>
+
+<h2>Example Client Program</h2>
+
+<p>In this section we provide a minimal example that uses our
+<a href="sfs.html">SFS</a> file system API. The program <code>simple-test.c</code> listed
+below defines two <a href="https://distrinet.cs.kuleuven.be/software/sancus/">Sancus</a>
+modules, named <em>clientA</em> and <em>clientB</em>. ClientA first creates a new
+empty file and automatically becomes the "owner" of this file. ClientA
+thereafter writes out some data bytes and assigns read-only permissions for clientB.
+Next, control is transferred to clientB, which successfully opens the file,
+reads the data and returns. ClientA then revokes the access permissions
+for clientB on the logical file and transfers control to clientB once more. Of course,
+this time access should be denied. Finally, clientA closes and removes the logical file.
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>../common.h</span><span style='color:#800000; '>"</span><span style='color:#004a43; '>          </span><span style='color:#696969; '>// utility functions</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>&lt;</span><span style='color:#40015a; '>sancus/sm_support.h</span><span style='color:#800000; '>></span><span style='color:#004a43; '>  </span><span style='color:#696969; '>// Sancus support</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>../sfs/sfs.h</span><span style='color:#800000; '>"</span><span style='color:#004a43; '>         </span><span style='color:#696969; '>// Sancus File System</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> THE_FILENAME        </span><span style='color:#0000e6; '>'a'</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> THE_INIT_FILESIZE   100</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> THE_TEST_DATA       </span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span><span style='color:#800000; '>"</span>
+
+DECLARE_SM<span style='color:#808030; '>(</span>clientB<span style='color:#808030; '>,</span> <span style='color:#008000; '>0x1234</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> B   </span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>[clientB] </span><span style='color:#800000; '>"</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>clientB</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> run_clientB<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printf_int_int<span style='color:#808030; '>(</span>B <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Hi, I have id </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> and was called from </span><span style='color:#007997; '>%d</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span>
+        sancus_get_self_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>char</span> cur<span style='color:#800080; '>;</span>
+    
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>B <span style='color:#800000; '>"</span><span style='color:#0000e6; '>attempting to open the file and read the data</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    fd <span style='color:#808030; '>=</span> sfs_open<span style='color:#808030; '>(</span>THE_FILENAME<span style='color:#808030; '>,</span> SFS_READ<span style='color:#808030; '>,</span> SFS_OPEN_EXISTING<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>fd <span style='color:#808030; '>&lt;</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>B <span style='color:#800000; '>"</span><span style='color:#0000e6; '>access to the file has been denied</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span><span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+
+    printf_str<span style='color:#808030; '>(</span>B <span style='color:#800000; '>"</span><span style='color:#0000e6; '>the chars are: </span><span style='color:#0f69ff; '>\"</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>while</span><span style='color:#808030; '>(</span><span style='color:#808030; '>(</span>cur <span style='color:#808030; '>=</span> sfs_getc<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>EOF</span><span style='color:#808030; '>)</span>
+        printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#007997; '>%c</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> cur<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printf_str<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\"</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    sfs_close<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+DECLARE_SM<span style='color:#808030; '>(</span>clientA<span style='color:#808030; '>,</span> <span style='color:#008000; '>0x1234</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> A   </span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>[clientA] </span><span style='color:#800000; '>"</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>clientA</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> run_clientA<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printf_int_int<span style='color:#808030; '>(</span>A <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Hi, I have id </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> and was called from </span><span style='color:#007997; '>%d</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span>
+        sancus_get_self_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        
+    <span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> i<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>char</span> <span style='color:#808030; '>*</span>str <span style='color:#808030; '>=</span> THE_TEST_DATA<span style='color:#800080; '>;</span>
+    sm_id idB <span style='color:#808030; '>=</span> sancus_get_id<span style='color:#808030; '>(</span>clientB<span style='color:#808030; '>.</span>public_start<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>A <span style='color:#800000; '>"</span><span style='color:#0000e6; '>creating the file and writing the data</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    fd <span style='color:#808030; '>=</span> sfs_open<span style='color:#808030; '>(</span>THE_FILENAME<span style='color:#808030; '>,</span> SFS_CREATOR<span style='color:#808030; '>,</span> THE_INIT_FILESIZE<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span><span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span> str<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>)</span>
+        sfs_putc<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> str<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>A <span style='color:#800000; '>"</span><span style='color:#0000e6; '>assigning read-only permissions for clientB and dumping ACLs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sfs_chmod<span style='color:#808030; '>(</span>THE_FILENAME<span style='color:#808030; '>,</span> idB<span style='color:#808030; '>,</span> SFS_READ<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sfs_dump<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    run_clientB<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>A <span style='color:#800000; '>"</span><span style='color:#0000e6; '>revoking permissions for clientB and dumping ACLs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>    
+    sfs_chmod<span style='color:#808030; '>(</span>THE_FILENAME<span style='color:#808030; '>,</span> idB<span style='color:#808030; '>,</span> SFS_NIL<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sfs_dump<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+ 
+    run_clientB<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span>A <span style='color:#800000; '>"</span><span style='color:#0000e6; '>closing and removing the logical file</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sfs_close<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sfs_remove<span style='color:#808030; '>(</span>THE_FILENAME<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> <span style='color:#400000; '>main</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    WDTCTL <span style='color:#808030; '>=</span> WDTPW <span style='color:#808030; '>|</span> WDTHOLD<span style='color:#800080; '>;</span>
+    uart_init<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\n</span><span style='color:#0000e6; '>---------------</span><span style='color:#0f69ff; '>\n</span><span style='color:#0000e6; '>main started</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    sancus_enable<span style='color:#808030; '>(</span><span style='color:#808030; '>&amp;</span>sfs<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sancus_enable<span style='color:#808030; '>(</span><span style='color:#808030; '>&amp;</span>clientA<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    sancus_enable<span style='color:#808030; '>(</span><span style='color:#808030; '>&amp;</span>clientB<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>    
+
+    run_clientA<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>[main] exiting</span><span style='color:#0f69ff; '>\n</span><span style='color:#0000e6; '>-----------------</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>while</span><span style='color:#808030; '>(</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span><span style='color:#800080; '>}</span>
+<span style='color:#800080; '>}</span>
+</pre>
+
+<hr>
+
+<p>
+To compile and run the above example, one should first
+<a href="https://distrinet.cs.kuleuven.be/software/sancus/install.php">install Sancus</a>.
+The following Makefile builds the test program and uploads it to the FPGA. The desired
+<a href="https://github.com/contiki-os/contiki/blob/master/core/cfs/cfs.h">CFS</a>
+back-end can be chosen at compile time through the <code>SFS_BACKEND</code> constant.
+The <code>SHM</code> back-end operates on a Sancus-protected memory buffer and thus
+realises a form of protected shared memory. The <code>COFFEE</code> back-end corresponds
+to <a href="https://github.com/contiki-os/contiki/blob/master/core/cfs/cfs-coffee.c">
+Contiki's Coffee file system</a>, optimised for embedded flash drives.
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#797997; '>SANCUS_SUPPORT_DIR </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#808030; '>/</span><span style='color:#007997; '>usr</span><span style='color:#808030; '>/</span><span style='color:#007997; '>local</span><span style='color:#808030; '>/</span><span style='color:#007997; '>share</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sancus-support</span>
+<span style='color:#797997; '>DEVICE             </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#808030; '>/</span><span style='color:#007997; '>dev</span><span style='color:#808030; '>/</span><span style='color:#007997; '>ttyUSB0</span>
+<span style='color:#797997; '>VENDOR_KEY         </span><span style='color:#808030; '>=</span><span style='color:#007997; '> 4078d505d82099ba</span>
+
+<span style='color:#797997; '>CC                 </span><span style='color:#808030; '>=</span><span style='color:#007997; '> sancus-cc</span>
+<span style='color:#797997; '>LD                 </span><span style='color:#808030; '>=</span><span style='color:#007997; '> sancus-ld</span>
+<span style='color:#797997; '>CRYPTO             </span><span style='color:#808030; '>=</span><span style='color:#007997; '> sancus-crypto</span>
+<span style='color:#797997; '>LOAD               </span><span style='color:#808030; '>=</span><span style='color:#007997; '> sancus-loader</span>
+<span style='color:#797997; '>RM                 </span><span style='color:#808030; '>=</span><span style='color:#007997; '> rm -f</span>
+
+<span style='color:#797997; '>DEBUG_LEVEL        </span><span style='color:#808030; '>=</span><span style='color:#007997; '> -DSFS_WARNING </span><span style='color:#696969; '>#-DNODEBUG #-DNOCOLOR #-DCOFFEE_DEBUG -DFLASH_DEBUG</span>
+<span style='color:#797997; '>CFS_FORMAT         </span><span style='color:#808030; '>=</span><span style='color:#007997; '> -DNO_CFS_FORMAT </span><span style='color:#696969; '># comment to format the flash drive on boot</span>
+
+<span style='color:#797997; '>CFLAGS             </span><span style='color:#808030; '>=</span><span style='color:#007997; '> -I</span><span style='color:#800080; '>$(</span><span style='color:#797997; '>SANCUS_SUPPORT_DIR</span><span style='color:#800080; '>)</span><span style='color:#808030; '>/</span><span style='color:#007997; '>include</span><span style='color:#808030; '>/</span><span style='color:#007997; '> -g --verbose -Wfatal-errors </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>DEBUG_LEVEL</span><span style='color:#800080; '>)</span><span style='color:#007997; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>CFS_FORMAT</span><span style='color:#800080; '>)</span>
+<span style='color:#797997; '>LDFLAGS            </span><span style='color:#808030; '>=</span><span style='color:#007997; '> --standalone --verbose --ram-size 24K --rom-size 32K</span>
+<span style='color:#797997; '>LIBS               </span><span style='color:#808030; '>=</span><span style='color:#007997; '> -L</span><span style='color:#800080; '>$(</span><span style='color:#797997; '>SANCUS_SUPPORT_DIR</span><span style='color:#800080; '>)</span><span style='color:#808030; '>/</span><span style='color:#007997; '>lib -ldev-uart -ldev-spi</span>
+<span style='color:#797997; '>CRYPTOFLAGS        </span><span style='color:#808030; '>=</span><span style='color:#007997; '> --key </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>VENDOR_KEY</span><span style='color:#800080; '>)</span>
+<span style='color:#797997; '>LOADFLAGS          </span><span style='color:#808030; '>=</span><span style='color:#007997; '> -device </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>DEVICE</span><span style='color:#800080; '>)</span><span style='color:#007997; '> -baudrate 115200</span>
+
+<span style='color:#797997; '>COFFEE             </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sfs</span><span style='color:#808030; '>/</span><span style='color:#007997; '>cfs</span><span style='color:#808030; '>/</span><span style='color:#007997; '>cfs-coffee</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o</span>
+<span style='color:#797997; '>SHM                </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sfs</span><span style='color:#808030; '>/</span><span style='color:#007997; '>shm</span><span style='color:#808030; '>/</span><span style='color:#007997; '>shared-mem</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o </span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sfs</span><span style='color:#808030; '>/</span><span style='color:#007997; '>shm</span><span style='color:#808030; '>/</span><span style='color:#007997; '>my_malloc</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o</span>
+<span style='color:#797997; '>SFS_BACKEND        </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>COFFEE</span><span style='color:#800080; '>)</span><span style='color:#007997; '> </span><span style='color:#696969; '>#$(SHM)</span>
+<span style='color:#797997; '>SFS                </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sfs</span><span style='color:#808030; '>/</span><span style='color:#007997; '>sfs-ram</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>SFS_BACKEND</span><span style='color:#800080; '>)</span>
+
+<span style='color:#797997; '>OBJECTS            </span><span style='color:#808030; '>=</span><span style='color:#007997; '> simple-test</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o </span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>/</span><span style='color:#007997; '>common</span><span style='color:#808030; '>.</span><span style='color:#007997; '>o </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>SFS</span><span style='color:#800080; '>)</span>
+<span style='color:#797997; '>TARGET             </span><span style='color:#808030; '>=</span><span style='color:#007997; '> sfs-test</span><span style='color:#808030; '>.</span><span style='color:#007997; '>elf</span>
+<span style='color:#797997; '>TARGET_NO_MACS     </span><span style='color:#808030; '>=</span><span style='color:#007997; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET</span><span style='color:#800080; '>)</span><span style='color:#007997; '>-no-macs</span>
+
+<span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET</span><span style='color:#800080; '>)</span><span style='color:#800000; font-weight:bold; '>:</span><span style='color:#0000e6; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET_NO_MACS</span><span style='color:#800080; '>)</span>
+	<span style='color:#800080; '>$(</span><span style='color:#797997; '>CRYPTO</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>CRYPTOFLAGS</span><span style='color:#800080; '>)</span> -o <span style='color:#797997; '>$@</span> <span style='color:#797997; '>$&lt;</span>
+
+<span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET_NO_MACS</span><span style='color:#800080; '>)</span><span style='color:#800000; font-weight:bold; '>:</span><span style='color:#0000e6; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>OBJECTS</span><span style='color:#800080; '>)</span>
+	<span style='color:#800080; '>$(</span><span style='color:#797997; '>LD</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>LDFLAGS</span><span style='color:#800080; '>)</span> -o <span style='color:#797997; '>$@</span> <span style='color:#797997; '>$^</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>LIBS</span><span style='color:#800080; '>)</span>
+
+<span style='color:#000000; background:#a8a800; '>.PHONY</span><span style='color:#800000; font-weight:bold; '>:</span><span style='color:#0000e6; '> load</span>
+<span style='color:#e34adc; '>load</span><span style='color:#800000; font-weight:bold; '>:</span><span style='color:#0000e6; '> </span><span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET</span><span style='color:#800080; '>)</span>
+	<span style='color:#800080; '>$(</span><span style='color:#797997; '>LOAD</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>LOADFLAGS</span><span style='color:#800080; '>)</span> <span style='color:#797997; '>$&lt;</span>
+
+<span style='color:#000000; background:#a8a800; '>.PHONY</span><span style='color:#800000; font-weight:bold; '>:</span><span style='color:#0000e6; '> clean</span>
+<span style='color:#e34adc; '>clean</span><span style='color:#800000; font-weight:bold; '>:</span>
+	<span style='color:#800080; '>$(</span><span style='color:#797997; '>RM</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>TARGET_NO_MACS</span><span style='color:#800080; '>)</span> <span style='color:#800080; '>$(</span><span style='color:#797997; '>OBJECTS</span><span style='color:#800080; '>)</span>
+</pre>
+
+<hr>
+
+<p> The output of the test program looks as follows:
+<center><img src="images/simple_test_output.png" alt="output of the test program"></center>
+</p>
+
+<h2>Access Control Layer Implementation</h2>
+
+<p>In this section we illustrate the
+<a href="sfs-front-end.html">implementation of the generic front-end</a> access
+control layer by means of short code snippets. The front-end is conceived as a wrapper
+implementation that associates an Access Control List (ACL)
+of <code>(smID, permission_flags)</code> pairs
+per logical file to validate the caller's permissions before passing the call to the
+back-end. Logical files are represented by a linked list of <code>OPEN_FILE</code>
+structs that each hold the file name and a linked list of <code>FILE_PERM</code> structs
+that make up the ACL. Once a file has been successfully opened, the corresponding
+<code>FILE_PERM</code> can be looked up quickly via a file-descriptor indexed array
+<code>fd_cache</code>.
+</p>
+
+<p>
+Access control is ensured through the two macros listed below. The <code>CHK_FD</code>
+macro checks whether a specified file descriptor is within bounds and belongs to a
+specified SM, whereas the <code>CHK_PERM</code> macro can be used to verify bitmask-permissions.
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_FD</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd </span><span style='color:#808030; '>&lt;</span><span style='color:#004a43; '> 0 </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> fd </span><span style='color:#808030; '>></span><span style='color:#808030; '>=</span><span style='color:#004a43; '> MAX_NB_OPEN_FILES</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> </span><span style='color:#808030; '>!</span><span style='color:#004a43; '>fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#004a43; '> </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>sm_id </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror_int_int</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>the provided file descriptor </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> isn't valid or </span><span style='color:#800000; '>"</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>doesn't belong to calling SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> fd</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_PERM</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p_have</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p_have </span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror_int_int</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>permission check failed p_have=0x</span><span style='color:#007997; '>%x</span><span style='color:#0000e6; '> ; p_want = 0x</span><span style='color:#007997; '>%x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;p_have</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+</pre>
+
+<hr>
+
+<p>
+The following code snippet defines the <code>sfs_getc()</code> implementation that
+uses the <code>sancus_get_caller_id()</code> hardware instruction and the above macros
+to enforce SM-grained logical file access control. The function returns <code>FAILURE</code>
+when access is denied and otherwise returns the result of the <code>cfs_read()</code>
+back-end call.
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_getc<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+   
+    CHK_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span>
+    CHK_PERM<span style='color:#808030; '>(</span>fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> SFS_READ<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+ 
+    <span style='color:#800000; font-weight:bold; '>return</span> <span style='color:#808030; '>(</span>cfs_read<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>buf<span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>></span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span><span style='color:#800080; '>?</span> buf <span style='color:#800080; '>:</span> <span style='color:#7d0045; '>EOF</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+</pre>
+
+<hr>
+
+<p>
+The following code snippet defines the implementation of the <code>sfs_chmod</code>
+function, which can be used to manipulate the SM-grained ACL of a logical file. As
+evident from the implementation below, only calling SMs that hold the special
+<code>SFS_ROOT</code> permission are allowed to change the associated ACL. The creator/owner
+of a logical file always holds this permission.
+The access rights for the caller are looked up in two phases: the
+<code>OPEN_FILE</code> struct for the given file name is first located and the
+associated ACL is thereafter traversed to locate the according <code>FILE_PERM</code>
+struct. The code snippet below furthermore shows how the special <code>SFS_NIL</code>
+permission is used to revoke existing access rights.
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_chmod<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> sm_id id<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> perm_flags<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#696969; '>// only root can chmod</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p_caller<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>two_phase_lookup<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> SFS_ROOT<span style='color:#808030; '>,</span> id<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>p_caller<span style='color:#808030; '>)</span> <span style='color:#808030; '>&lt;</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>perm_flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_NIL<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> revoke_acl<span style='color:#808030; '>(</span>p_caller<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>,</span> id<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+   
+    <span style='color:#800000; font-weight:bold; '>return</span> add_acl<span style='color:#808030; '>(</span>p_caller<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>,</span> id<span style='color:#808030; '>,</span> perm_flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+</pre>
+
+<hr>
+</div>
+</body>
+</html> 

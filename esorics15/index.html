@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+ <title>
+  M&uuml;hlberg, Noorman and Piessens:
+  Trust Assessment Modules for the IoT
+ </title>
+ <style type="text/css">
+div.pre { font-family:monospace; font-size:12px; white-space:pre; }
+ </style>
+
+</head>
+<body bgcolor="#FFFFFF">
+
+<center><table width="85%"><tr><td>
+<br>
+<h2>Lightweight and Flexible Trust Assessment
+    Modules  for the Internet of Things</h2>
+<p><b><a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan
+   Tobias M&uuml;hlberg</a>,
+   Job Noorman
+   and Frank Piessens</b><br>
+   iMinds-DistriNet, KU Leuven, Celestijnenlaan 200A, B-3001
+   Belgium
+</p><br>
+
+<hr>
+
+<p><b>
+This page contains suplementary material for ESORICS 2015 submission 168:
+&quot;Lightweight and Flexible Trust Assessment Modules 
+for the Internet of Things&quot;
+</b></p>
+
+<hr>
+
+<p><b>Abstract.</b>
+In this paper we describe a novel approach to securely obtain measurements
+with respect to the integrity of software running on a low-cost and
+low-power computing node autonomously or on request.  We propose to use
+these measurements as an indication of the trustworthiness of that node.
+Our approach is based on recent developments in Program Counter Based
+Access Control.  Specifically, we employ Sancus, a light-weight
+hardware-only Trusted Computing Base and Protected Module Architecture, to
+integrate trust assessment modules into an untrusted embedded OS without
+using a hypervisor.  Sancus ensures by means of hardware extensions that
+code and data of a protected module cannot be tampered with, and that the
+module's data remains confidential.  Sancus further provides cryptographic
+primitives that are employed by our approach to enable the trust management
+system to verify that the obtained trust metrics are authentic and fresh.
+Thereby, our trust assessment modules can inspect the OS or application
+code and securely report reliable trust metrics to an external trust
+management system.  We evaluate a prototypic implementation of our approach
+that integrates Sancus-protected trust assessment modules with the Contiki
+OS, running on a Sancus-enabled TI MSP430 microcontroller.
+</p>
+
+<p><b>Contiki and Trust Assessment Module.</b>
+Below we provide the trust assessment scenario that we evaluate in the
+paper, and a version of <a href="http://www.contiki-os.org/">Contiki</a>
+that has been adapted to run on our Sancus-enabled MSP430. To compile the
+code you will need the <a
+href="http://distrinet.cs.kuleuven.be/software/sancus/">Sancus tools</a>
+and <a href="http://www.ti.com/tool/msp430-gcc-opensource">MSP430-GCC</a>
+installed on your system. The code of the trust assessment scenario
+(<code>ta_mod.tar.gz</code>) must be extracted to
+<code>sancus-contiki-3x/examples/ta_mod</code>.
+The demo scenario may then either be executed in
+the Sancus simulator (sancus-sim, comes with the Sancus tools) or on an
+FPGA programmed with the Sancus core. In our experiments we used a Spartan
+6 FPGA.</p>
+
+<center>
+<table rules="rows" width="60%">
+<tr>
+ <th colspan="2">Description</th>
+ <th colspan="2">Download</th>
+ <th>Size</th>
+</tr>
+<tr>
+ <td>Trust assessment scenario</td>
+ <td width="2%"></td>
+ <td><a href="ta_mod.tar.gz">ta_mod.tar.gz</a></td>
+ <td width="2%"></td>
+ <td>17 KiB</td>
+</tr>
+<tr>
+ <td>Contiki 3.x with extensions for Sancus</td>
+ <td></td>
+ <td><a href="sancus-contiki-3x.tar.gz">sancus-contiki-3x.tar.gz</a></td>
+ <td>&nbsp; &nbsp;</td>
+ <td>16 MiB</td>
+</tr>
+</table>
+</center>
+
+<br><br>
+<p>For convenience we provide quick links to the entry point functions of the
+trust assessment module, as described in the paper:</p>
+
+<center>
+<table rules="rows" width="60%">
+<tr>
+ <th colspan="2">Function Name</th>
+ <th colspan="2">Description</th>
+ <th>Start Line</th>
+</tr>
+<tr>
+ <td><a href="ta_mod/ta_mod.c.html">TAMainFunc</a></td>
+ <td width="2%"></td>
+ <td>main entry point controlling initialisation and
+   periodic behaviour</td>
+ <td width="2%"></td>
+ <td>56</td>
+</tr>
+<tr>
+ <td><a href="ta_mod/ta_invar.c.html">TARegisterInvar</a></td>
+ <td></td>
+ <td>can be used by application code and internally to
+   register an address range for regular integrity checks</td>
+ <td></td>
+ <td>77</td>
+</tr>
+<tr>
+ <td><a href="ta_mod/ta_mod_scheduler.c.html">TASecureCallProcess</a></td>
+ <td></td>
+ <td>used by the OS scheduler to invoke application
+   functions; the trust assessment module extends the call with counting
+   the number of invocations and measuring time</td>
+ <td></td>
+ <td>34</td>
+</tr>
+<tr>
+ <td><a href="ta_mod/ta_invar.c.html">TAInvarsStatus</a></td>
+ <td></td>
+ <td>returns an encrypted status report on the integrity
+   checked address ranges</td>
+ <td></td>
+ <td>162</td>
+</tr>
+<tr>
+ <td><a href="ta_mod/ta_proc.c.html">TAProcessStatus</a></td>
+ <td></td>
+ <td> returns an encrypted status report on the processes
+   currently running on a node</td>
+ <td></td>
+ <td>164</td>
+</tr>
+</table>
+</center>
+
+
+<br>
+<hr>
+<p align="right"><a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan
+ Tobias M&uuml;hlberg</a>, Thu, 17 Sep 2015 16:58:11 +0200
+</td></tr></table></center>
+</body>
+</html>
+

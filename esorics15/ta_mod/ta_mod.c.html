@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/ta_mod.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span>
+<span class="lnr">  2 </span><span class="PreProc">#include </span><span class="Constant">&lt;msp430.h&gt;</span>
+<span class="lnr">  3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr">  4 </span><span class="PreProc">#include </span><span class="Constant">&lt;string.h&gt;</span>
+<span class="lnr">  5 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdlib.h&gt;</span>
+<span class="lnr">  6 </span>
+<span class="lnr">  7 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki.h&quot;</span>
+<span class="lnr">  8 </span><span class="PreProc">#include </span><span class="Constant">&quot;contiki-net.h&quot;</span>
+<span class="lnr">  9 </span><span class="PreProc">#include </span><span class="Constant">&quot;sys/mt.h&quot;</span>
+<span class="lnr"> 10 </span>
+<span class="lnr"> 11 </span><span class="PreProc">#include </span><span class="Constant">&quot;config.h&quot;</span>
+<span class="lnr"> 12 </span><span class="PreProc">#include </span><span class="Constant">&quot;ta_mod.h&quot;</span>
+<span class="lnr"> 13 </span>
+<span class="lnr"> 14 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus_support/elf.h&gt;</span>
+<span class="lnr"> 15 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus_support/global_symtab.h&gt;</span>
+<span class="lnr"> 16 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus_support/sm_control.h&gt;</span>
+<span class="lnr"> 17 </span>
+<span class="lnr"> 18 </span>
+<span class="lnr"> 19 </span>DECLARE_SM(TACore, <span class="Constant">0x1234</span>);
+<span class="lnr"> 20 </span>
+<span class="lnr"> 21 </span>
+<span class="lnr"> 22 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr"> 23 </span><span class="PreProc">#ifdef __SANCUS_MSP430</span>
+<span class="lnr"> 24 </span><span class="PreProc">  #include </span><span class="Constant">&quot;util/memcpy.c&quot;</span>
+<span class="lnr"> 25 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 26 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 27 </span>
+<span class="lnr"> 28 </span>
+<span class="lnr"> 29 </span><span class="Type">int</span> SM_DATA(TA_SM_NAME) TAInitialised = <span class="Constant">0</span>;
+<span class="lnr"> 30 </span>
+<span class="lnr"> 31 </span><span class="PreProc">#if (TA_SCHEDULER_PROTECTION == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 32 </span><span class="PreProc">  #include </span><span class="Constant">&quot;ta_mod_scheduler.c&quot;</span>
+<span class="lnr"> 33 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 34 </span>
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 37 </span><span class="Comment">/*</span><span class="Comment"> TAInit()                                                                  </span><span class="Comment">*/</span>
+<span class="lnr"> 38 </span>
+<span class="lnr"> 39 </span><span class="Type">static</span> <span class="Type">int</span> SM_FUNC(TA_SM_NAME) TAInit (<span class="Type">void</span>)
+<span class="lnr"> 40 </span>{
+<span class="lnr"> 41 </span>
+<span class="lnr"> 42 </span>  <span class="cConditional">if</span> (! TAInitialised) {
+<span class="lnr"> 43 </span>    TAInvarInit ();
+<span class="lnr"> 44 </span>    TAProcInit ();
+<span class="lnr"> 45 </span>
+<span class="lnr"> 46 </span>    TAInitialised = <span class="Constant">1</span>;
+<span class="lnr"> 47 </span>  }
+<span class="lnr"> 48 </span>
+<span class="lnr"> 49 </span>  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr"> 50 </span>}
+<span class="lnr"> 51 </span>
+<span class="lnr"> 52 </span>
+<span class="lnr"> 53 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr"> 54 </span><span class="Comment">/*</span><span class="Comment"> Interface Function: TAMainFunc() -- main() of the TA module.              </span><span class="Comment">*/</span>
+<span class="lnr"> 55 </span>
+<span class="lnr"> 56 </span><span class="Type">int</span> SM_ENTRY(TA_SM_NAME) TAMainFunc (process_event_t ev)
+<span class="lnr"> 57 </span>{
+<span class="lnr"> 58 </span>  __TIMING_INIT();
+<span class="lnr"> 59 </span>
+<span class="lnr"> 60 </span><span class="PreProc">#ifdef __TIMING</span>
+<span class="lnr"> 61 </span>  <span class="Type">volatile</span> <span class="Type">int</span> tmp;
+<span class="lnr"> 62 </span>  <span class="cConditional">if</span> (!TAInitialised) {
+<span class="lnr"> 63 </span>    tmp = NoTAEntryPoint();
+<span class="lnr"> 64 </span>    __TIMING_PRINT(<span class="Constant">&quot;+++ unprot call from prot code: &quot;</span>);
+<span class="lnr"> 65 </span>    __TIMING_REINIT();
+<span class="lnr"> 66 </span>    tmp = TAEntryPoint();
+<span class="lnr"> 67 </span>    __TIMING_PRINT(<span class="Constant">&quot;+++ sm_entry call from prot code: &quot;</span>);
+<span class="lnr"> 68 </span>    __TIMING_REINIT();
+<span class="lnr"> 69 </span>  }
+<span class="lnr"> 70 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 71 </span>
+<span class="lnr"> 72 </span>  <span class="cConditional">if</span> (!TAInitialised) {
+<span class="lnr"> 73 </span>    TAInit ();
+<span class="lnr"> 74 </span>  }
+<span class="lnr"> 75 </span>
+<span class="lnr"> 76 </span>  <span class="Comment">// This needs to be done after processes are initialised.</span>
+<span class="lnr"> 77 </span>  <span class="cConditional">if</span> (ev == PROCESS_EVENT_TIMER &amp;&amp; TAInitialised == <span class="Constant">1</span>) {
+<span class="lnr"> 78 </span><span class="PreProc">#if (PROTECT_IVTBL == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 79 </span>    <span class="Comment">// protect Interrupt Vector Table</span>
+<span class="lnr"> 80 </span>    <span class="Comment">// 0000ffe0 &lt;__ivtbl_16&gt;: 32 bytes</span>
+<span class="lnr"> 81 </span>    TARegisterInvar((<span class="Type">void</span> *) <span class="Constant">0xffe0</span>,<span class="Constant">32</span>);
+<span class="lnr"> 82 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 83 </span>
+<span class="lnr"> 84 </span><span class="PreProc">#if (TA_PROCESS_INSPECTOR == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 85 </span>    TAScanProcessesInit();
+<span class="lnr"> 86 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 87 </span>
+<span class="lnr"> 88 </span>    TAInitialised = <span class="Constant">2</span>;
+<span class="lnr"> 89 </span>  }
+<span class="lnr"> 90 </span>
+<span class="lnr"> 91 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TAMainFunc(): initialisation &quot;</span>);
+<span class="lnr"> 92 </span>  __TIMING_REINIT();
+<span class="lnr"> 93 </span>
+<span class="lnr"> 94 </span><span class="PreProc">#if (TA_PROCESS_INSPECTOR == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 95 </span>  TACheckProcesses();
+<span class="lnr"> 96 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TACheckProcesses(): &quot;</span>);
+<span class="lnr"> 97 </span>  __TIMING_REINIT();
+<span class="lnr"> 98 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 99 </span>  TACheckInvars ();
+<span class="lnr">100 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TACheckInvars(): &quot;</span>);
+<span class="lnr">101 </span>
+<span class="lnr">102 </span>  <span class="cStatement">return</span> (TA_SUCCESS);
+<span class="lnr">103 </span>}
+<span class="lnr">104 </span>
+<span class="lnr">105 </span><span class="Comment">/*</span><span class="Comment">---------------------------------------------------------------------------</span><span class="Comment">*/</span>
+<span class="lnr">106 </span>
+</pre>
+</body>
+</html>

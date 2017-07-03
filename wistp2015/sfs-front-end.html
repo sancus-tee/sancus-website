@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure Resource Sharing for Embedded Protected Module Architectures</title>
+    <link href="stylesheet.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+<div class="content">
+
+<h1>sfs-ram.c</h1>
+
+<p>A wrapper implementation of the <a href="sfs.html">Sancus File System (SFS)</a>
+interface that first performs Sancus-module-grained access control using
+non-persistent RAM data structures and thereafter translates the SFS call to a
+<a href="https://github.com/contiki-os/contiki/blob/master/core/cfs/cfs.h">CFS</a>
+-compatible back-end call (pluggable at link time).
+</p>
+
+<hr>
+<!-- source code highlighting via tohtml.com -->
+
+<pre style='color:#000000;background:#ffffff;'><span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* A wrapper implementation of the Sancus File System (SFS) interface that first </span>
+<span style='color:#3f5fbf; '>&#xa0;* performs Sancus-module-grained access control using non-persistent RAM data</span>
+<span style='color:#3f5fbf; '>&#xa0;* structures and thereafter translates the SFS call to a CFS-compatible back-end</span>
+<span style='color:#3f5fbf; '>&#xa0;* call (pluggable at link time).</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* \author Jo Van Bulck</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>&lt;</span><span style='color:#40015a; '>sancus/sm_support.h</span><span style='color:#800000; '>></span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>&lt;</span><span style='color:#40015a; '>stdbool.h</span><span style='color:#800000; '>></span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>sfs-debug.h</span><span style='color:#800000; '>"</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>sfs.h</span><span style='color:#800000; '>"</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>cfs/cfs.h</span><span style='color:#800000; '>"</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> SUCCESS</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> SUCCESS         1       </span><span style='color:#696969; '>// a positive value, to indicate success</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> EOF</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> EOF             </span><span style='color:#808030; '>-</span><span style='color:#004a43; '>1</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> FAILURE</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> FAILURE         </span><span style='color:#808030; '>-</span><span style='color:#004a43; '>1     </span><span style='color:#696969; '>// a negative value, to indicate failure</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifdef</span><span style='color:#004a43; '> MEASURE_CFS_BACKEND</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>include </span><span style='color:#800000; '>"</span><span style='color:#40015a; '>../../benchmark.h</span><span style='color:#800000; '>"</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>else</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> TSC1</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> TSC2</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>str</span><span style='color:#808030; '>)</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+DECLARE_SM<span style='color:#808030; '>(</span>sfs<span style='color:#808030; '>,</span> <span style='color:#008000; '>0x1234</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// ############################### FILE SYS PARAM #################################</span>
+
+<span style='color:#696969; '>// the system-wide max number of open files; defines open-file-cache size</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> MAX_NB_OPEN_FILES       8</span>
+<span style='color:#696969; '>// the system-wide max number of different files; defines file_pool size</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> MAX_NB_FILES            5</span>
+<span style='color:#696969; '>// the system-wide max number of assignable file permissions; defines perm_pool size</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> MAX_NB_PERMS            10</span>
+
+<span style='color:#696969; '>// ######################### GLOBAL PROTECTED DATA STRUCTURES #####################</span>
+
+<span style='color:#696969; '>// used to pass a character pointer to the uprotected back-end file system</span>
+<span style='color:#800000; font-weight:bold; '>char</span> buf<span style='color:#800080; '>;</span>
+<span style='color:#696969; '>// used to translate the filename_t to a string ptr for the CFS backend</span>
+<span style='color:#800000; font-weight:bold; '>char</span> public_str<span style='color:#808030; '>[</span><span style='color:#008c00; '>2</span><span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* two-phase lookup linked list structs to lookup by filename and sm_id</span>
+<span style='color:#3f5fbf; '>&#xa0;*  (un)populated by sfs_creat() and sfs_remove()</span>
+<span style='color:#3f5fbf; '>&#xa0;*</span>
+<span style='color:#3f5fbf; '>&#xa0;* @invar(file->acl != NULL): a file has exactely one creator ACL entry</span>
+<span style='color:#3f5fbf; '>&#xa0;*  on creation: sfs_creat(): file->acl->flags == SFS_CREATOR</span>
+<span style='color:#3f5fbf; '>&#xa0;*  on revocation: sfs_chmod(): no adding/altering/removing of an SFS_CREATOR entry</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+
+<span style='color:#696969; '>// these structs are aligned on a power of 2 so they can be indexed by the Sancus</span>
+<span style='color:#696969; '>// compiler, but actually need less space (e.g. byte flags instead of ints, etc)</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#800080; '>{</span>
+    sm_id sm_id<span style='color:#800080; '>;</span>                        <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> flags<span style='color:#800080; '>;</span>                          <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#800080; '>;</span>             <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>next<span style='color:#800080; '>;</span>             <span style='color:#696969; '>// 2 bytes</span>
+<span style='color:#800080; '>}</span><span style='color:#800080; '>;</span>
+
+<span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#800080; '>{</span>
+    filename_t name<span style='color:#800080; '>;</span>                    <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> open_count<span style='color:#800080; '>;</span>                     <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>acl<span style='color:#800080; '>;</span>              <span style='color:#696969; '>// 2 bytes</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>next<span style='color:#800080; '>;</span>             <span style='color:#696969; '>// 2 bytes</span>
+<span style='color:#800080; '>}</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// protected memory pools</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> perm_pool<span style='color:#808030; '>[</span>MAX_NB_PERMS<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> file_pool<span style='color:#808030; '>[</span>MAX_NB_FILES<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// open file cache: index with fd into the cache to get the corresponding permission</span>
+<span style='color:#696969; '>// (un)populated by sfs_open() and sfs_close()</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>*</span>fd_cache<span style='color:#808030; '>[</span>MAX_NB_OPEN_FILES<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// list management pointers</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>*</span>free_perm_list<span style='color:#800080; '>;</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>*</span>free_file_list<span style='color:#800080; '>;</span>
+<span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#808030; '>*</span>open_file_list<span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// indicates data structures are intialized; set to false (zero) on SM creation</span>
+bool SM_DATA<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> INIT_DONE<span style='color:#800080; '>;</span>
+
+<span style='color:#696969; '>// ############################# HELPER MACROS ####################################</span>
+
+<span style='color:#3f5fbf; '>/******************* file descriptor checks *******************/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> IS_VALID_FD</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd </span><span style='color:#808030; '>></span><span style='color:#808030; '>=</span><span style='color:#004a43; '> 0 </span><span style='color:#808030; '>&amp;</span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '> fd </span><span style='color:#808030; '>&lt;</span><span style='color:#004a43; '> MAX_NB_OPEN_FILES</span><span style='color:#808030; '>)</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_FD</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>!</span><span style='color:#004a43; '>IS_VALID_FD</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> </span><span style='color:#808030; '>!</span><span style='color:#004a43; '>fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#004a43; '> </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>sm_id </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror_int_int</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>the provided file descriptor </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> isn't valid or </span><span style='color:#800000; '>"</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>doesn't belong to calling SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> fd</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CLOSE_FD</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>open_count</span><span style='color:#808030; '>-</span><span style='color:#808030; '>-</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;fd_cache</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>]</span><span style='color:#004a43; '> </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> NULL</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;cfs_close</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>fd</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#3f5fbf; '>/********************** permission checks *********************/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_PERM</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p_have</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p_have </span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror_int_int</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>permission check failed p_have=0x</span><span style='color:#007997; '>%x</span><span style='color:#0000e6; '> ; p_want = 0x</span><span style='color:#007997; '>%x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;p_have</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p_want</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#696969; '>// on success, p will point to the corresponding FILE_PERM struct</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_ROOT</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>two_phase_lookup</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> SFS_ROOT</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> </span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '>p</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>&lt;</span><span style='color:#004a43; '> 0</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+
+<span style='color:#696969; '>// on success, p will point to the corresponding FILE_PERM struct</span>
+<span style='color:#696969; '>// and prev will point to the preceding OPEN_FILE struct</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> CHK_ROOT_PREV</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> prev</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>two_phase_lookup_prev</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> SFS_ROOT</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> </span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '>p</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> </span><span style='color:#808030; '>&amp;</span><span style='color:#004a43; '>prev</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>&lt;</span><span style='color:#004a43; '> 0</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+
+<span style='color:#3f5fbf; '>/***************** permission list management *****************/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> ALLOC_PERM</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_flags</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_file</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_next</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>!</span><span style='color:#004a43; '>free_perm_list</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>no more FILE_PERM structs left</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_perm_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;free_perm_list </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_perm_list</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>sm_id </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_id</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>flags </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_flags</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>file </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_file</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_next</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> FREE_PERM</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>p</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;p</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_perm_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;free_perm_list </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> p</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#696969; '>// cur will point to the FILE_PERM struct if found; else NULL</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> LOOKUP_PERM</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>file</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;for </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>acl</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> NULL</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>sm_id </span><span style='color:#808030; '>=</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> id</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;break</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#3f5fbf; '>/******************** file list management ********************/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> ALLOC_FILE</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>the_file</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_acl</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> the_next</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>!</span><span style='color:#004a43; '>free_file_list</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printerror</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>no more OPEN_FILE structs left</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return FAILURE</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;the_file </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_file_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;free_file_list </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_file_list</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;the_file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>name </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_name</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;the_file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>open_count </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> 0</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;the_file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>acl </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_acl</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;the_file</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> the_next</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> FREE_FILE</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>f</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;f</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> free_file_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;free_file_list </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> f</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#696969; '>// cur will point to the OPEN_FILE struct if found; else NULL</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> LOOKUP_FILE</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;for </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> open_file_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> NULL</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>name </span><span style='color:#808030; '>=</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> name</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;break</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#696969; '>// cur will point to the OPEN_FILE struct if found; else NULL</span>
+<span style='color:#696969; '>// and prev will point to the preceding OPEN_FILE struct; or the last one</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> LOOKUP_FILE_PREV</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> prev</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;for </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> prev </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> open_file_list</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> NULL</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> prev </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> cur </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>next</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>cur</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span><span style='color:#004a43; '>name </span><span style='color:#808030; '>=</span><span style='color:#808030; '>=</span><span style='color:#004a43; '> name</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;break</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while </span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#3f5fbf; '>/*************************** various **************************/</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> DO_INIT</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>(</span><span style='color:#808030; '>!</span><span style='color:#004a43; '>INIT_DONE</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;init_data_structures</span><span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#808030; '>}</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> TO_PUBLIC_STR</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>char_name</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>do </span><span style='color:#808030; '>{</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;public_str</span><span style='color:#808030; '>[</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>]</span><span style='color:#004a43; '> </span><span style='color:#808030; '>=</span><span style='color:#004a43; '> char_name</span><span style='color:#808030; '>;</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;</span><span style='color:#696969; '>/* optimalisation: following line is not needed (done on init_data_structures): \</span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;* public_str[1] = '\0'; \</span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;*/</span><span style='color:#004a43; '> \</span>
+<span style='color:#808030; '>}</span><span style='color:#004a43; '> while</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>0</span><span style='color:#808030; '>)</span>
+
+<span style='color:#696969; '>// ############################# HELPER FUNCTIONS #################################</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_FUNC<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> init_data_structures<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printd_info<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>initializing data structures</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>struct FILE_PERM size is </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>sizeof</span><span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM<span style='color:#808030; '>)</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>struct OPEN_FILE size is </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>sizeof</span><span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE<span style='color:#808030; '>)</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#696969; '>// populate free_file_list linked list</span>
+    free_file_list <span style='color:#808030; '>=</span> file_pool<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> i<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>cur_f <span style='color:#808030; '>=</span> file_pool<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span> i <span style='color:#808030; '>&lt;</span> MAX_NB_FILES<span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>,</span> cur_f <span style='color:#808030; '>=</span> cur_f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        cur_f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> <span style='color:#808030; '>&amp;</span>file_pool<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+    cur_f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#696969; '>// populate free_perm_list linked list</span>
+    free_perm_list <span style='color:#808030; '>=</span> perm_pool<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>cur_p <span style='color:#808030; '>=</span> perm_pool<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span> i <span style='color:#808030; '>&lt;</span> MAX_NB_PERMS<span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>,</span> cur_p <span style='color:#808030; '>=</span> cur_p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        cur_p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> <span style='color:#808030; '>&amp;</span>perm_pool<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+    cur_p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#696969; '>// empty open_fd_cache</span>
+    <span style='color:#696969; '>// when using compiler optimalisations, requires MAX_NB_OPEN_FILES a power of 2</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i<span style='color:#808030; '>=</span><span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span> i <span style='color:#808030; '>&lt;</span> MAX_NB_OPEN_FILES<span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>)</span>
+        fd_cache<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#696969; '>// empty open_file_list</span>
+    open_file_list <span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#696969; '>// init the null-termination character of te one-character string for cfs backend</span>
+    public_str<span style='color:#808030; '>[</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span> <span style='color:#0000e6; '>'\0'</span><span style='color:#800080; '>;</span>
+    
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> NO_CFS_FORMAT</span>
+    printd_info<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>calling cfs_format</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    cfs_format<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_format</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+    
+    INIT_DONE <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Searches for the file associated with @param(name) and then checks permissions</span>
+<span style='color:#3f5fbf; '>&#xa0;* @param(flags) for SM with id @param(sm). On success, zero is returned and</span>
+<span style='color:#3f5fbf; '>&#xa0;* @param(p_ptr) points to the matching FILE_PERM struct. On failure -1 is returned.</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_FUNC<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> two_phase_lookup_prev <span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> flags<span style='color:#808030; '>,</span> sm_id sm<span style='color:#808030; '>,</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span><span style='color:#808030; '>*</span>p_ptr<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span><span style='color:#808030; '>*</span>prev_ptr<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printdname_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>two_phase_lookup for file</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printdii_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '> with permission flags 0x</span><span style='color:#007997; '>%x</span><span style='color:#0000e6; '> and SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> flags<span style='color:#808030; '>,</span> sm<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#808030; '>,</span> <span style='color:#808030; '>*</span>prev<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>prev_ptr<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        LOOKUP_FILE_PREV<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> file<span style='color:#808030; '>,</span> prev<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#808030; '>*</span>prev_ptr <span style='color:#808030; '>=</span> prev<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    <span style='color:#800000; font-weight:bold; '>else</span>
+        LOOKUP_FILE<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> file<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>file<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>found open_file struct at address </span><span style='color:#007997; '>%#x</span><span style='color:#0000e6; '>; now searching ACL</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> file<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#800080; '>;</span>
+    LOOKUP_PERM<span style='color:#808030; '>(</span>file<span style='color:#808030; '>,</span> sm<span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>p<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printerror_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>found no perm entry for SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> sm<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>found file_perm struct at address </span><span style='color:#007997; '>%#x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#808030; '>*</span>p_ptr <span style='color:#808030; '>=</span> p<span style='color:#800080; '>;</span>
+    CHK_PERM<span style='color:#808030; '>(</span>p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span> <span style='color:#696969; '>// might return failure</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>define</span><span style='color:#004a43; '> two_phase_lookup</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> flags</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> \</span>
+<span style='color:#004a43; '>&#xa0;&#xa0;&#xa0;&#xa0;two_phase_lookup_prev</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>name</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> flags</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> sm</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> p</span><span style='color:#808030; '>,</span><span style='color:#004a43; '> NULL</span><span style='color:#808030; '>)</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Attempts to open the file @p(name) in the CFS back-end and populates the</span>
+<span style='color:#3f5fbf; '>&#xa0;* corresponding fd_cache entry with @p(p) iff a valid back-end fd is returned.</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_FUNC<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> open_back_end_file<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>char</span> name<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> size<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    <span style='color:#696969; '>// open with read write in the back-end; front-end will take care of finer</span>
+    <span style='color:#696969; '>// grained permissions</span>
+    printd_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>opening file in back-end</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TO_PUBLIC_STR<span style='color:#808030; '>(</span>name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> fd <span style='color:#808030; '>=</span> cfs_open<span style='color:#808030; '>(</span>public_str<span style='color:#808030; '>,</span> CFS_WRITE <span style='color:#808030; '>|</span> CFS_READ<span style='color:#808030; '>,</span> size<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_open</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>the returned back-end fd is </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>IS_VALID_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printerror_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>returned back-end fd </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> out of range</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        cfs_close<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>open_count<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#800080; '>;</span>
+    fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span> p<span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> fd<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Helper function to revoke the ACL entry for SM @param(id) on file @param(file)</span>
+<span style='color:#3f5fbf; '>&#xa0;* iff non-SFS_CREATOR ACL entry (to satisfy invar).</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_FUNC<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> revoke_acl<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#808030; '>,</span> sm_id id<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    <span style='color:#696969; '>// walk the ACL to check for existing entry</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>cur<span style='color:#808030; '>,</span> <span style='color:#808030; '>*</span>prev<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>int</span> i<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>cur <span style='color:#808030; '>=</span> prev <span style='color:#808030; '>=</span> file<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>acl<span style='color:#800080; '>;</span> cur <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> prev <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>,</span> cur <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>sm_id <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> id<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>{</span>
+            <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_CREATOR<span style='color:#808030; '>)</span>
+            <span style='color:#800080; '>{</span>
+                printerror<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>SFS_CREATOR permission is non-revocable</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+            <span style='color:#800080; '>}</span>
+            <span style='color:#800000; font-weight:bold; '>else</span>
+            <span style='color:#800080; '>{</span>
+                <span style='color:#696969; '>// free the permission entry; close any open file descriptors first</span>
+                <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span> i <span style='color:#808030; '>&lt;</span> MAX_NB_OPEN_FILES<span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>)</span>
+                    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>fd_cache<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> cur<span style='color:#808030; '>)</span>
+                    <span style='color:#800080; '>{</span>
+                        printdi_warning<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>ACL entry currently open; now closing fd </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> i<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                        CLOSE_FD<span style='color:#808030; '>(</span>i<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>                        
+                    <span style='color:#800080; '>}</span>
+            
+                printdi_warning<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>removing ACL entry at address </span><span style='color:#007997; '>%#x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> cur<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                prev<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#800080; '>;</span>
+                FREE_PERM<span style='color:#808030; '>(</span>cur<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+            <span style='color:#800080; '>}</span>
+        <span style='color:#800080; '>}</span>
+    
+    <span style='color:#696969; '>// no existing entry in the ACL; postcondition is ok</span>
+    <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* Helper function to add/override the ACL entry with permissions @param(perm_flags)</span>
+<span style='color:#3f5fbf; '>&#xa0;* for SM @param(id) on file @param(file) iff non-SFS_CREATOR (to satisfy invar).</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_FUNC<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> add_acl<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#808030; '>,</span> sm_id id<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> perm_flags<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    <span style='color:#696969; '>// walk the access control list; override any existing permission</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#808030; '>,</span> <span style='color:#808030; '>*</span>prev<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>p <span style='color:#808030; '>=</span> prev <span style='color:#808030; '>=</span> file<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>acl<span style='color:#800080; '>;</span> p <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> prev <span style='color:#808030; '>=</span> p<span style='color:#808030; '>,</span> p <span style='color:#808030; '>=</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>sm_id <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> id<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>{</span>
+            <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_CREATOR<span style='color:#808030; '>)</span>
+            <span style='color:#800080; '>{</span>
+                printerror<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>SFS_CREATOR permission is non-overrideable</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+            <span style='color:#800080; '>}</span>
+            <span style='color:#800000; font-weight:bold; '>else</span>
+            <span style='color:#800080; '>{</span>
+                printdi_warning<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>overriding existing ACL entry flag </span><span style='color:#007997; '>%#x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+                p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags <span style='color:#808030; '>=</span> perm_flags<span style='color:#800080; '>;</span>
+                <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+            <span style='color:#800080; '>}</span>
+        <span style='color:#800080; '>}</span>
+        
+    <span style='color:#696969; '>// no existing entry in the access control list; try to append new one</span>
+    printd_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>appending additional ACL entry</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>perm_flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_CREATOR<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printerror<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>SFS_CREATOR permission is non-assignable</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    
+    ALLOC_PERM<span style='color:#808030; '>(</span>p<span style='color:#808030; '>,</span> id<span style='color:#808030; '>,</span> perm_flags<span style='color:#808030; '>,</span> file<span style='color:#808030; '>,</span> <span style='color:#7d0045; '>NULL</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#696969; '>// prev != NULL because a file always has at least the owner ACL entry (invar)</span>
+    prev<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> p<span style='color:#800080; '>;</span>
+
+    <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>   
+<span style='color:#800080; '>}</span>
+
+<span style='color:#696969; '>// ######################### SFS API IMPLEMENTATION ###############################</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_ping<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>   
+    printdii_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_ping</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Hi from sfs-ram; I have id </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> and was called </span><span style='color:#800000; '>"</span> \
+     <span style='color:#800000; '>"</span><span style='color:#0000e6; '>by </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '>; now calling cfs_ping()</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> sancus_get_self_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>,</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>if</span><span style='color:#004a43; '> </span><span style='color:#808030; '>!</span><span style='color:#004a43; '>defined</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>NODEBUG</span><span style='color:#808030; '>)</span><span style='color:#004a43; '> </span><span style='color:#808030; '>|</span><span style='color:#808030; '>|</span><span style='color:#004a43; '> </span><span style='color:#004a43; '>defined</span><span style='color:#808030; '>(</span><span style='color:#004a43; '>MEASURE_CFS_BACKEND</span><span style='color:#808030; '>)</span>
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    cfs_ping<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_ping()</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+    <span style='color:#800000; font-weight:bold; '>return</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_init<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printd_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_init</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>calling DO_INIT macro</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>void</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_dump<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>void</span><span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifndef</span><span style='color:#004a43; '> NODEBUG</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>f<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>int</span> i<span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+        
+    printd_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_dump</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>dumping global protected ACL data structures:</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\t</span><span style='color:#0000e6; '>----------------------------------------------------------------</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>f <span style='color:#808030; '>=</span> open_file_list<span style='color:#800080; '>;</span> f <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> f <span style='color:#808030; '>=</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printf_int<span style='color:#808030; '>(</span>BOLD <span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\t</span><span style='color:#0000e6; '>FILE</span><span style='color:#800000; '>"</span> NONE <span style='color:#800000; '>"</span><span style='color:#0000e6; '> with name '</span><span style='color:#007997; '>%c</span><span style='color:#0000e6; '>'</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '> at </span><span style='color:#007997; '>%#x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> f<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>; open_count = </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '>; </span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>open_count<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>next_ptr = </span><span style='color:#007997; '>%#x</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>p <span style='color:#808030; '>=</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>acl<span style='color:#800080; '>;</span> p <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> p <span style='color:#808030; '>=</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>{</span>
+            printf_int<span style='color:#808030; '>(</span>BOLD <span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\t</span><span style='color:#0f69ff; '>\t</span><span style='color:#0000e6; '>PERM</span><span style='color:#800000; '>"</span> NONE <span style='color:#800000; '>"</span><span style='color:#0000e6; '> (</span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>sm_id<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>, 0x</span><span style='color:#007997; '>%02x</span><span style='color:#0000e6; '>) </span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>at </span><span style='color:#007997; '>%#x</span><span style='color:#0000e6; '>; </span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>file_ptr = </span><span style='color:#007997; '>%#x</span><span style='color:#0000e6; '>; </span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            printf_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>next_ptr = </span><span style='color:#007997; '>%#x</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800080; '>}</span>
+    <span style='color:#800080; '>}</span>
+    <span style='color:#603000; '>puts</span><span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\t</span><span style='color:#0000e6; '>----------------------------------------------------------------</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    printd_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_dump</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>dumping global protected file descriptor cache:</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printf_str<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\t</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#800080; '>;</span> i <span style='color:#808030; '>&lt;</span> MAX_NB_OPEN_FILES<span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>)</span>
+        printf_int_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>(</span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '>, 0x</span><span style='color:#007997; '>%x</span><span style='color:#0000e6; '>); </span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> i<span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#603000; '>intptr_t</span><span style='color:#808030; '>)</span> fd_cache<span style='color:#808030; '>[</span>i<span style='color:#808030; '>]</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printf_str<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>,</span> f <span style='color:#808030; '>=</span> free_file_list<span style='color:#800080; '>;</span> f <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>,</span> f <span style='color:#808030; '>=</span> f<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>;</span>
+    printdii_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>free file list size is </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> max is </span><span style='color:#007997; '>%d</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> i<span style='color:#808030; '>,</span> MAX_NB_FILES<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>i <span style='color:#808030; '>=</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>,</span> p <span style='color:#808030; '>=</span> free_perm_list<span style='color:#800080; '>;</span> p<span style='color:#808030; '>!</span><span style='color:#808030; '>=</span><span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> i<span style='color:#808030; '>+</span><span style='color:#808030; '>+</span><span style='color:#808030; '>,</span> p <span style='color:#808030; '>=</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>;</span>
+    printdii_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>free perm list size is </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> max is </span><span style='color:#007997; '>%d</span><span style='color:#0f69ff; '>\n</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> i<span style='color:#808030; '>,</span> MAX_NB_PERMS<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>ifdef</span><span style='color:#004a43; '> CFS_DUMP    </span>
+    printd_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs-dump</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>now calling cfs_dump</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    cfs_dump<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>else</span><span style='color:#004a43; '> </span><span style='color:#696969; '>// NODEBUG</span>
+    <span style='color:#800000; font-weight:bold; '>return</span><span style='color:#800080; '>;</span>
+<span style='color:#004a43; '>#</span><span style='color:#004a43; '>endif</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_open<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> flags<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> size<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#800080; '>;</span>
+    LOOKUP_FILE<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> file<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>file<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>size <span style='color:#808030; '>&lt;</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>{</span>
+            printerror_int<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_open</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>caller requested not to create new </span><span style='color:#800000; '>"</span> \
+            <span style='color:#800000; '>"</span><span style='color:#0000e6; '>non-existing file '</span><span style='color:#007997; '>%c</span><span style='color:#0000e6; '>'; returning failure...</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span><span style='color:#808030; '>)</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+        <span style='color:#800080; '>}</span>
+        printdname_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_open</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>creating new file with name</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        
+        <span style='color:#696969; '>/* </span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;printd_debug("removing any existing file of the same name in the back-end");</span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;TO_PUBLIC_STR(name);</span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;cfs_remove(public_str);</span>
+<span style='color:#696969; '>&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;*/</span>
+    
+        <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>free_perm_list <span style='color:#808030; '>|</span><span style='color:#808030; '>|</span> <span style='color:#808030; '>!</span>free_file_list<span style='color:#808030; '>)</span>
+        <span style='color:#800080; '>{</span>
+            printerror<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>need a free OPEN_FILE struct and FILE_PERM struct</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+            <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+        <span style='color:#800080; '>}</span>
+    
+        <span style='color:#696969; '>// create the new file and add it in front of open_file_list</span>
+        ALLOC_FILE<span style='color:#808030; '>(</span>file<span style='color:#808030; '>,</span> name<span style='color:#808030; '>,</span> <span style='color:#7d0045; '>NULL</span><span style='color:#808030; '>,</span> open_file_list<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        open_file_list <span style='color:#808030; '>=</span> file<span style='color:#800080; '>;</span>
+        ALLOC_PERM<span style='color:#808030; '>(</span>p<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>,</span> SFS_CREATOR<span style='color:#808030; '>,</span> file<span style='color:#808030; '>,</span> <span style='color:#7d0045; '>NULL</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        file<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>acl <span style='color:#808030; '>=</span> p<span style='color:#800080; '>;</span>
+    
+        <span style='color:#800000; font-weight:bold; '>return</span> open_back_end_file<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> size<span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+
+    printdname_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_open</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>opening existing file with name</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    LOOKUP_PERM<span style='color:#808030; '>(</span>file<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>p<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printerror_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>found no permission entry for SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    CHK_PERM<span style='color:#808030; '>(</span>p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span> <span style='color:#696969; '>// might return failure</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> open_back_end_file<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> size<span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_close<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    printdi_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_close</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>file with fd </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    CHK_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span>    
+    fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>open_count<span style='color:#808030; '>-</span><span style='color:#808030; '>-</span><span style='color:#800080; '>;</span>
+    fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span> <span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span>
+
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    cfs_close<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_close</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#3f5fbf; '>/**</span>
+<span style='color:#3f5fbf; '>&#xa0;* this implementation refuses to remove a file that is still open</span>
+<span style='color:#3f5fbf; '>&#xa0;* by some SM; an alternative would be that the implementation closes</span>
+<span style='color:#3f5fbf; '>&#xa0;* any remaining open file connection on behalf of the caller (owner of the file)</span>
+<span style='color:#3f5fbf; '>&#xa0;*/</span>
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_remove<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    printdname_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_remove</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>trying to remove file</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#696969; '>// only root can remove a file</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>cur<span style='color:#808030; '>,</span> <span style='color:#808030; '>*</span>prev<span style='color:#800080; '>;</span>
+    CHK_ROOT_PREV<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>,</span> p<span style='color:#808030; '>,</span> prev<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    cur <span style='color:#808030; '>=</span> p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>open_count<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        printerror_int<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>there are </span><span style='color:#007997; '>%d</span><span style='color:#0000e6; '> remaining open file connections;</span><span style='color:#800000; '>"</span> \
+        <span style='color:#800000; '>"</span><span style='color:#0000e6; '> close them first</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>open_count<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    
+    <span style='color:#696969; '>// remove associated access control data structures</span>
+    prev<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>curp<span style='color:#808030; '>,</span> <span style='color:#808030; '>*</span>nextp<span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>for</span> <span style='color:#808030; '>(</span>curp <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>acl<span style='color:#800080; '>;</span> curp <span style='color:#808030; '>!</span><span style='color:#808030; '>=</span> <span style='color:#7d0045; '>NULL</span><span style='color:#800080; '>;</span> curp <span style='color:#808030; '>=</span> nextp<span style='color:#808030; '>)</span>
+    <span style='color:#800080; '>{</span>
+        nextp <span style='color:#808030; '>=</span> curp<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#800080; '>;</span>
+        FREE_PERM<span style='color:#808030; '>(</span>curp<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800080; '>}</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>open_file_list <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> cur<span style='color:#808030; '>)</span>
+        open_file_list <span style='color:#808030; '>=</span> cur<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>next<span style='color:#800080; '>;</span>
+    FREE_FILE<span style='color:#808030; '>(</span>cur<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    printd_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>now removing file in CFS back-end</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TO_PUBLIC_STR<span style='color:#808030; '>(</span>name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> rv <span style='color:#808030; '>=</span> cfs_remove<span style='color:#808030; '>(</span>public_str<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_remove</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> rv<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_getc<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    printdi_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_getc</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>read a char from file with fd </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+   
+    CHK_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span>
+    CHK_PERM<span style='color:#808030; '>(</span>fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> SFS_READ<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> rv <span style='color:#808030; '>=</span> cfs_read<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>buf<span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_read_one_char</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_read returned </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> rv<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>return</span> <span style='color:#808030; '>(</span>rv <span style='color:#808030; '>></span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span><span style='color:#800080; '>?</span> buf <span style='color:#800080; '>:</span> <span style='color:#7d0045; '>EOF</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_putc<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>unsigned</span> <span style='color:#800000; font-weight:bold; '>char</span> c<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    printdi_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_putc</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>write a char to file with fd </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    CHK_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span>
+    CHK_PERM<span style='color:#808030; '>(</span>fd_cache<span style='color:#808030; '>[</span>fd<span style='color:#808030; '>]</span><span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> SFS_WRITE<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    buf <span style='color:#808030; '>=</span> c<span style='color:#800080; '>;</span> <span style='color:#696969; '>// this is part of the back-end function call overhead...</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> rv <span style='color:#808030; '>=</span> cfs_write<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>buf<span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_write_one_char</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_write returned </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> rv<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>return</span> <span style='color:#808030; '>(</span>rv <span style='color:#808030; '>></span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span><span style='color:#800080; '>?</span> buf <span style='color:#800080; '>:</span> <span style='color:#7d0045; '>EOF</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_seek<span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>int</span> fd<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> offset<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> origin<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    printdi_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_seek</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>now trying to seek in file with fd </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> fd<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    CHK_FD<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>)</span>
+
+    TSC1<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>int</span> rv <span style='color:#808030; '>=</span> cfs_seek<span style='color:#808030; '>(</span>fd<span style='color:#808030; '>,</span> offset<span style='color:#808030; '>,</span> origin<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    TSC2<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>cfs_seek</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> rv<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_chmod<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> sm_id id<span style='color:#808030; '>,</span> <span style='color:#800000; font-weight:bold; '>int</span> perm_flags<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    sm_id caller_id <span style='color:#808030; '>=</span> sancus_get_caller_id<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    DO_INIT<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
+
+    printdname_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_chmod</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>trying to modify ACL for file</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> name<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>wanted permission entry for SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> id<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    printdi_debug<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>and flags </span><span style='color:#007997; '>%#x</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> perm_flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#696969; '>// only root can chmod</span>
+    <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p_caller<span style='color:#800080; '>;</span>
+    CHK_ROOT<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>,</span> p_caller<span style='color:#808030; '>)</span>
+    
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>perm_flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_NIL<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> revoke_acl<span style='color:#808030; '>(</span>p_caller<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>,</span> id<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+   
+    <span style='color:#800000; font-weight:bold; '>return</span> add_acl<span style='color:#808030; '>(</span>p_caller<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>file<span style='color:#808030; '>,</span> id<span style='color:#808030; '>,</span> perm_flags<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+
+<span style='color:#800000; font-weight:bold; '>int</span> SM_ENTRY<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> sfs_attest<span style='color:#808030; '>(</span>filename_t name<span style='color:#808030; '>,</span> sm_id owner<span style='color:#808030; '>)</span>
+<span style='color:#800080; '>{</span>
+    printdii_info<span style='color:#808030; '>(</span>FCT<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>sfs_attest</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>validating file '</span><span style='color:#007997; '>%c</span><span style='color:#0000e6; '>' was created by SM </span><span style='color:#007997; '>%d</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span>
+        <span style='color:#808030; '>(</span><span style='color:#800000; font-weight:bold; '>char</span><span style='color:#808030; '>)</span> name<span style='color:#808030; '>,</span> owner<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+
+    <span style='color:#800000; font-weight:bold; '>struct</span> OPEN_FILE <span style='color:#808030; '>*</span>file<span style='color:#800080; '>;</span> <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p<span style='color:#800080; '>;</span>
+    LOOKUP_FILE<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> file<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>file<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    
+    LOOKUP_PERM<span style='color:#808030; '>(</span>file<span style='color:#808030; '>,</span> owner<span style='color:#808030; '>,</span> p<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span><span style='color:#808030; '>!</span>p<span style='color:#808030; '>)</span>
+        <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
+    
+    CHK_PERM<span style='color:#808030; '>(</span>p<span style='color:#808030; '>-</span><span style='color:#808030; '>></span>flags<span style='color:#808030; '>,</span> SFS_CREATOR<span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+    
+    <span style='color:#800000; font-weight:bold; '>return</span> SUCCESS<span style='color:#800080; '>;</span>
+<span style='color:#800080; '>}</span>
+</pre>
+
+<hr>
+
+</div>
+</body>
+</html> 

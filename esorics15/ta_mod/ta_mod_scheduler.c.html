@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/www/leuven/ta-modules-esorics15/www/ta_mod/ta_mod_scheduler.c.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span>
+<span class="lnr">  2 </span><span class="PreProc">#if (BUILTIN_PROT_SCHED == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr">  3 </span>
+<span class="lnr">  4 </span><span class="PreProc">#include </span><span class="Constant">&quot;ta_internals.h&quot;</span>
+<span class="lnr">  5 </span>
+<span class="lnr">  6 </span>
+<span class="lnr">  7 </span><span class="PreProc">#define PROCESS_STATE_NONE        </span><span class="Constant">0</span>
+<span class="lnr">  8 </span><span class="PreProc">#define PROCESS_STATE_RUNNING     </span><span class="Constant">1</span>
+<span class="lnr">  9 </span><span class="PreProc">#define PROCESS_STATE_CALLED      </span><span class="Constant">2</span>
+<span class="lnr"> 10 </span>
+<span class="lnr"> 11 </span><span class="PreProc">#define DEBUG </span><span class="Constant">0</span>
+<span class="lnr"> 12 </span><span class="PreProc">#if DEBUG</span>
+<span class="lnr"> 13 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 14 </span><span class="PreProc">#define PRINTF(...) printf(__VA_ARGS__)</span>
+<span class="lnr"> 15 </span><span class="PreProc">#else</span>
+<span class="lnr"> 16 </span><span class="PreProc">#define PRINTF(...)</span>
+<span class="lnr"> 17 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 18 </span>
+<span class="lnr"> 19 </span><span class="Type">void</span> call_process(<span class="Type">struct</span> process *p, process_event_t ev, process_data_t data);
+<span class="lnr"> 20 </span><span class="Type">void</span> exit_process(<span class="Type">struct</span> process *p, <span class="Type">struct</span> process *fromprocess);
+<span class="lnr"> 21 </span>
+<span class="lnr"> 22 </span><span class="Type">static</span> <span class="Type">int</span> __attribute__ ((noinline))
+<span class="lnr"> 23 </span>__TASecureCallProcess (<span class="Type">struct</span> process *p,
+<span class="lnr"> 24 </span>  process_event_t ev, process_data_t data)
+<span class="lnr"> 25 </span>{
+<span class="lnr"> 26 </span>  <span class="Type">static</span> <span class="Type">int</span> ret = -<span class="Constant">1</span>;
+<span class="lnr"> 27 </span>  eint();
+<span class="lnr"> 28 </span>  ret = p-&gt;thread(&amp;p-&gt;pt, ev, data);
+<span class="lnr"> 29 </span>  dint();
+<span class="lnr"> 30 </span>  <span class="cStatement">return</span> (ret);
+<span class="lnr"> 31 </span>}
+<span class="lnr"> 32 </span>
+<span class="lnr"> 33 </span>
+<span class="lnr"> 34 </span><span class="Type">int</span> SM_ENTRY(TA_SM_NAME) TASecureCallProcess (<span class="Type">struct</span> process *p,
+<span class="lnr"> 35 </span>  process_event_t ev, process_data_t data)
+<span class="lnr"> 36 </span>{
+<span class="lnr"> 37 </span>  <span class="Type">static</span> <span class="Type">int</span> ret = -<span class="Constant">1</span>;
+<span class="lnr"> 38 </span>
+<span class="lnr"> 39 </span><span class="Comment">/*</span><span class="Comment"> Check __TASecureCallProcess()</span>
+<span class="lnr"> 40 </span><span class="Comment"> * Check p-&gt;thread</span>
+<span class="lnr"> 41 </span><span class="Comment"> * Store call and timing somewhere</span>
+<span class="lnr"> 42 </span><span class="Comment"> *</span>
+<span class="lnr"> 43 </span><span class="Comment"> * Q: check caller? Do we gain anything from that?</span>
+<span class="lnr"> 44 </span><span class="Comment"> * Q: Why noth check all code sections at every call?</span>
+<span class="lnr"> 45 </span><span class="Comment"> * A: We want to minimise overhead and check a minimum subset of</span>
+<span class="lnr"> 46 </span><span class="Comment"> *    components that enable us to give relatively strong guarantees</span>
+<span class="lnr"> 47 </span><span class="Comment"> *    already. Importantly, this is not a countermeasure against a specific</span>
+<span class="lnr"> 48 </span><span class="Comment"> *    known attack but a pretty much generic approach to mitigate unknown</span>
+<span class="lnr"> 49 </span><span class="Comment"> *    attacks and to detect faulty corruption of software components.</span>
+<span class="lnr"> 50 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 51 </span>
+<span class="lnr"> 52 </span>
+<span class="lnr"> 53 </span><span class="PreProc">#ifdef __DEBUG</span>
+<span class="lnr"> 54 </span>  printf2(<span class="Constant">&quot;TA: calling process '</span><span class="Special">%s</span><span class="Constant">' with event </span><span class="Special">%d</span><span class="Constant">.</span><span class="Special">\n</span><span class="Constant">&quot;</span>,
+<span class="lnr"> 55 </span>    (<span class="Type">void</span> *) PROCESS_NAME_STRING(p), (<span class="Type">void</span> *) ((<span class="Type">int</span>) ev));
+<span class="lnr"> 56 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 57 </span><span class="PreProc">#if (TA_PROCESS_INSPECTOR == </span><span class="Constant">1</span><span class="PreProc">)</span>
+<span class="lnr"> 58 </span>  __TIMING_INIT();
+<span class="lnr"> 59 </span>  <span class="cConditional">if</span> (TAInitialised) {
+<span class="lnr"> 60 </span>    TAProcessUpdate (p-&gt;thread);
+<span class="lnr"> 61 </span>  }
+<span class="lnr"> 62 </span>  __TIMING_PRINT(<span class="Constant">&quot;+++ TASecureCallProcess(): update inv &amp; time &quot;</span>);
+<span class="lnr"> 63 </span><span class="PreProc">#endif</span>
+<span class="lnr"> 64 </span>  ret = __TASecureCallProcess (p, ev, data);
+<span class="lnr"> 65 </span>
+<span class="lnr"> 66 </span>  <span class="cStatement">return</span> (ret);
+<span class="lnr"> 67 </span>}
+<span class="lnr"> 68 </span>
+<span class="lnr"> 69 </span>
+<span class="lnr"> 70 </span>
+<span class="lnr"> 71 </span><span class="Comment">/*</span><span class="Comment"> modified from contiki/core/sys/process.c </span><span class="Comment">*/</span>
+<span class="lnr"> 72 </span><span class="Type">void</span>
+<span class="lnr"> 73 </span>exit_process(<span class="Type">struct</span> process *p, <span class="Type">struct</span> process *fromprocess)
+<span class="lnr"> 74 </span>{
+<span class="lnr"> 75 </span>  <span class="Type">register</span> <span class="Type">struct</span> process *q;
+<span class="lnr"> 76 </span>  <span class="Type">struct</span> process *old_current = process_current;
+<span class="lnr"> 77 </span>
+<span class="lnr"> 78 </span>  PRINTF(<span class="Constant">&quot;process: exit_process '</span><span class="Special">%s</span><span class="Constant">'</span><span class="Special">\n</span><span class="Constant">&quot;</span>, PROCESS_NAME_STRING(p));
+<span class="lnr"> 79 </span>
+<span class="lnr"> 80 </span>  <span class="Comment">/*</span><span class="Comment"> Make sure the process is in the process list before we try to</span>
+<span class="lnr"> 81 </span><span class="Comment">     exit it. </span><span class="Comment">*/</span>
+<span class="lnr"> 82 </span>  <span class="cRepeat">for</span>(q = process_list; q != p &amp;&amp; q != <span class="Constant">NULL</span>; q = q-&gt;next);
+<span class="lnr"> 83 </span>  <span class="cConditional">if</span>(q == <span class="Constant">NULL</span>) {
+<span class="lnr"> 84 </span>    <span class="cStatement">return</span>;
+<span class="lnr"> 85 </span>  }
+<span class="lnr"> 86 </span>
+<span class="lnr"> 87 </span>  <span class="cConditional">if</span>(process_is_running(p)) {
+<span class="lnr"> 88 </span>    <span class="Comment">/*</span><span class="Comment"> Process was running </span><span class="Comment">*/</span>
+<span class="lnr"> 89 </span>    p-&gt;state = PROCESS_STATE_NONE;
+<span class="lnr"> 90 </span>
+<span class="lnr"> 91 </span>    <span class="Comment">/*</span>
+<span class="lnr"> 92 </span><span class="Comment">     * Post a synchronous event to all processes to inform them that</span>
+<span class="lnr"> 93 </span><span class="Comment">     * this process is about to exit. This will allow services to</span>
+<span class="lnr"> 94 </span><span class="Comment">     * deallocate state associated with this process.</span>
+<span class="lnr"> 95 </span><span class="Comment">     </span><span class="Comment">*/</span>
+<span class="lnr"> 96 </span>    <span class="cRepeat">for</span>(q = process_list; q != <span class="Constant">NULL</span>; q = q-&gt;next) {
+<span class="lnr"> 97 </span>      <span class="cConditional">if</span>(p != q) {
+<span class="lnr"> 98 </span>        call_process(q, PROCESS_EVENT_EXITED, (process_data_t)p);
+<span class="lnr"> 99 </span>      }
+<span class="lnr">100 </span>    }
+<span class="lnr">101 </span>
+<span class="lnr">102 </span>    <span class="cConditional">if</span>(p-&gt;thread != <span class="Constant">NULL</span> &amp;&amp; p != fromprocess) {
+<span class="lnr">103 </span>      <span class="Comment">/*</span><span class="Comment"> Post the exit event to the process that is about to exit. </span><span class="Comment">*/</span>
+<span class="lnr">104 </span>      process_current = p;
+<span class="lnr">105 </span>      dint();
+<span class="lnr">106 </span>      TASecureCallProcess(p, PROCESS_EVENT_EXIT, <span class="Constant">NULL</span>);
+<span class="lnr">107 </span>      eint();
+<span class="lnr">108 </span>    }
+<span class="lnr">109 </span>  }
+<span class="lnr">110 </span>
+<span class="lnr">111 </span>  <span class="cConditional">if</span>(p == process_list) {
+<span class="lnr">112 </span>    process_list = process_list-&gt;next;
+<span class="lnr">113 </span>  } <span class="cConditional">else</span> {
+<span class="lnr">114 </span>    <span class="cRepeat">for</span>(q = process_list; q != <span class="Constant">NULL</span>; q = q-&gt;next) {
+<span class="lnr">115 </span>      <span class="cConditional">if</span>(q-&gt;next == p) {
+<span class="lnr">116 </span>        q-&gt;next = p-&gt;next;
+<span class="lnr">117 </span>        <span class="cStatement">break</span>;
+<span class="lnr">118 </span>      }
+<span class="lnr">119 </span>    }
+<span class="lnr">120 </span>  }
+<span class="lnr">121 </span>
+<span class="lnr">122 </span>  process_current = old_current;
+<span class="lnr">123 </span>}
+<span class="lnr">124 </span>
+<span class="lnr">125 </span>
+<span class="lnr">126 </span><span class="Comment">/*</span><span class="Comment"> modified from contiki/core/sys/process.c </span><span class="Comment">*/</span>
+<span class="lnr">127 </span><span class="Type">void</span>
+<span class="lnr">128 </span>call_process(<span class="Type">struct</span> process *p, process_event_t ev, process_data_t data)
+<span class="lnr">129 </span>{
+<span class="lnr">130 </span>  <span class="Type">int</span> ret;
+<span class="lnr">131 </span>
+<span class="lnr">132 </span><span class="PreProc">#if DEBUG</span>
+<span class="lnr">133 </span>  <span class="cConditional">if</span>(p-&gt;state == PROCESS_STATE_CALLED) {
+<span class="lnr">134 </span>    printf(<span class="Constant">&quot;process: process '</span><span class="Special">%s</span><span class="Constant">' called again with event </span><span class="Special">%d</span><span class="Special">\n</span><span class="Constant">&quot;</span>, PROCESS_NAME_STRING(p), ev);
+<span class="lnr">135 </span>  }
+<span class="lnr">136 </span><span class="PreProc">#endif</span> <span class="Comment">/*</span><span class="Comment"> DEBUG </span><span class="Comment">*/</span>
+<span class="lnr">137 </span>
+<span class="lnr">138 </span>  <span class="cConditional">if</span>((p-&gt;state &amp; PROCESS_STATE_RUNNING) &amp;&amp;
+<span class="lnr">139 </span>     p-&gt;thread != <span class="Constant">NULL</span>) {
+<span class="lnr">140 </span>    PRINTF(<span class="Constant">&quot;process: calling process '</span><span class="Special">%s</span><span class="Constant">' with event </span><span class="Special">%d</span><span class="Special">\n</span><span class="Constant">&quot;</span>, PROCESS_NAME_STRING(p), ev);
+<span class="lnr">141 </span>    process_current = p;
+<span class="lnr">142 </span>    p-&gt;state = PROCESS_STATE_CALLED;
+<span class="lnr">143 </span>    dint();
+<span class="lnr">144 </span>    ret = TASecureCallProcess(p, ev, data);
+<span class="lnr">145 </span>    eint();
+<span class="lnr">146 </span>    <span class="cConditional">if</span>(ret == PT_EXITED ||
+<span class="lnr">147 </span>       ret == PT_ENDED ||
+<span class="lnr">148 </span>       ev == PROCESS_EVENT_EXIT) {
+<span class="lnr">149 </span>      exit_process(p, p);
+<span class="lnr">150 </span>    } <span class="cConditional">else</span> {
+<span class="lnr">151 </span>      p-&gt;state = PROCESS_STATE_RUNNING;
+<span class="lnr">152 </span>    }
+<span class="lnr">153 </span>  }
+<span class="lnr">154 </span>}
+<span class="lnr">155 </span>
+<span class="lnr">156 </span>
+<span class="lnr">157 </span><span class="PreProc">#endif</span> <span class="Comment">/*</span><span class="Comment"> #if (BUILTIN_PROT_SCHED == 1) </span><span class="Comment">*/</span>
+<span class="lnr">158 </span>
+</pre>
+</body>
+</html>

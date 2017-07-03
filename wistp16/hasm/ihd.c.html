@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/paper-smart-meter/www/hasm/ihd.c.html</title>
+<meta name="Generator" content="Vim/7.4">
+<meta name="plugin-version" content="vim7.4_v1">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,no_foldcolumn,expand_tabs,line_ids">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span>
+<span class="lnr"> 2 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 3 </span>
+<span class="lnr"> 4 </span><span class="PreProc">#include </span><span class="Constant">&quot;ihd.h&quot;</span>
+<span class="lnr"> 5 </span><span class="PreProc">#include </span><span class="Constant">&quot;wan_commands.h&quot;</span>
+<span class="lnr"> 6 </span>
+<span class="lnr"> 7 </span>
+<span class="lnr"> 8 </span><span class="Type">static</span> <span class="Type">uint8_t</span>  ihd_supply_state;
+<span class="lnr"> 9 </span><span class="Type">static</span> <span class="Type">uint16_t</span> ihd_active_power_import;
+<span class="lnr">10 </span><span class="Type">static</span> <span class="Type">uint16_t</span> ihd_active_import_register;
+<span class="lnr">11 </span>
+<span class="lnr">12 </span>
+<span class="lnr">13 </span><span class="Type">void</span> ihd_update_supply_state (<span class="Type">uint8_t</span> i)
+<span class="lnr">14 </span>{
+<span class="lnr">15 </span>    ihd_supply_state = i;
+<span class="lnr">16 </span>}
+<span class="lnr">17 </span>
+<span class="lnr">18 </span><span class="Type">void</span> ihd_update_active_power_import (<span class="Type">uint16_t</span> i)
+<span class="lnr">19 </span>{
+<span class="lnr">20 </span>    ihd_active_power_import = i;
+<span class="lnr">21 </span>}
+<span class="lnr">22 </span>
+<span class="lnr">23 </span><span class="Type">void</span> ihd_update_active_import_register (<span class="Type">uint16_t</span> i)
+<span class="lnr">24 </span>{
+<span class="lnr">25 </span>    ihd_active_import_register = i;
+<span class="lnr">26 </span>}
+<span class="lnr">27 </span>
+<span class="lnr">28 </span><span class="Type">void</span> ihd_display (<span class="Type">void</span>)
+<span class="lnr">29 </span>{
+<span class="lnr">30 </span>    printf (<span class="Constant">&quot;* IHD -- Supply: &quot;</span>);
+<span class="lnr">31 </span>    <span class="cConditional">if</span> (ihd_supply_state == SUPPLY_STATE_ENABLED) {
+<span class="lnr">32 </span>      printf (<span class="Constant">&quot; ON; &quot;</span>); }
+<span class="lnr">33 </span>    <span class="cConditional">else</span> <span class="cConditional">if</span> (ihd_supply_state == SUPPLY_STATE_DISABLED) {
+<span class="lnr">34 </span>      printf (<span class="Constant">&quot;OFF; &quot;</span>); }
+<span class="lnr">35 </span>    <span class="cConditional">else</span> {
+<span class="lnr">36 </span>      printf (<span class="Constant">&quot;???; &quot;</span>); }
+<span class="lnr">37 </span>    printf (<span class="Constant">&quot;Active Power: </span><span class="Special">%u</span><span class="Constant">; Total Consumption: </span><span class="Special">%u</span><span class="Special">\n</span><span class="Constant">&quot;</span>,
+<span class="lnr">38 </span>      ihd_active_power_import, ihd_active_import_register);
+<span class="lnr">39 </span>}
+<span class="lnr">40 </span>
+</pre>
+</body>
+</html>

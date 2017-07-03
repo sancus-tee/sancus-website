@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/paper-smart-meter/www/hasm/esme.c.html</title>
+<meta name="Generator" content="Vim/7.4">
+<meta name="plugin-version" content="vim7.4_v1">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,no_foldcolumn,expand_tabs,line_ids">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.cStatement { color: #ff6060; font-weight: bold; }
+.Comment { color: #00ffff; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus/reactive.h&gt;</span>
+<span class="lnr">  2 </span>
+<span class="lnr">  3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr">  4 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdlib.h&gt;</span>
+<span class="lnr">  5 </span><span class="PreProc">#include </span><span class="Constant">&lt;random.h&gt;</span>
+<span class="lnr">  6 </span>
+<span class="lnr">  7 </span><span class="PreProc">#include </span><span class="Constant">&quot;wan_commands.h&quot;</span>
+<span class="lnr">  8 </span>
+<span class="lnr">  9 </span><span class="PreProc">#define SMNAME     ESME</span>
+<span class="lnr"> 10 </span>
+<span class="lnr"> 11 </span><span class="PreProc">#define MAX_OBSERVERS </span><span class="Constant">4</span>
+<span class="lnr"> 12 </span>
+<span class="lnr"> 13 </span>SM_OUTPUT(SMNAME, load_switch_out);
+<span class="lnr"> 14 </span>SM_OUTPUT(SMNAME, central_system_out);
+<span class="lnr"> 15 </span>SM_OUTPUT(SMNAME, han_if_out);
+<span class="lnr"> 16 </span>
+<span class="lnr"> 17 </span>
+<span class="lnr"> 18 </span><span class="Type">static</span> <span class="Type">int</span>      SM_DATA(SMNAME) initialised;
+<span class="lnr"> 19 </span><span class="Type">static</span> <span class="Type">uint16_t</span> SM_DATA(SMNAME) time;
+<span class="lnr"> 20 </span><span class="Type">static</span> <span class="Type">int</span>      SM_DATA(SMNAME) seq;
+<span class="lnr"> 21 </span>
+<span class="lnr"> 22 </span><span class="Type">static</span> <span class="Type">uint8_t</span>  SM_DATA(SMNAME) supply_state;
+<span class="lnr"> 23 </span><span class="Type">static</span> <span class="Type">uint16_t</span> SM_DATA(SMNAME) active_power_import;
+<span class="lnr"> 24 </span><span class="Type">static</span> <span class="Type">uint16_t</span> SM_DATA(SMNAME) active_import_register; <span class="Comment">// too small; CC bug</span>
+<span class="lnr"> 25 </span><span class="Type">static</span> <span class="Type">uint8_t</span>  SM_DATA(SMNAME) observers[MAX_OBSERVERS];
+<span class="lnr"> 26 </span>
+<span class="lnr"> 27 </span><span class="PreProc">#define CHANNEL_LS   </span><span class="Constant">1</span>
+<span class="lnr"> 28 </span><span class="PreProc">#define CHANNEL_CS   </span><span class="Constant">2</span>
+<span class="lnr"> 29 </span><span class="PreProc">#define CHANNEL_HAN  </span><span class="Constant">3</span>
+<span class="lnr"> 30 </span>
+<span class="lnr"> 31 </span><span class="Type">static</span> <span class="Type">uint32_t</span> modu16 (<span class="Type">uint32_t</span> i, <span class="Type">uint32_t</span> j)
+<span class="lnr"> 32 </span>{
+<span class="lnr"> 33 </span>    <span class="cStatement">return</span> (i % j);
+<span class="lnr"> 34 </span>}
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span><span class="Type">void</span> SM_FUNC(SMNAME) init(<span class="Type">void</span>)
+<span class="lnr"> 37 </span>{
+<span class="lnr"> 38 </span>  <span class="cConditional">if</span> (! initialised) {
+<span class="lnr"> 39 </span>    time         = <span class="Constant">0</span>;
+<span class="lnr"> 40 </span>    seq          = <span class="Constant">0</span>;
+<span class="lnr"> 41 </span>
+<span class="lnr"> 42 </span>    supply_state = <span class="Constant">1</span>;
+<span class="lnr"> 43 </span>    active_power_import    = <span class="Constant">0</span>;
+<span class="lnr"> 44 </span>    active_import_register = <span class="Constant">0</span>;
+<span class="lnr"> 45 </span>
+<span class="lnr"> 46 </span>    random_init(<span class="Constant">0</span>);
+<span class="lnr"> 47 </span>    <span class="cRepeat">for</span> (<span class="Type">int</span> i = <span class="Constant">0</span>; i &lt; MAX_OBSERVERS; i++) {
+<span class="lnr"> 48 </span>      observers[i] = <span class="Constant">0</span> ;
+<span class="lnr"> 49 </span>    }
+<span class="lnr"> 50 </span>    observers[<span class="Constant">0</span>] = CHANNEL_HAN;
+<span class="lnr"> 51 </span>
+<span class="lnr"> 52 </span>    initialised  = <span class="Constant">1</span>;
+<span class="lnr"> 53 </span>  }
+<span class="lnr"> 54 </span>}
+<span class="lnr"> 55 </span>
+<span class="lnr"> 56 </span><span class="Type">void</span> SM_FUNC(SMNAME) produce_output(<span class="Type">uint8_t</span> channel, <span class="Type">uint8_t</span> info)
+<span class="lnr"> 57 </span>{
+<span class="lnr"> 58 </span>    <span class="Type">uint8_t</span> data[<span class="Constant">4</span>] __attribute__((aligned(<span class="Constant">2</span>)))
+<span class="lnr"> 59 </span>                   = { (seq    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 60 </span>                       (seq    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 61 </span>                       info, <span class="Constant">0</span> };
+<span class="lnr"> 62 </span>    seq += <span class="Constant">1</span>;
+<span class="lnr"> 63 </span>
+<span class="lnr"> 64 </span>    <span class="cConditional">if</span> (channel == CHANNEL_CS) {
+<span class="lnr"> 65 </span>      central_system_out(data, <span class="Statement">sizeof</span>(data));
+<span class="lnr"> 66 </span>    }
+<span class="lnr"> 67 </span>
+<span class="lnr"> 68 </span>    <span class="cConditional">if</span> (channel == CHANNEL_LS) {
+<span class="lnr"> 69 </span>      load_switch_out(data, <span class="Statement">sizeof</span>(data));
+<span class="lnr"> 70 </span>    }
+<span class="lnr"> 71 </span>}
+<span class="lnr"> 72 </span>
+<span class="lnr"> 73 </span><span class="Type">void</span> SM_FUNC(SMNAME) output_consumption_data(<span class="Type">void</span>)
+<span class="lnr"> 74 </span>{
+<span class="lnr"> 75 </span>    <span class="Type">uint8_t</span> data[<span class="Constant">10</span>] __attribute__((aligned(<span class="Constant">2</span>)))
+<span class="lnr"> 76 </span>                     = { (seq                    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 77 </span>                         (seq                    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 78 </span>                         GET_CONSUMPTION_DATA, <span class="Constant">0</span>,
+<span class="lnr"> 79 </span>                         supply_state,
+<span class="lnr"> 80 </span>                         (active_power_import    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 81 </span>                         (active_power_import    &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 82 </span>                         (active_import_register &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr"> 83 </span>                         (active_import_register &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>};
+<span class="lnr"> 84 </span>
+<span class="lnr"> 85 </span>    <span class="cRepeat">for</span> (<span class="Type">int</span> i = <span class="Constant">0</span>; i &lt; MAX_OBSERVERS; i++) {
+<span class="lnr"> 86 </span>      <span class="cConditional">if</span> (observers[i] == CHANNEL_HAN) {
+<span class="lnr"> 87 </span>        han_if_out(data, <span class="Statement">sizeof</span>(data));
+<span class="lnr"> 88 </span>      }
+<span class="lnr"> 89 </span>      <span class="cConditional">else</span> <span class="cConditional">if</span> (observers[i] == CHANNEL_CS) {
+<span class="lnr"> 90 </span>        central_system_out(data, <span class="Statement">sizeof</span>(data));
+<span class="lnr"> 91 </span>      }
+<span class="lnr"> 92 </span>    }
+<span class="lnr"> 93 </span>}
+<span class="lnr"> 94 </span>
+<span class="lnr"> 95 </span><span class="Type">void</span> SM_FUNC(SMNAME) get_input(<span class="Type">uint8_t</span> channel, <span class="Type">const</span> <span class="Type">uint8_t</span> *data,
+<span class="lnr"> 96 </span>    <span class="Type">size_t</span> len)
+<span class="lnr"> 97 </span>{
+<span class="lnr"> 98 </span>    <span class="cConditional">if</span> (channel == CHANNEL_LS &amp;&amp; len &gt;= <span class="Constant">3</span>) {
+<span class="lnr"> 99 </span>      supply_state = data[<span class="Constant">2</span>]; <span class="Comment">/*</span><span class="Comment"> only one opperation supported </span><span class="Comment">*/</span>
+<span class="lnr">100 </span>    }
+<span class="lnr">101 </span>
+<span class="lnr">102 </span>    <span class="cConditional">if</span> (channel == CHANNEL_CS &amp;&amp; len &gt;= <span class="Constant">3</span>) {
+<span class="lnr">103 </span>      <span class="cConditional">if</span> (data[<span class="Constant">2</span>] == GET_CONSUMPTION_DATA) {
+<span class="lnr">104 </span>        <span class="cRepeat">for</span> (<span class="Type">int</span> i = <span class="Constant">0</span>; i &lt; MAX_OBSERVERS; i++) {
+<span class="lnr">105 </span>          <span class="cConditional">if</span> (observers[i] == <span class="Constant">0</span> || observers[i] == CHANNEL_CS) {
+<span class="lnr">106 </span>            observers[i] = CHANNEL_CS;
+<span class="lnr">107 </span>            produce_output(CHANNEL_CS, GET_CONSUMPTION_DATA);
+<span class="lnr">108 </span>            <span class="cStatement">break</span>; }
+<span class="lnr">109 </span>        }
+<span class="lnr">110 </span>      }
+<span class="lnr">111 </span>    }
+<span class="lnr">112 </span>}
+<span class="lnr">113 </span>
+<span class="lnr">114 </span>
+<span class="lnr">115 </span>SM_ENTRY(SMNAME) <span class="Type">void</span> advance_time(<span class="Type">void</span>)
+<span class="lnr">116 </span>{
+<span class="lnr">117 </span>    <span class="cConditional">if</span> (! initialised) {
+<span class="lnr">118 </span>      init();
+<span class="lnr">119 </span>      produce_output(CHANNEL_LS, GET_SUPPLY_STATE);
+<span class="lnr">120 </span>    }
+<span class="lnr">121 </span>    time++;
+<span class="lnr">122 </span>
+<span class="lnr">123 </span>    <span class="Comment">// measure consumption; should be a call to a protected driver</span>
+<span class="lnr">124 </span>    <span class="cConditional">if</span> (supply_state == SUPPLY_STATE_ENABLED) {
+<span class="lnr">125 </span>      active_power_import = <span class="Constant">50</span> + (modu16(random_rand(), <span class="Constant">100</span>));
+<span class="lnr">126 </span>    } <span class="cConditional">else</span> {
+<span class="lnr">127 </span>      active_power_import = <span class="Constant">0</span>;
+<span class="lnr">128 </span>    }
+<span class="lnr">129 </span>    <span class="Comment">// accumulate; wee need a notion of time her</span>
+<span class="lnr">130 </span>    active_import_register += active_power_import;
+<span class="lnr">131 </span>
+<span class="lnr">132 </span>
+<span class="lnr">133 </span>    <span class="cConditional">if</span> (! (modu16(time, <span class="Constant">5</span>))) {
+<span class="lnr">134 </span>      produce_output(CHANNEL_LS, GET_SUPPLY_STATE);
+<span class="lnr">135 </span>      output_consumption_data();
+<span class="lnr">136 </span>    }
+<span class="lnr">137 </span>}
+<span class="lnr">138 </span>
+<span class="lnr">139 </span>SM_INPUT(SMNAME, load_switch_in, data, len)
+<span class="lnr">140 </span>{
+<span class="lnr">141 </span>    <span class="cConditional">if</span> (! initialised) { init(); }
+<span class="lnr">142 </span>
+<span class="lnr">143 </span>    get_input(CHANNEL_LS, data, len);
+<span class="lnr">144 </span>}
+<span class="lnr">145 </span>
+<span class="lnr">146 </span>SM_INPUT(SMNAME, central_system_in, data, len)
+<span class="lnr">147 </span>{
+<span class="lnr">148 </span>    <span class="cConditional">if</span> (! initialised) { init(); }
+<span class="lnr">149 </span>
+<span class="lnr">150 </span>    get_input(CHANNEL_CS, data, len);
+<span class="lnr">151 </span>}
+<span class="lnr">152 </span>
+</pre>
+</body>
+</html>
