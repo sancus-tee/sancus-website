@@ -3,10 +3,6 @@
 #include <sancus/sm_support.h>
 #include "reader.h"
 
-// NOTE: this struct is put in the data section instead of on the stack due to
-// a bug in the LLVM MSP430 backend
-// ReaderOutput out;
-
 void print_bytes(const char* bytes, size_t n)
 {
     int i;

@@ -299,7 +299,7 @@ permission is used to revoke existing access rights.
 
     <span style='color:#696969; '>// only root can chmod</span>
     <span style='color:#800000; font-weight:bold; '>struct</span> FILE_PERM <span style='color:#808030; '>*</span>p_caller<span style='color:#800080; '>;</span>
-    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>two_phase_lookup<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> SFS_ROOT<span style='color:#808030; '>,</span> id<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>p_caller<span style='color:#808030; '>)</span> <span style='color:#808030; '>&lt;</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span>
+    <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>two_phase_lookup<span style='color:#808030; '>(</span>name<span style='color:#808030; '>,</span> SFS_ROOT<span style='color:#808030; '>,</span> caller_id<span style='color:#808030; '>,</span> <span style='color:#808030; '>&amp;</span>p_caller<span style='color:#808030; '>)</span> <span style='color:#808030; '>&lt;</span> <span style='color:#008c00; '>0</span><span style='color:#808030; '>)</span>
         <span style='color:#800000; font-weight:bold; '>return</span> FAILURE<span style='color:#800080; '>;</span>
     
     <span style='color:#800000; font-weight:bold; '>if</span> <span style='color:#808030; '>(</span>perm_flags <span style='color:#808030; '>=</span><span style='color:#808030; '>=</span> SFS_NIL<span style='color:#808030; '>)</span>
