@@ -1,5 +1,7 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $DOMAIN = "https://distrinet.cs.kuleuven.be/software/sancus";
@@ -10,7 +12,8 @@ $navbar_links = array(
     "Home"          => "index.php",
     "Installation"  => "install.php",
     "Documentation" => "doc.php",
-    "Examples"      => "examples.php"
+    "Examples"      => "examples.php",
+    "Research"      => "research.php"
 );
 
 include("tools.php");
@@ -44,7 +47,7 @@ include("tools.php");
     <div class="container">
         <div class="row">
             <?php if (empty($sections)): ?>
-            <div class="span9">
+            <div class="span12">
             <?php else: ?>
             <div class="span3 side-nav-bar">
                 <ul class="nav nav-list side-nav-list span3" data-spy="affix">
@@ -53,5 +56,5 @@ include("tools.php");
                     <?php endforeach ?>
                 </ul>
             </div>
-            <div class="span6">
+            <div class="span9">
             <?php endif ?>

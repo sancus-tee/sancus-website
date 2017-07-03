@@ -20,6 +20,24 @@ h3
     padding-top: 40px;
 }
 
+.research-par
+{
+    margin-bottom: 25px;
+}
+
+.research-list
+{
+    padding: 4px 4px 4px 4px;
+    background-color: #f7f7f9;
+    border-radius:4px;
+    border: 1px solid #e5e5e5;
+}
+
+.research-list li
+{
+    margin: 8px 0px 8px 0px;
+}
+
 .side-nav-bar
 {
 }
@@ -67,7 +85,7 @@ h3
 
 .logo
 {
-    width: 200px;
+    width: 180px;
     margin: 15px auto 15px auto;
     text-align: center;
 }

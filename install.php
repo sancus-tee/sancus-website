@@ -51,9 +51,9 @@ include("header.php");
 </p>
 
 <div class="alert alert-info">
-    <strong>Tip:</strong>
+    <p><strong>Tip:</strong>
     If you have <a href="https://help.ubuntu.com/community/AptURL">AptURL</a> installed, you can install the prerequisites by clicking the package name.
-    You can also click the button below to install all prerequisites at once.
+    You can also click the button below to install all prerequisites at once.</p>
     <div class="all-prereq-button">
         <a href="apt:python2.7,iverilog,cmake,tk,binutils-msp430,gcc-msp430,msp430-libc,msp430mcu,g++-4.7" class="btn btn-primary">Install prerequisites</a>
     </div>

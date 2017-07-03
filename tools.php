@@ -61,6 +61,90 @@ function end_section_header()
 EOF;
 }
 
+function start_subsection_header($id)
+{
+    global $sections;
+    $title = $sections[$id];
+
+    echo <<<EOF
+<div class="page-header">
+    <h2 id="$id" class="section-header">
+        $title
+EOF;
+}
+
+function end_subsection_header()
+{
+    echo <<<EOF
+    </h2>
+</div>
+EOF;
+}
+
+function publication_list($pubs)
+{
+    if (!empty($pubs))
+    {
+        echo <<<EOF
+        <div class=research-list>
+        <ul>
+EOF;
+
+    foreach ($pubs as $pub)
+    {
+        $author     = $pub["author"];
+        $title      = $pub["title"];
+        $publisher  = $pub["publisher"];
+        $year       = $pub["year"];
+        $id         = $pub["id"];
+
+        echo <<<EOF
+        <li>$author. <strong>$title.</strong> <em>$publisher</em>, $year.
+EOF;
+
+        if (!empty($pub["pdf"]))
+        {
+            $url = ($id == "ext")? $pub["pdf"] : "downloads/$id.pdf";
+            echo <<<EOF
+            <a href=$url>pdf</a>
+EOF;
+        }
+
+        if (!empty($pub["slides"]))
+        {
+            $url = ($id == "ext")? $pub["slides"] : "downloads/$id-slides.pdf";
+            echo <<<EOF
+            <a href=$url>slides</a>
+EOF;
+        }
+
+        if (!empty($pub["bibtex"]))
+        {
+            $url = ($id == "ext")? $pub["bibtex"] : "downloads/$id.bib";
+            echo <<<EOF
+            <a href=$url>bibtex</a>
+EOF;
+        }
+
+        if (!empty($pub["web"]))
+        {
+            $url = ($id == "ext")? $pub["web"] : "$id";
+            echo <<<EOF
+            <a href=$url>web</a>
+EOF;
+        }
+
+        echo <<<EOF
+        </li>
+EOF;
+    }
+        echo <<<EOF
+        </ul>
+        </div>
+EOF;
+    }
+}
+
 function install_section($id, $downloads = null, $prereqs = null)
 {
     start_section_header($id);
@@ -163,6 +247,12 @@ function example_section($id)
 {
     start_section_header($id);
     end_section_header();
+}
+
+function research_section($id)
+{
+    start_subsection_header($id);
+    end_subsection_header();
 }
 
 function display_source_file($file)
