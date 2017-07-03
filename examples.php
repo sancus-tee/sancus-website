@@ -34,7 +34,7 @@ ROM=48K
 RAM=10K
 STACK=256
 VENDOR_ID=1234
-NODE_KEY=deadbeefcafebabedeadbeefcafebabe
+NODE_KEY=deadbeefcafebabe
 </pre>
 <p>
 Compile the sources:
@@ -57,14 +57,17 @@ Then we need to make sure the MAC sections are filled in in order for the reader
 The first step is to calculate the vendor key:
 </p>
 <pre>
-VENDOR_KEY=`sancus-hmac --vendor-key $VENDOR_ID --key $NODE_KEY`
+sancus-crypto --gen-vendor-key $VENDOR_ID --key $NODE_KEY
 </pre>
 <p>
-Then we fill in the MAC sections using this key:
+Then we fill in the hash sections using this key:
 </p>
 <pre>
-sancus-hmac --key $VENDOR_KEY -o main.elf main-no-mac.elf
+sancus-crypto --fill-macs --key $VENDOR_KEY -o main.elf main-no-mac.elf
 </pre>
+<p>
+Where <code>$VENDOR_KEY</code> refers to the output of the previous command.
+</p>
 
 <?php example_section("running") ?>
 <p>
@@ -78,14 +81,14 @@ sancus-sim --rom-size $ROM --ram-size $RAM main.elf
 To verify the output of the reader module, we first have to calculate its key:
 </p>
 <pre>
-SM_KEY=`sancus-hmac --hkdf reader --key $VENDOR_KEY main.elf`
+sancus-crypto --gen-sm-key reader --key $VENDOR_KEY main.elf
 </pre>
 
 <p>
-Then we can calculate the MAC of the data (<code>DATA</code> refers to the data printed by the simulator):
+Then we can decrypt the output of the reader  module (<code>$NONCE</code>, <code>$CIPHER</code>, and <code>$TAG</code> refer to the data printed by the simulator and <code>$SM_KEY</code> refers to the output of the previous command):
 </p>
 <pre>
-sancus-hmac --signature $DATA --key $SM_KEY
+sancus-crypto --unwrap $AD $CIPHER $TAG --key $SM_KEY
 </pre>
 
 <?php

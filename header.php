@@ -21,7 +21,9 @@ include("tools.php");
 <html>
 
 <head>
-    <title>Sancus: Low-cost trustworthy extensible networked devices with a zero-software Trusted Computing Base</title>
+    <meta charset="UTF-8">
+    <!-- title>Sancus: Low-cost trustworthy extensible networked devices with a zero-software Trusted Computing Base</title-->
+    <title>Sancus 2.0: A Low-Cost Security Architecture for IoT Devices</title>
     <link href="sancus.css" rel="stylesheet" />
     <script src="include/jquery.js"></script>
     <script src="include/bootstrap.min.js"></script>

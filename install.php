@@ -12,8 +12,8 @@ $sections = array(
 $python_prereq = array(
     "name"    => "Python",
     "url"     => "http://www.python.org/",
-    "package" => "python2.7",
-    "version" => "&ge;2.7 &and; <3.0",
+    "package" => "python3",
+    "version" => "&ge;3.3",
     "build"   => false
 );
 
@@ -22,17 +22,15 @@ $cmake_prereq = array(
     "name"    => "CMake",
     "url"     => "http://www.cmake.org/",
     "package" => "cmake",
-    "version" => "&ge;2.8",
+    "version" => "&ge;3.4.3",
     "build"   => true
 );
 
-$core_src = "sancus-core_1.0.tar.gz";
-$core_deb = "sancus-core_1.0_all.deb";
-$compiler_src = "sancus-compiler_1.0.tar.gz";
-$compiler_deb32 = "sancus-compiler_1.0_i386.deb";
-$compiler_deb64 = "sancus-compiler_1.0_amd64.deb";
-$llvm_deb32 = "llvm-sancus_3.3_i386.deb";
-$llvm_deb64 = "llvm-sancus_3.3_amd64.deb";
+$core_src = "sancus-core_2.0.tar.gz";
+$core_deb = "sancus-core_2.0_all.deb";
+$compiler_src = "sancus-compiler_2.0.tar.gz";
+$compiler_deb64 = "sancus-compiler_2.0_amd64.deb";
+$llvm_deb64 = "clang-sancus_4.0.0_amd64.deb";
 
 include("header.php");
 ?>
@@ -41,7 +39,7 @@ include("header.php");
 <p>
     This page provides installation instructions for Sancus.
     We provide both source files and binary packages for the simulator, the compiler and any runtime support libraries.
-    All provided binary packages have been tested on Ubuntu 13.04 but should work on any Debian-based GNU/Linux distribution.
+    All provided binary packages have been tested on Ubuntu 16.04 but should work on any Debian-based GNU/Linux distribution.
 </p>
 
 <p>
@@ -98,7 +96,7 @@ cmake ..
 make install
 </pre>
 
-<p>This will install <?php doc_ref("sancus-sim")?>, <?php doc_ref("sancus-loader")?>, <?php doc_ref("sancus-gdbproxy")?> and <?doc_ref("sancus-minidebug")?>.</p>
+<p>This will install <?php doc_ref("sancus-sim")?>, <?php doc_ref("sancus-loader")?>, <?php doc_ref("sancus-gdbproxy")?> and <?php doc_ref("sancus-minidebug")?>.</p>
 
 <?php
     $downloads = array(
@@ -121,24 +119,22 @@ make install
 ?>
 
 <p>
-    An ISE project for synthesizing Sancus on an <a href="http://www.xilinx.com/products/boards-and-kits/AES-S6MB-LX9.htm">Avnet Spartan-6 LX9 MicroBoard</a> can be found in <code>$SOURCE_ROOT/fpga/xilinx_avnet_lx9microbard_sancus</code>.
+    An ISE project for synthesizing Sancus for a <a href="http://www.xess.com/shop/product/xula2-lx25/">XuLA2-LX25</a> FPGA on a <a href="http://www.xess.com/shop/product/stickit-mb/">StickIt!-MB</a> board can be found in <code>$SOURCE_ROOT/fpga/xula2-stickit</code>.
     We also provide a pre-compiled BIT file as well as an MCS file for loading into the SPI/Flash.
     By default, Sancus is synthesized with the following features:
     <ul>
-        <li>Support for four concurrent protected modules.</li>
+        <li>Support for 8 concurrent protected modules.</li>
+        <li>64-bit keys</li>
         <li>48KB of program memory.</li>
         <li>10KB of data memory.</li>
         <li>Debug interface.</li>
         <li>UART interface.</li>
-        <li>PS/2 interface.</li>
     </ul>
 </p>
 
 <?php
     $downloads = array(
-        "LLVM patch"  => "llvm.patch",
         "Clang patch" => "clang.patch",
-        "32-bit"      => $llvm_deb32,
         "64-bit"      => $llvm_deb64
     );
 
@@ -157,26 +153,19 @@ make install
 ?>
 
 <p>
-    While building our compiler, we have found a number of bugs in the experimental MSP430 backend of LLVM.
-    Since not all fixes have made it into mainline yet, LLVM and Clang need to be patched in order to use our compiler.
-    The easiest way to do this is to install the provided binary packages.
-    However, since this will replace any existing LLVM/Clang installation on the system, this may not be appropriate for everybody.
-    This section explains how to patch and build LLVM/Clang manually.
+    While building our compiler, we have found a bug in Clang that needs to be patched before being able to use our compiler.
+    The easiest way to do this is to install the provided binary package.
+    This package is called <code>clang-sancus</code> and will be installed in <code>/usr/local/</code>.
+    If you want to patch and build LLVM/Clang manually, you can use the following instructions:
 </p>
 
-<!--svn co http://llvm.org/svn/llvm-project/llvm/tags/RELEASE_33/final/ llvm-3.3.src-->
-<!--svn co http://llvm.org/svn/llvm-project/cfe/tags/RELEASE_33/final/ clang-->
-<!-- TODO change URLs once LLVM 3.3 has been released -->
 <pre>
-wget http://llvm.org/releases/3.3/llvm-3.3.src.tar.gz
-tar xf llvm-3.3.src.tar.gz
-cd llvm-3.3.src/
-wget <?php echo $DOMAIN ?>/downloads/llvm.patch
-patch -p1 &lt; llvm.patch
-cd tools/
-wget http://llvm.org/releases/3.3/cfe-3.3.src.tar.gz
-tar xf cfe-3.3.src.tar.gz
-mv cfe-3.3.src clang
+wget http://releases.llvm.org/4.0.0/llvm-4.0.0.src.tar.xz
+tar xf llvm-4.0.0.src.tar.xz
+cd llvm-4.0.0.src/tools/
+wget http://releases.llvm.org/4.0.0/cfe-4.0.0.src.tar.xz
+tar xf cfe-4.0.0.src.tar.xz
+mv cfe-4.0.0.src clang
 cd clang
 wget <?php echo $DOMAIN ?>/downloads/clang.patch
 patch -p1 &lt; clang.patch
@@ -193,7 +182,6 @@ make install
 <?php
     $downloads = array(
         "Source"  => $compiler_src,
-        "32-bit"  => $compiler_deb32,
         "64-bit"  => $compiler_deb64
     );
 
@@ -203,8 +191,9 @@ make install
         array(
             "name"    => "pyelftools",
             "url"     => "https://pypi.python.org/pypi/pyelftools",
-            "package" => "N/A<sup>1</sup>",
-            "version" => "&ge;0.21",
+            "package" => null,
+            "note"    => "<sup>1</sup>",
+            "version" => "&ge;0.24",
             "build"   => false
         ),
         array(
@@ -245,8 +234,8 @@ make install
         array(
             "name"    => "GNU C++ Compiler",
             "url"     => "http://gcc.gnu.org/",
-            "package" => "g++-4.7",
-            "version" => "&ge;4.7.0",
+            "package" => "g++",
+            "version" => "&ge;4.8",
             "build"   => true
         ),
         $cmake_prereq
@@ -255,7 +244,7 @@ make install
     install_section("compiler", $downloads, $prereqs);
 ?>
 
-<p><small><sup>1</sup>Can be installed using <code>pip install pyelftools</code></small></p>
+<p><small><sup>1</sup>Can be installed using <code>pip3 install pyelftools</code></small></p>
 
 <p>To install the Sancus compiler:</p>
 <pre>
@@ -268,7 +257,7 @@ make install
 </pre>
 
 <p>
-    This will install <?php doc_ref("sancus-cc")?>, <?php doc_ref("sancus-ld")?> and <?php doc_ref("sancus-hmac")?>.
+    This will install <?php doc_ref("sancus-cc")?>, <?php doc_ref("sancus-ld")?> and <?php doc_ref("sancus-crypto")?>.
 </p>
 
 <?php

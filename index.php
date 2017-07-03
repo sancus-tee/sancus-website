@@ -9,24 +9,25 @@ include("header.php");
 <div>
     <blockquote class="abstract">
     <p>
-        In this paper we propose Sancus, a security architecture for networked  embedded devices.
-        Sancus supports extensibility in the form of remote (even third-party) software installation on devices while maintaining strong security guarantees.
-        More specifically, Sancus can remotely attest to a software provider that a specific software module is running uncompromised, and can authenticate messages from software modules to software providers.
+        The Sancus security architecture for networked embedded devices was proposed in 2013 at the USENIX Security conference.
+        It supports remote  (even third-party) software installation on devices while maintaining strong security guarantees.
+        More specifically, Sancus can remotely attest to a software provider that a specific software module is running uncompromised, and can provide a secure communication channel between software modules and software providers.
         Software modules can securely maintain local state, and can securely interact with other software modules that they choose to trust.
-        The most distinguishing feature of Sancus is that it achieves these security guarantees without trusting <em>any</em> infrastructural software on the device.
-        The Trusted Computing Base (TCB) on the device is <em>only</em> the hardware.
-        Moreover, the hardware cost of Sancus is low.
     </p>
     <p>
-        We describe the design of Sancus, and develop and evaluate a prototype FPGA implementation of a Sancus-enabled device.
+        Over the past three years, significant experience has been gained with applications of Sancus, and several extensions of the architecture have  been investigated &ndash; both by the original designers as well as by independent researchers.
+        Informed by these additional research results, this journal version of the Sancus paper describes an improved design and implementation, supporting additional security guarantees (such as confidential deployment) and a more efficient cryptographic core.
+    </p>
+    <p>
+        We describe the design of Sancus 2.0 (without relying on any prior knowledge of Sancus), and develop and evaluate a prototype FPGA implementation.
         The prototype extends an MSP430 processor with hardware support for the memory access control and cryptographic functionality required to run Sancus.
-        We also develop a C compiler that targets our device and that can compile standard C modules to Sancus protected software modules.
+        We report on our experience with using Sancus in a variety of application scenarios, and discuss some important avenues of ongoing and future work.
     </p>
     </blockquote>
     <p>
-        Job Noorman, Pieter Agten, Wilfried Daniels, Raoul Strackx, Anthony Van Herrewege, Christophe Huygens, Bart Preneel, Ingrid Verbauwhede, Frank Piessens.
-        <strong>Sancus: Low-cost trustworthy extensible networked devices with a zero-software Trusted Computing Base.</strong>
-        <em>Proceedings of the 22nd USENIX conference on Security symposium</em>
+        Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling.
+        <strong>Sancus 2.0: A Low-Cost Security Architecture for IoT Devices.</strong>
+        <em>ACM Transactions on Privacy and Security (TOPS)</em>
     </p>
     <p><a class="btn btn-primary btn-large" href="downloads/sancus.pdf">Get the paper</a></p>
 </div>

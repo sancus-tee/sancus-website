@@ -2,17 +2,20 @@
 #define READER_H
 
 #include <sancus/sm_support.h>
+
 #include "sensor.h"
 
 extern struct SancusModule reader;
 
 typedef struct
 {
-    sensor_data data;
-    char mac[16];
+    char cipher[sizeof(sensor_data)];
+    char tag[SANCUS_TAG_SIZE];
 } ReaderOutput;
 
-void SM_ENTRY("reader") get_readings(ReaderOutput* out);
+typedef unsigned nonce;
+
+void SM_ENTRY(reader) get_readings(nonce no, ReaderOutput* out);
 
 #endif
 

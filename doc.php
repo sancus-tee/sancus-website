@@ -2,12 +2,12 @@
 $page_title = "Documentation";
 
 $sections = array(
-    "sancus-sim"   => "Simulator",
-    "sancus-cc"    => "Compiler",
-    "sancus-ld"    => "Linker",
-    "sancus-hmac"  => "Crypto",
-    "tools"        => "Tools",
-    "api"          => "API"
+    "sancus-sim"    => "Simulator",
+    "sancus-cc"     => "Compiler",
+    "sancus-ld"     => "Linker",
+    "sancus-crypto" => "Crypto",
+    "tools"         => "Tools",
+    "api"           => "API"
 );
 
 include("header.php");
@@ -42,12 +42,12 @@ The compiler will generate protected modules based on annotations that should be
 The header file <code>&lt;sancus/sm_support.h&gt;</code>, installed as part of the compiler, provides the following annotations:
 </p>
 <ul>
-    <li><code>SPM_ENTRY(name)</code> declares an entry point.</li>
-    <li><code>SPM_FUNC(name)</code> declares a function that is <em>not</em> an entry point.</li>
-    <li><code>SPM_DATA(name)</code> declares data that should be part of the module's secret section.</li>
+    <li><code>SM_ENTRY(name)</code> declares an entry point.</li>
+    <li><code>SM_FUNC(name)</code> declares a function that is <em>not</em> an entry point.</li>
+    <li><code>SM_DATA(name)</code> declares data that should be part of the module's secret section.</li>
 </ul>
 <p>
-Here, <code>name</code> is a string identifying the software module.
+Here, <code>name</code> must be a valid C identifier uniquely identifying the software module.
 This name is only used by the compiler to differentiate modules; it is never used by the Sancus hardware.
 </p>
 
@@ -79,9 +79,9 @@ However, library functions will not be added to the binary and should be resolve
 Currently, a <code>main</code> function is not supported in this mode which means that after a binary is loaded, the host software should provide the means to call an entry point of one of the protected modules.
 </p>
 
-<?php doc_section("sancus-hmac", "sancus-hmac", "compiler") ?>
+<?php doc_section("sancus-crypto", "sancus-crypto", "compiler") ?>
 <p>
-The <code>sancus-hmac</code> script provides a convenient way to perform all needed crypto operations.
+The <code>sancus-crypto</code> script provides a convenient way to perform all needed crypto operations.
 All input keys and data should be provided in hexadecimal notation without the leading <code>0x</code>.
 </p>
 
@@ -89,39 +89,39 @@ All input keys and data should be provided in hexadecimal notation without the l
 To compute a vendor key:
 </p>
 <pre>
-sancus-hmac --vendor-key ID --key NODE_KEY
+sancus-crypto --gen-vendor-key ID --key NODE_KEY
 </pre>
 
 <p>
 To compute the key of a software module:
 </p>
 <pre>
-sancus-hmac --hkdf SM_NAME --key VENDOR_KEY ELF_FILE
+sancus-crypto --gen-sm-key SM_NAME --key VENDOR_KEY ELF_FILE
 </pre>
 <p>
 Here, <code>SM_NAME</code> is the name of the module as given to the compiler using the annotations.
 </p>
 
 <p>
-To compute the MAC of a software module using the key of another module:
+To encrypt some plaintext (<code>BODY</code>) using associated data (<code>AD</code>):
 </p>
 <pre>
-sancus-hmac --hmac SM_NAME --key SM_KEY ELF_FILE
+sancus-crypto --wrap AD BODY --key KEY
 </pre>
 
 <p>
-To compute the signature of some data:
+And the reverse operation:
 </p>
 <pre>
-sancus-hmac --signature DATA --key KEY
+sancus-crypto --unwrap AD CIPHER TAG --key KEY
 </pre>
 
 <p>
 Finally, the following can be used for binaries created using the <code>--standalone</code> linker mode.
-This will automatically fill all the MAC sections in the binary:
+This will automatically fill all the hash sections used for secure linking in the binary:
 </p>
 <pre>
-sancus-hmac --key VENDOR_KEY -o OUT_FILE IN_FILE
+sancus-crypto --fill-macs --key VENDOR_KEY -o OUT_FILE IN_FILE
 </pre>
 <p>
 Currently, all modules need to have the same vendor ID for this to work.
@@ -196,7 +196,7 @@ This struct can then be used in some of the API calls.
 Deactivates the hardware protection of the currently executing module.
 That is, the module whose public section contains the current value of the program counter.
 </p>
-<?php api_call("void unprotect_sm(void);") ?>
+<?php api_call("void sancus_disable(void);") ?>
 
 <?php instruction("protect <em>SP</em>, <em>layout</em>", "0x1381") ?>
 <p>
@@ -206,37 +206,43 @@ The boundaries of the public section are given in r12 and r13 and those of the s
 <em>SP</em>, the ID of the software provider, is given in r11.
 If the protection is successfully activated, the ID that Sancus has assigned to the new module is returned in r15; otherwise, 0 is returned.
 </p>
-<?php api_call("int protect_sm(struct SancusModule* sm);") ?>
+<?php api_call("sm_id sancus_enable(struct SancusModule* sm);") ?>
 <p>
-This function returns 1 if the protection was successfully actived, 0 otherwise.
+This function returns the ID of the module if the protection was successfully actived, 0 otherwise.
 </p>
 
-<?php instruction("MAC-verify <em>address</em>, <em>expected MAC</em>", "0x1382") ?>
+<?php instruction("attest <em>address</em>, <em>expected hash</em>", "0x1382") ?>
 <p>
-The MAC of the module whose public section contains <em>address</em> (r14), is calculated and compared with the value stored at <em>expected MAC</em> (r15).
-The key used in the MAC computation is that of the module whose public section contains the current value of the program counter.
-If the MACs are equal, the ID of the verified module is returned in r15, otherwise 0 is returned.
+The hash of the identity of the module whose public section contains <em>address</em> (r14), is calculated and compared with the value stored at <em>expected hash</em> (r15).
+If the hashes are equal, the ID of the verified module is returned in r15, otherwise 0 is returned.
 </p>
 
-<?php api_call("sm_id hmac_verify(const void* expected, struct SancusModule* sm);") ?>
+<?php api_call("sm_id sancus_verify_address(const void* expected_hash, struct SancusModule* sm);") ?>
 
-<?php instruction("MAC-seal <em>start</em>, <em>end</em>, <em>result</em>", "0x1384") ?>
+<?php instruction("encrypt <em>AD start</em>, <em>AD end</em>, <em>BODY start</em>, <em>BODY end</em>, <em>CIPHER result</em>, <em>TAG result</em>", "0x1384") ?>
 <p>
-Calculates the MAC, using the key of the calling module, of the data from <em>start</em> (r13) until <em>end</em> (r14) exclusive.
-The MAC is stored at the address pointed to by <em>result</em> (r15).
+Encrypts, using the key of the calling module, the data from <em>BODY start</em> (r12) until <em>BODY end</em> (r13) using the data from <em>AD start</em> (r10) until <em>AD end</em> (r11) as associated data.
+The resulting ciphertext is stored at the address pointed to by <em>CIPHER result</em> (r14) and the tag at the address pointed to by <em>TAG result</em> (r15).
 If something fails, for example when this instruction is called from unprotected code, 0 is returned in r15.
 </p>
 
-<?php api_call("sm_id hmac_sign(void* dest, const void* src, size_t n);") ?>
+<?php api_call("int sancus_wrap(const void* ad, size_t ad_len, const void* body, size_t body_len, void* cipher, void* tag);") ?>
+
+<?php instruction("decrypt <em>AD start</em>, <em>AD end</em>, <em>CIPHER start</em>, <em>CIPHER end</em>, <em>TAG</em>, <em>BODY result</em>", "0x1384") ?>
 <p>
-Note: <code class=prettyprint>(char*)src + n</code> is used for <em>end</em>.
+Decrypts, using the key of the calling module, the data from <em>CIPHER start</em> (r12) until <em>CIPHER end</em> (r13) using the data from <em>AD start</em> (r10) until <em>AD end</em> (r11) as associated data and the data at <em>TAG</em> (r15) as MAC.
+The resulting plaintext is stored at the address pointed to by <em>BODY result</em> (r14).
+If something fails, for example when this instruction is called from unprotected code or the tag is incorrect, 0 is returned in r15.
 </p>
+
+<?php api_call("int sancus_unwrap(const void* ad, size_t ad_len, const void* cipher, size_t cipher_len, const void* tag, void* body);") ?>
 
 <?php instruction("get-id <em>address</em>", "0x1385") ?>
 <p>
 Returns the ID of the module whose public section contains <em>address</em> (r15) in r15.
-This instruction currently does not contain a convenience wrapper but the compiler automatically calls it when needed.
 </p>
+
+<?php api_call("sm_id sancus_get_id(void* addr);") ?>
 
 <?php
 include("footer.php");

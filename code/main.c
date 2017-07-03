@@ -5,7 +5,7 @@
 
 // NOTE: this struct is put in the data section instead of on the stack due to
 // a bug in the LLVM MSP430 backend
-ReaderOutput out;
+// ReaderOutput out;
 
 void print_bytes(const char* bytes, size_t n)
 {
@@ -18,15 +18,19 @@ int main()
 {
     WDTCTL = WDTPW | WDTHOLD;
 
-    protect_sm(&sensor);
-    protect_sm(&reader);
+    sancus_enable(&sensor);
+    sancus_enable(&reader);
 
-    get_readings(&out);
+    nonce no = 0xabcd;
+    ReaderOutput out;
+    get_readings(no, &out);
 
-    printf("Data: ");
-    print_bytes((char*)&out.data, sizeof(out.data));
-    printf(", MAC: ");
-    print_bytes(out.mac, sizeof(out.mac));
+    printf("Nonce: ");
+    print_bytes((char*)&no, sizeof(no));
+    printf(", Cipher: ");
+    print_bytes((char*)&out.cipher, sizeof(out.cipher));
+    printf(", Tag: ");
+    print_bytes(out.tag, sizeof(out.tag));
     printf("\n");
 
     return 0;
@@ -38,4 +42,3 @@ int putchar(int c)
     P1OUT |= 0x80;
     return c;
 }
-

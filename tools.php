@@ -108,7 +108,12 @@ EOF;
         $class = $prereq["build"] ? "build-prereq" : "runtime-prereq";
         $package_name = $prereq["package"];
         if (empty($package_name))
+        {
             $package = "N/A";
+            $note = $prereq["note"];
+            if (!empty($note))
+                $package .= $note;
+        }
         else
             $package = "<a href=\"apt:$package_name\">$package_name</a>";
 
