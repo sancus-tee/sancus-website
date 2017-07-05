@@ -51,7 +51,7 @@ publications on the Protected Module Architecture research field.
             "title"     => "Protected Software Module Architectures",
             "publisher" => "Securing Electronic Business Processes (ISSE)",
             "date"   	=> "2013",
-            "id"        => "ext",
+            "id"        => "isse13",
             "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/430320/1/ISSE-2013-paper.pdf",
             "bibtex"    => true
         ),
@@ -60,7 +60,7 @@ publications on the Protected Module Architecture research field.
             "title"     => "Hardware-Based Trusted Computing Architectures for Isolation and Attestation",
             "publisher" => "IEEE Transactions on Computers",
             "date"   	=> "2017",
-            "id"        => "ext",
+            "id"        => "ieee17",
             "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
             "bibtex"    => true
         ),
@@ -69,8 +69,8 @@ publications on the Protected Module Architecture research field.
             "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT devices",
             "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
             "date"   	=> "2017",
-            "id"        => "ext",//"tops17",
-            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
+            "id"        => "tops17",
+            "pdf"       => true,
             "src"       => "https://github.com/sancus-pma",
             "bibtex"    => true
         ),
@@ -79,7 +79,7 @@ publications on the Protected Module Architecture research field.
             "title"     => "Sancus: A Low-Cost Security Architecture for Distributed IoT Applications on a Shared Infrastructure",
             "publisher" => "PhD thesis KU Leuven",
             "date"   	=> "2017",
-            "id"        => "ext", //"noorman17phd",
+            "id"        => "noorman17phd",
             "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf",
             "bibtex"    => true
         )
@@ -102,7 +102,7 @@ compromised embedded platform.</p>
             "title"     => "Soteria: Offline Software Protection within Low-cost Embedded Devices",
             "publisher" => "Proceedings of the 31st Annual Computer Security Applications Conference (ACSAC)",
             "date"   	=> "2015",
-            "id"        => "ext",
+            "id"        => "acsac15",
             "src"       => "https://www1.cs.fau.de/soteria",
             "pdf"       => "https://www1.cs.fau.de/filepool/projects/soteria/soteria.pdf",
             "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf",
@@ -184,11 +184,13 @@ electricity meters or automotive control networks.</p>
 
 <?php research_section("theses") ?>
 
-<p> Sancus has been used as the development platform for several master theses.
-Specifically, on project explored the feasibility of supplementing Sancus'
-hardware-enforced security guarantees with availability and access control
-guarantees for shared system resources.
-Another ongoing project investigates hardware/software design trade-offs by 
+<p> Sancus has been used as the development platform for several master thesis
+projects. Specifically, one thesis explored the feasibility of supplementing
+Sancus' hardware-enforced security guarantees with availability and access
+control guarantees for shared system resources.
+Another project leveraged Sancus to to establish secure I/O paths for
+applications running on higher-end Protected Module Architectures.
+Ongoing work finally investigates hardware/software design trade-offs by
 developing a trusted kernel-like software module that adopts the
 responsibilities of Sancus' existing cryptographic hardware primitives.
 </p>
@@ -200,13 +202,21 @@ responsibilities of Sancus' existing cryptographic hardware primitives.
             "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
             "publisher" => "Master thesis KU Leuven",
             "date"   	=> "2015",
-            "id"        => "ext",
-            "pdf"       => "https://distrinet.cs.kuleuven.be/news/2015/thesis_jovanbulck_digital_version.pdf",
+            "id"        => "vanbulck15thesis",
+            "pdf"       => true,
             "slides"    => true,
             "src"       => "https://github.com/jovanbulck/thesis-src/",
             "bibtex"    => true
         ),
-        //TODO Deniss Fret thesis?
+        array(
+            "author"    => "Dennis Frett",
+            "title"     => "Extending Protected Module Architectures with a Secure I/O Framework",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2015",
+            "id"        => "frett15thesis",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Alexandru - Madalin Ghenea",
             "title"     => "A Security Kernel for Protected Module Architectures",
@@ -215,7 +225,7 @@ responsibilities of Sancus' existing cryptographic hardware primitives.
             "id"        => "ext",
             "pdf"       => false,
             "slides"    => false,
-            "web"       => false,
+            "src"       => false,
             "bibtex"    => false
         )
     );

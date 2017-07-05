@@ -81,6 +81,11 @@ function end_subsection_header()
 EOF;
 }
 
+function get_pub_opt($pub, $opt)
+{
+    return isset($pub[$opt]) ? $pub[$opt] : null;
+}
+
 function publication_list($pubs)
 {
     if (!empty($pubs))
@@ -97,33 +102,37 @@ EOF;
         $title      = $pub["title"];
         $publisher  = $pub["publisher"];
         $date       = $pub["date"];
-        $id         = $pub["id"];
 
-        $src        = isset($pub["src"]) ? $pub["src"] : null;
+        $id         = get_pub_opt($pub, "id");
+        $pdf        = get_pub_opt($pub, "pdf");
+        $slides     = get_pub_opt($pub, "slides");
+        $bibtex     = get_pub_opt($pub, "bibtex");
+        $src        = get_pub_opt($pub, "src");
+        $web        = get_pub_opt($pub, "web");
 
         echo <<<EOF
         <li>$author. <strong>$title.</strong> <em>$publisher</em>, $date.
 EOF;
 
-        if (!empty($pub["pdf"]))
+        if (!empty($pdf))
         {
-            $url = ($id == "ext")? $pub["pdf"] : "downloads/$id.pdf";
+            $url = ($pdf === true) ? "downloads/$id.pdf" : $pdf;
             echo <<<EOF
             <a href=$url>pdf</a>
 EOF;
         }
 
-        if (!empty($pub["slides"]))
+        if (!empty($slides))
         {
-            $url = ($id == "ext")? $pub["slides"] : "downloads/$id-slides.pdf";
+            $url = ($slides === true) ? "downloads/$id-slides.pdf" : $slides;
             echo <<<EOF
             <a href=$url>slides</a>
 EOF;
         }
 
-        if (!empty($pub["bibtex"]))
+        if (!empty($bibtex))
         {
-            $url = ($id == "ext")? $pub["bibtex"] : "downloads/$id.bib";
+            $url = ($bibtex === true) ? "downloads/$id.bib" : $bibtex;
             echo <<<EOF
             <a href=$url>bibtex</a>
 EOF;
@@ -136,9 +145,9 @@ EOF;
 EOF;
         }
 
-        if (!empty($pub["web"]))
+        if (!empty($web))
         {
-            $url = ($id == "ext")? $pub["web"] : "$id";
+            $url = ($web === true) ? "$id" : $web;
             echo <<<EOF
             <a href=$url>web</a>
 EOF;

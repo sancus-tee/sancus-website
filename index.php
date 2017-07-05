@@ -29,7 +29,7 @@ include("header.php");
         <strong>Sancus 2.0: A Low-Cost Security Architecture for IoT Devices.</strong>
         <em>ACM Transactions on Privacy and Security (TOPS)</em>
     </p>
-    <p><a class="btn btn-primary btn-large" href="downloads/sancus.pdf">Get the paper</a></p>
+    <p><a class="btn btn-primary btn-large" href="downloads/tops17.pdf">Get the paper</a></p>
 </div>
 
 <?php
