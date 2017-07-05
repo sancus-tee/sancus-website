@@ -116,7 +116,7 @@ EOF;
 
         if (!empty($pdf))
         {
-            $url = ($pdf === true) ? "downloads/$id.pdf" : $pdf;
+            $url = ($pdf === true) ? "publications/$id.pdf" : $pdf;
             echo <<<EOF
             <a href=$url>pdf</a>
 EOF;
@@ -124,7 +124,7 @@ EOF;
 
         if (!empty($slides))
         {
-            $url = ($slides === true) ? "downloads/$id-slides.pdf" : $slides;
+            $url = ($slides === true) ? "publications/$id-slides.pdf" : $slides;
             echo <<<EOF
             <a href=$url>slides</a>
 EOF;
@@ -132,7 +132,7 @@ EOF;
 
         if (!empty($bibtex))
         {
-            $url = ($bibtex === true) ? "downloads/$id.bib" : $bibtex;
+            $url = ($bibtex === true) ? "publications/$id.bib" : $bibtex;
             echo <<<EOF
             <a href=$url>bibtex</a>
 EOF;

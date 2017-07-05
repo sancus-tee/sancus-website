@@ -106,7 +106,7 @@ compromised embedded platform.</p>
             "src"       => "https://www1.cs.fau.de/soteria",
             "pdf"       => "https://www1.cs.fau.de/filepool/projects/soteria/soteria.pdf",
             "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf",
-            "bibtex"    => true
+            "bibtex"    => false
         ),
         array(
             "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
@@ -165,7 +165,7 @@ electricity meters or automotive control networks.</p>
             "date"   	=> "2016",
             "id"        => "wistp16",
             "pdf"       => true,
-            "slides"    => true,
+            "slides"    => false,
             "web"       => true,
             "bibtex"    => true
         ),
