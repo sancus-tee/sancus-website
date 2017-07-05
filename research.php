@@ -154,7 +154,7 @@ electricity meters or automotive control networks.</p>
             "date"   	=> "2015",
             "id"        => "esorics15",
             "pdf"       => true,
-            "slides"    => true,
+            "slides"    => false,
             "web"       => true,
             "bibtex"    => true
         ),
