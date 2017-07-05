@@ -3,7 +3,7 @@
 $page_title = "Research";
 
 $sections = array(
-    "core"	=> "Core Architecture",
+    "core"      => "Core Architecture",
     "ext"       => "Extensions",
     "apps"     	=> "Applications",
     "theses"    => "Master Theses"
@@ -21,50 +21,67 @@ imec-DistriNet research group as well as by independent researchers. This page
 aims to give a comprehensive overview of academic publications on Sancus-based
 architectures and applications. Feel free to <a
 href="mailto:jo.vanbulck@cs.kuleuven.be">contact</a> us if you know of other
-relevant research to be included here.
+relevant research results to be included here.
 </p>
-
-        <!-- div class="btn-group">
-            <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">More info<span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="downloads/paper.pdf">paper</a></li>
-            </ul>
-        </div-->
 
 <?php research_section("core") ?>
 
-<p class=research-par>The core Sancus security architecture was first presented at the 2013 USENIX security
-symposium. More recent developments are described in the Sancus 2.0 ACM TOPS
-journal paper, and in Job Noorman's PhD dissertation linked below.</p>
+<p> The core Sancus security architecture was first presented at the 2013
+USENIX security symposium. More recent developments are described in the Sancus
+2.0 ACM TOPS journal paper, and in Job Noorman's PhD dissertation linked below.
+Furthermore, a higher-level description of Sancus is provided by two survey
+publications on the Protected Module Architecture research field.
+</p>
 
 <?php
     $pubs = array(
         array(
             "author"    => "Job Noorman, Pieter Agten, Wilfried Daniels, Raoul Strackx, Anthony Van Herrewege, Christophe Huygens, Bart Preneel, Ingrid Verbauwhede, Frank Piessens",
-            "title"     => "Sancus: Low-cost trustworthy extensible networked devices with a zero-software Trusted Computing Base",
+            "title"     => "Sancus: Low-Cost Trustworthy Extensible Networked Devices with a Zero-Software Trusted Computing Base",
             "publisher" => "Proceedings of the 22nd USENIX Security Symposium",
-            "year"   	=> "2013",
+            "date"   	=> "2013",
             "id"        => "usenix13",
             "pdf"       => true,
             "slides"    => true,
+            "src"       => "https://github.com/sancus-pma",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Raoul Strackx, Job Noorman, Ingrid Verbauwhede, Bart Preneel, Frank Piessens",
+            "title"     => "Protected Software Module Architectures",
+            "publisher" => "Securing Electronic Business Processes (ISSE)",
+            "date"   	=> "2013",
+            "id"        => "ext",
+            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/430320/1/ISSE-2013-paper.pdf",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Pieter Maene, Johannes Götzfried, Ruan De Clercq, Tilo Müller, Felix Freiling, Ingrid Verbauwhede",
+            "title"     => "Hardware-Based Trusted Computing Architectures for Isolation and Attestation",
+            "publisher" => "IEEE Transactions on Computers",
+            "date"   	=> "2017",
+            "id"        => "ext",
+            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
             "bibtex"    => true
         ),
         array(
             "author"    => "Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling",
-            "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT Devices",
+            "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT devices",
             "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
-            "year"   	=> "2017",
-            "id"        => "tops17",
-            "pdf"       => true,
+            "date"   	=> "2017",
+            "id"        => "ext",//"tops17",
+            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
+            "src"       => "https://github.com/sancus-pma",
             "bibtex"    => true
         ),
         array(
             "author"    => "Job Noorman",
             "title"     => "Sancus: A Low-Cost Security Architecture for Distributed IoT Applications on a Shared Infrastructure",
             "publisher" => "PhD thesis KU Leuven",
-            "year"   	=> "2017",
+            "date"   	=> "2017",
             "id"        => "ext", //"noorman17phd",
-            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf"
+            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf",
+            "bibtex"    => true
         )
     );
 
@@ -73,7 +90,7 @@ journal paper, and in Job Noorman's PhD dissertation linked below.</p>
 
 <?php research_section("ext") ?>
 
-<p class=research-par>The following papers propose extensions to the Sancus
+<p>The following papers propose extensions to the Sancus
 hardware and compiler infrastructure. Either to protect the confidentiality of
 security-critical code, or to preserve real-time deadlines on a partially
 compromised embedded platform.</p>
@@ -84,17 +101,18 @@ compromised embedded platform.</p>
             "author"    => "Johannes Götzfried, Tilo Müller, Ruan de Clercq, Pieter Maene, Felix Freiling, Ingrid Verbauwhede",
             "title"     => "Soteria: Offline Software Protection within Low-cost Embedded Devices",
             "publisher" => "Proceedings of the 31st Annual Computer Security Applications Conference (ACSAC)",
-            "year"   	=> "2015",
+            "date"   	=> "2015",
             "id"        => "ext",
-            "web"       => "https://www1.cs.fau.de/soteria",
+            "src"       => "https://www1.cs.fau.de/soteria",
             "pdf"       => "https://www1.cs.fau.de/filepool/projects/soteria/soteria.pdf",
-            "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf"
+            "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf",
+            "bibtex"    => true
         ),
         array(
             "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
             "title"     => "Towards Availability and Real-Time Guarantees for Protected Module Architectures",
             "publisher" => "Companion Proceedings of the 15th International Conference on Modularity (MASS)",
-            "year"   	=> "2016",
+            "date"   	=> "2016",
             "id"        => "mass16",
             "pdf"       => true,
             "slides"    => true,
@@ -107,7 +125,13 @@ compromised embedded platform.</p>
 
 <?php research_section("apps") ?>
 
-<p class=research-par>Sancus has recently been applied in a number of application scenarios. Ranging from securely multiplexing shared system resources, over establishing the integrity of an untrusted host operating system, to implementing a secure smart metering infrastructure.</p>
+<p>Recent and ongoing work leverages Sancus' lightweight
+isolation and authentication primitives to establish trust in distributed
+embedded application scenarios. These range from addressing specific
+requirements, such as securely multiplexing shared platform resources among
+distrusting clients, or establishing the integrity of an untrusted host
+operating system, to extended case studies in the context of emerging smart
+electricity meters or automotive control networks.</p>
 
 <?php
     $pubs = array(
@@ -115,18 +139,19 @@ compromised embedded platform.</p>
             "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
             "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
             "publisher" => "9th WISTP International Conference on Information Security Theory and Practice (WISTP)",
-            "year"   	=> "2015",
+            "date"   	=> "2015",
             "id"        => "wistp15",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
+            "src"       => "https://github.com/sancus-pma/sm-access-control",
             "bibtex"    => true
         ),
         array(
             "author"    => "Jan Tobias Mühlberg, Job Noorman, Frank Piessens",
             "title"     => "Lightweight and Flexible Trust Assessment Modules for the Internet of Things",
-            "publisher" => "Proceedsings of the 20th European Symposium on Research in Computer Security (ESORICS)",
-            "year"   	=> "2015",
+            "publisher" => "Proceedings of the 20th European Symposium on Research in Computer Security (ESORICS)",
+            "date"   	=> "2015",
             "id"        => "esorics15",
             "pdf"       => true,
             "slides"    => true,
@@ -137,12 +162,20 @@ compromised embedded platform.</p>
             "author"    => "Jan Tobias Mühlberg, Sara Cleemput, Mustafa A. Mustafa, Jo Van Bulck, Bart Preneel, Frank Piessens",
             "title"     => "An Implementation of a High Assurance Smart Meter using Protected Module Architectures",
             "publisher" => "10th WISTP International Conference on Information Security Theory and Practice (WISTP)",
-            "year"   	=> "2016",
+            "date"   	=> "2016",
             "id"        => "wistp16",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
             "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "A New Security Architecture for Networked Embedded Devices",
+            "publisher" => "eeNews Europe Automotive",
+            "date"   	=> "June 28, 2017",
+            "id"        => "ext",
+            "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
         )
     );
 
@@ -151,7 +184,14 @@ compromised embedded platform.</p>
 
 <?php research_section("theses") ?>
 
-<p class=research-par>The following master thesis topics build upon Sancus.</p>
+<p> Sancus has been used as the development platform for several master theses.
+Specifically, on project explored the feasibility of supplementing Sancus'
+hardware-enforced security guarantees with availability and access control
+guarantees for shared system resources.
+Another ongoing project investigates hardware/software design trade-offs by 
+developing a trusted kernel-like software module that adopts the
+responsibilities of Sancus' existing cryptographic hardware primitives.
+</p>
 
 <?php
     $pubs = array(
@@ -159,11 +199,23 @@ compromised embedded platform.</p>
             "author"    => "Jo Van Bulck",
             "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
             "publisher" => "Master thesis KU Leuven",
-            "year"   	=> "2015",
+            "date"   	=> "2015",
             "id"        => "ext",
             "pdf"       => "https://distrinet.cs.kuleuven.be/news/2015/thesis_jovanbulck_digital_version.pdf",
+            "slides"    => true,
+            "src"       => "https://github.com/jovanbulck/thesis-src/",
+            "bibtex"    => true
+        ),
+        //TODO Deniss Fret thesis?
+        array(
+            "author"    => "Alexandru - Madalin Ghenea",
+            "title"     => "A Security Kernel for Protected Module Architectures",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2017 (ongoing)",
+            "id"        => "ext",
+            "pdf"       => false,
             "slides"    => false,
-            "web"       => "https://github.com/jovanbulck/thesis-src/",
+            "web"       => false,
             "bibtex"    => false
         )
     );

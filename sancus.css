@@ -20,6 +20,12 @@ h3
     padding-top: 40px;
 }
 
+.subsection-header
+{
+    padding-top: 10px;
+}
+
+
 .research-par
 {
     margin-bottom: 25px;
@@ -28,9 +34,9 @@ h3
 .research-list
 {
     padding: 4px 4px 4px 4px;
-    background-color: #f7f7f9;
+    background-color: #f5f5f5;
     border-radius:4px;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #ccc;
 }
 
 .research-list li

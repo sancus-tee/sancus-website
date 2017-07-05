@@ -68,7 +68,7 @@ function start_subsection_header($id)
 
     echo <<<EOF
 <div class="page-header">
-    <h2 id="$id" class="section-header">
+    <h2 id="$id" class="subsection-header">
         $title
 EOF;
 }
@@ -86,6 +86,7 @@ function publication_list($pubs)
     if (!empty($pubs))
     {
         echo <<<EOF
+        <p class=research-par></p>
         <div class=research-list>
         <ul>
 EOF;
@@ -95,11 +96,13 @@ EOF;
         $author     = $pub["author"];
         $title      = $pub["title"];
         $publisher  = $pub["publisher"];
-        $year       = $pub["year"];
+        $date       = $pub["date"];
         $id         = $pub["id"];
 
+        $src        = isset($pub["src"]) ? $pub["src"] : null;
+
         echo <<<EOF
-        <li>$author. <strong>$title.</strong> <em>$publisher</em>, $year.
+        <li>$author. <strong>$title.</strong> <em>$publisher</em>, $date.
 EOF;
 
         if (!empty($pub["pdf"]))
@@ -123,6 +126,13 @@ EOF;
             $url = ($id == "ext")? $pub["bibtex"] : "downloads/$id.bib";
             echo <<<EOF
             <a href=$url>bibtex</a>
+EOF;
+        }
+
+        if (!empty($src))
+        {
+            echo <<<EOF
+            <a href=$src>src</a>
 EOF;
         }
 
