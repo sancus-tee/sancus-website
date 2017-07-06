@@ -71,6 +71,7 @@ publications on the Protected Module Architecture research field.
             "date"   	=> "2017",
             "id"        => "tops17",
             "pdf"       => true,
+            "slides"    => true,
             "src"       => "https://github.com/sancus-pma",
             "bibtex"    => true
         ),
@@ -154,7 +155,7 @@ electricity meters or automotive control networks.</p>
             "date"   	=> "2015",
             "id"        => "esorics15",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "web"       => true,
             "bibtex"    => true
         ),
