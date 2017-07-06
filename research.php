@@ -104,7 +104,7 @@ compromised embedded platform.</p>
             "publisher" => "Proceedings of the 31st Annual Computer Security Applications Conference (ACSAC)",
             "date"   	=> "2015",
             "id"        => "acsac15",
-            "src"       => "https://www1.cs.fau.de/soteria",
+            "web"       => "https://www1.cs.fau.de/soteria",
             "pdf"       => "https://www1.cs.fau.de/filepool/projects/soteria/soteria.pdf",
             "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf",
             "bibtex"    => false

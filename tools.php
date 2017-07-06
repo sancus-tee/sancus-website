@@ -118,7 +118,7 @@ EOF;
         {
             $url = ($pdf === true) ? "publications/$id.pdf" : $pdf;
             echo <<<EOF
-            <a href=$url>pdf</a>
+            <a href=$url><img alt="pdf" src="icons/pdf.png"></a>
 EOF;
         }
 
@@ -126,7 +126,7 @@ EOF;
         {
             $url = ($slides === true) ? "publications/$id-slides.pdf" : $slides;
             echo <<<EOF
-            <a href=$url>slides</a>
+            <a href=$url><img alt="slides" src="icons/slides.png"></a>
 EOF;
         }
 
@@ -134,14 +134,14 @@ EOF;
         {
             $url = ($bibtex === true) ? "publications/$id.bib" : $bibtex;
             echo <<<EOF
-            <a href=$url>bibtex</a>
+            <a href=$url><img alt="bibtex" src="icons/bibtex.png"></a>
 EOF;
         }
 
         if (!empty($src))
         {
             echo <<<EOF
-            <a href=$src>src</a>
+            <a href=$src><img alt="src" src="icons/src.png"></a>
 EOF;
         }
 
@@ -149,7 +149,7 @@ EOF;
         {
             $url = ($web === true) ? "$id" : $web;
             echo <<<EOF
-            <a href=$url>web</a>
+            <a href=$url><img alt="web" src="icons/web.png"></a>
 EOF;
         }
 
