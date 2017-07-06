@@ -213,7 +213,7 @@ EOF;
         if (empty($package_name))
         {
             $package = "N/A";
-            $note = $prereq["note"];
+            $note = isset($prereq["note"]) ? $prereq["note"] : null;
             if (!empty($note))
                 $package .= $note;
         }
