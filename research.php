@@ -70,7 +70,7 @@ publications on the Protected Module Architecture research field.
             "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
             "date"   	=> "2017",
             "id"        => "tops17",
-            "pdf"       => true,
+            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2785.pdf",
             "slides"    => true,
             "src"       => "https://github.com/sancus-pma",
             "bibtex"    => true
