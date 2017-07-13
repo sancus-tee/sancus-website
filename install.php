@@ -37,9 +37,16 @@ include("header.php");
 
 <?php install_section("overview") ?>
 <p>
-    This page provides installation instructions for Sancus.
-    We provide both source files and binary packages for the simulator, the compiler and any runtime support libraries.
-    All provided binary packages have been tested on Ubuntu 16.04 but should work on any Debian-based GNU/Linux distribution.
+    Sancus is free software. The latest source code of the Sancus project is being actively
+    maintained on <a href="https://github.com/sancus-pma">GitHub</a>. Please
+    redirect all your bug reports, issues, and pull requests to the corresponding
+    GitHub repository.
+</p>
+<p>
+    This page provides installation instructions, source code and binary
+    packages for the official Sancus 2.0 release: simulator, compiler and
+    runtime support libraries.  All provided binary packages have been tested on
+    Ubuntu 16.04 but should work on any Debian-based GNU/Linux distribution.
 </p>
 
 <p>
@@ -84,7 +91,7 @@ include("header.php");
         $cmake_prereq
     );
 
-    install_section("sim", $downloads, $prereqs);
+    install_section("sim", $downloads, $prereqs, "sancus-core");
 ?>
 
 <p>To install the Sancus simulator and tools:</p>
@@ -241,7 +248,7 @@ make install
         $cmake_prereq
     );
 
-    install_section("compiler", $downloads, $prereqs);
+    install_section("compiler", $downloads, $prereqs, "sancus-compiler");
 ?>
 
 <p><small><sup>1</sup>Can be installed using <code>pip3 install pyelftools</code></small></p>

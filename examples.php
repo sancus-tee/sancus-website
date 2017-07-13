@@ -17,7 +17,7 @@ In this section we will give a complete example of how to build and run a Sancus
 We will follow the example given in the paper: one protected module providing sensor data and one that transforms this data and signs it to be sent to the vendor.
 </p>
 
-<?php example_section("source") ?>
+<?php example_section("source", "sancus-examples/tree/master/sensor-reader") ?>
 <?php display_source_file("sensor.h") ?>
 <?php display_source_file("sensor.c") ?>
 <?php display_source_file("reader.h") ?>

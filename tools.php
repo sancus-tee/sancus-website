@@ -1,5 +1,7 @@
 <?php
 
+define("GITHUB_URL", "https://github.com/sancus-pma");
+
 function doc_ref($id, $title = null)
 {
     if (empty($title))
@@ -164,9 +166,17 @@ EOF;
     }
 }
 
-function install_section($id, $downloads = null, $prereqs = null)
+function install_section($id, $downloads = null, $prereqs = null, $git=null)
 {
     start_section_header($id);
+
+    if (!empty($git))
+    {
+        $url=GITHUB_URL . "/" . $git;
+        echo <<<EOF
+        <small><a href=$url><img alt="src" src="icons/github-32px.png"></a></small>
+EOF;
+    }
 
     if (!empty($downloads))
     {
@@ -262,9 +272,18 @@ EOF;
     end_section_header();
 }
 
-function example_section($id)
+function example_section($id, $git=null)
 {
     start_section_header($id);
+
+    if (!empty($git))
+    {
+        $url=GITHUB_URL . "/" . $git;
+        echo <<<EOF
+        <small><a href=$url><img alt="src" src="icons/github-32px.png"></a></small>
+EOF;
+    }
+
     end_section_header();
 }
 
@@ -277,10 +296,10 @@ function research_section($id)
 function display_source_file($file)
 {
     echo <<<EOF
-<a href="code/$file" class="btn btn-primary src-button">$file</a>
+<a href="code/sensor-reader/$file" class="btn btn-primary src-button">$file</a>
 <pre class="prettyprint">
 EOF;
-    echo chop(htmlspecialchars(file_get_contents("code/$file")));
+    echo chop(htmlspecialchars(file_get_contents("code/sensor-reader/$file")));
     echo "</pre>\n";
 }
 
