@@ -6,7 +6,8 @@ $sections = array(
     "core"      => "Core Architecture",
     "ext"       => "Extensions",
     "apps"     	=> "Applications",
-    "theses"    => "Master Theses"
+    "theses"    => "Master Theses",
+    "media"     => "Media Coverage",
 );
 
 include("header.php");
@@ -131,8 +132,8 @@ isolation and authentication primitives to establish trust in distributed
 embedded application scenarios. These range from addressing specific
 requirements, such as securely multiplexing shared platform resources among
 distrusting clients, or establishing the integrity of an untrusted host
-operating system, to extended case studies in the context of emerging smart
-electricity meters or automotive control networks.</p>
+operating system, to an extended case studies in the context of emerging smart
+electricity meters.</p>
 
 <?php
     $pubs = array(
@@ -157,6 +158,7 @@ electricity meters or automotive control networks.</p>
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
+            "src"       => "https://github.com/sancus-pma/sancus-examples",
             "bibtex"    => true
         ),
         array(
@@ -169,14 +171,6 @@ electricity meters or automotive control networks.</p>
             "slides"    => false,
             "web"       => true,
             "bibtex"    => true
-        ),
-        array(
-            "author"    => "Jan Tobias Mühlberg",
-            "title"     => "A New Security Architecture for Networked Embedded Devices",
-            "publisher" => "eeNews Europe Automotive",
-            "date"   	=> "June 28, 2017",
-            "id"        => "ext",
-            "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
         )
     );
 
@@ -229,6 +223,53 @@ responsibilities of Sancus' existing cryptographic hardware primitives.
             "src"       => false,
             "bibtex"    => false
         )
+    );
+
+    publication_list($pubs);
+?>
+
+<?php research_section("media") ?>
+
+<p>
+Sancus has recently been featured in a number of technology news website
+articles. Specifically, in the context of ongoing research that applies
+Sancus-based techniques to secure automotive control networks.
+</p>
+
+<?php
+    $pubs = array(
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "A New Security Architecture for Networked Embedded Devices",
+            "publisher" => "eeNews Europe Automotive",
+            "date"   	=> "June 28, 2017",
+            "id"        => "ext",
+            "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
+        ),
+        array(
+            "author"    => "Laura Reggiani",
+            "title"     => "Mobilità Intelligente: Privacy e Sicurezza",
+            "publisher" => "Elettronica News",
+            "date"   	=> "July 5, 2017",
+            "id"        => "ext",
+            "web"       => "https://www.elettronicanews.it/mobilita-intelligente-privacy-e-sicurezza/"
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "Schwachpunkte Ausmerzen",
+            "publisher" => "Elektronik Automotive",
+            "date"   	=> "July 5, 2017",
+            "id"        => "ext",
+            "web"       => "http://www.elektroniknet.de/elektronik-automotive/sonstiges/schwachpunkte-ausmerzen-143239.html"
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "Isolate and Verify: Security for Embedded Control Systems",
+            "publisher" => "EuroSTAR Huddle",
+            "date"   	=> "July 12, 2017",
+            "id"        => "ext",
+            "web"       => "https://huddle.eurostarsoftwaretesting.com/security-for-embedded-control-systems/"
+        ),
     );
 
     publication_list($pubs);
