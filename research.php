@@ -240,6 +240,14 @@ Sancus-based techniques to secure automotive control networks.
     $pubs = array(
         array(
             "author"    => "Jan Tobias Mühlberg",
+            "title"     => "Making Car Electronics Safe Again",
+            "publisher" => "imec Magazine",
+            "date"   	=> "March, 2017",
+            "id"        => "ext",
+            "web"       => "http://magazine.imec.be/data/117/reader/reader.html?t=1499962475129#!preferred/1/package/117/pub/123/page/4"
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg",
             "title"     => "A New Security Architecture for Networked Embedded Devices",
             "publisher" => "eeNews Europe Automotive",
             "date"   	=> "June 28, 2017",
