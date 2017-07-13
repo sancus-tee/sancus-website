@@ -88,7 +88,7 @@ sancus-crypto --gen-sm-key reader --key $VENDOR_KEY main.elf
 Then we can decrypt the output of the reader  module (<code>$NONCE</code>, <code>$CIPHER</code>, and <code>$TAG</code> refer to the data printed by the simulator and <code>$SM_KEY</code> refers to the output of the previous command):
 </p>
 <pre>
-sancus-crypto --unwrap $AD $CIPHER $TAG --key $SM_KEY
+sancus-crypto --unwrap $NONCE $CIPHER $TAG --key $SM_KEY
 </pre>
 
 <?php
