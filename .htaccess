@@ -1,0 +1,4 @@
+<FilesMatch "\.(bib)$">
+  ForceType text/plain
+  Header set Content-Disposition inline
+</FilesMatch>
