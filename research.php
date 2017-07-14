@@ -63,6 +63,7 @@ publications on the Protected Module Architecture research field.
             "date"   	=> "2017",
             "id"        => "ieee17",
             "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
+            "slides"    => true,
             "bibtex"    => true
         ),
         array(
@@ -83,6 +84,7 @@ publications on the Protected Module Architecture research field.
             "date"   	=> "2017",
             "id"        => "noorman17phd",
             "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf",
+            "slides"    => true,
             "bibtex"    => true
         )
     );
