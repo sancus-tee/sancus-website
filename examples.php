@@ -23,8 +23,6 @@ We will follow the example given in the paper: one protected module providing se
 <?php display_source_file("reader.h") ?>
 <?php display_source_file("reader.c") ?>
 <?php display_source_file("main.c") ?>
-<?php display_source_file("../common.h") ?>
-<?php display_source_file("../common.c") ?>
 
 <?php example_section("building") ?>
 <p>
@@ -45,14 +43,13 @@ Compile the sources:
 sancus-cc -c -o sensor.o sensor.c
 sancus-cc -c -o reader.o reader.c
 sancus-cc -c -o main.o main.c
-sancus-cc -c -o common.o common.c
 </pre>
 
 <p>
 Link everything in standalone mode:
 </p>
 <pre>
-sancus-ld --standalone --rom-size $ROM --ram-size $RAM --sm-stack-size $STACK -o main-no-mac.elf main.o reader.o sensor.o common.o
+sancus-ld --standalone --rom-size $ROM --ram-size $RAM --sm-stack-size $STACK -o main-no-mac.elf main.o reader.o sensor.o
 </pre>
 
 <p>
