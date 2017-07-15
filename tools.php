@@ -296,10 +296,10 @@ function research_section($id)
 function display_source_file($file)
 {
     echo <<<EOF
-<a href="code/sensor-reader/$file" class="btn btn-primary src-button">$file</a>
+<a href="code/$file" class="btn btn-primary src-button">$file</a>
 <pre class="prettyprint">
 EOF;
-    echo chop(htmlspecialchars(file_get_contents("code/sensor-reader/$file")));
+    echo chop(htmlspecialchars(file_get_contents("code/$file")));
     echo "</pre>\n";
 }
 

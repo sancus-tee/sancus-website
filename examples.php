@@ -13,8 +13,20 @@ include("header.php");
 
 <?php example_section("overview") ?>
 <p>
-In this section we will give a complete example of how to build and run a Sancus application.
-We will follow the example given in the paper: one protected module providing sensor data and one that transforms this data and signs it to be sent to the vendor.
+In this section we provide a complete example of how to build and run a Sancus
+application.
+We follow the example given in the paper: one protected module providing sensor
+data and one that transforms this data and signs it to be sent to the vendor.
+</p>
+
+<p>
+Note that the example code below remains fully compatible with the
+official Sancus 2.0 release, as provided on the <a href="install.php">
+installation page</a>. An updated example scenario with an MMIO sensor module
+providing authenticated readings from a time stamp counter peripheral is
+available on <a href=
+"https://github.com/sancus-pma/sancus-examples/tree/master/sensor-reader">
+GitHub </a>.
 </p>
 
 <?php example_section("source", "sancus-examples/tree/master/sensor-reader") ?>
