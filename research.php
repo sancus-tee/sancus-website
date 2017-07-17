@@ -67,6 +67,16 @@ publications on the Protected Module Architecture research field.
             "bibtex"    => true
         ),
         array(
+            "author"    => "Job Noorman",
+            "title"     => "Sancus: A Low-Cost Security Architecture for Distributed IoT Applications on a Shared Infrastructure",
+            "publisher" => "PhD thesis KU Leuven",
+            "date"   	=> "2017",
+            "id"        => "noorman17phd",
+            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf",
+            "slides"    => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling",
             "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT devices",
             "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
@@ -77,16 +87,6 @@ publications on the Protected Module Architecture research field.
             "src"       => "https://github.com/sancus-pma",
             "bibtex"    => true
         ),
-        array(
-            "author"    => "Job Noorman",
-            "title"     => "Sancus: A Low-Cost Security Architecture for Distributed IoT Applications on a Shared Infrastructure",
-            "publisher" => "PhD thesis KU Leuven",
-            "date"   	=> "2017",
-            "id"        => "noorman17phd",
-            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/574995/1/thesis.pdf",
-            "slides"    => true,
-            "bibtex"    => true
-        )
     );
 
     publication_list($pubs);

@@ -90,6 +90,10 @@ function get_pub_opt($pub, $opt)
 
 function publication_list($pubs)
 {
+    // sort publications in reverse order, we want readers to start with the
+    // latest (or most relevant) paper
+    $pubs = array_reverse($pubs);
+
     if (!empty($pubs))
     {
         echo <<<EOF
