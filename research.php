@@ -17,8 +17,8 @@ include("header.php");
 <h1 class="section-header">Research Publications</h1>
 </div>
 
-<p> Sancus is an ongoing research project, being used both in the
-imec-DistriNet research group as well as by independent researchers. This page
+<p> Sancus is an ongoing research project, being used both within
+imec-DistriNet as well as by independent researchers. This page
 aims to give a comprehensive overview of academic publications on Sancus-based
 architectures and applications. Feel free to <a
 href="mailto:jo.vanbulck@cs.kuleuven.be">contact</a> us if you know of other
@@ -134,7 +134,7 @@ isolation and authentication primitives to establish trust in distributed
 embedded application scenarios. These range from addressing specific
 requirements, such as securely multiplexing shared platform resources among
 distrusting clients, or establishing the integrity of an untrusted host
-operating system, to an extended case studies in the context of emerging smart
+operating system, to an extended case study in the context of emerging smart
 electricity meters.</p>
 
 <?php
@@ -188,8 +188,8 @@ control guarantees for shared system resources.
 Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
 Ongoing work finally investigates hardware/software design trade-offs by
-developing a trusted kernel-like software module that adopts the
-responsibilities of Sancus' existing cryptographic hardware primitives.
+implementing Sancus' cryptographic hardware primitives in a trusted kernel-like
+software module.
 </p>
 
 <?php
