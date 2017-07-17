@@ -257,7 +257,7 @@ Sancus-based techniques to secure automotive control networks.
             "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
         ),
         array(
-            "author"    => "Laura Reggiani",
+            "author"    => "Jan Tobias Mühlberg and Laura Reggiani",
             "title"     => "Mobilità Intelligente: Privacy e Sicurezza",
             "publisher" => "Elettronica News",
             "date"   	=> "July 5, 2017",
