@@ -1,6 +1,7 @@
 <?php
 
 define("GITHUB_URL", "https://github.com/sancus-pma");
+define("TRAVIS_URL", "https://travis-ci.org/sancus-pma");
 
 function doc_ref($id, $title = null)
 {
@@ -276,7 +277,7 @@ EOF;
     end_section_header();
 }
 
-function example_section($id, $git=null)
+function example_section($id, $git=null, $travis=null)
 {
     start_section_header($id);
 
@@ -285,6 +286,14 @@ function example_section($id, $git=null)
         $url=GITHUB_URL . "/" . $git;
         echo <<<EOF
         <small><a href=$url><img alt="src" src="icons/github-32px.png"></a></small>
+EOF;
+    }
+
+    if (!empty($travis))
+    {
+        $url=TRAVIS_URL . "/" . $travis;
+        echo <<<EOF
+        <small><a href=$url><img alt="status" src="https://travis-ci.org/sancus-pma/sancus-examples.svg?branch=master"></a></small>
 EOF;
     }
 

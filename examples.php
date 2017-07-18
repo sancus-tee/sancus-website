@@ -36,7 +36,7 @@ GitHub </a>.
 <?php display_source_file("reader.c") ?>
 <?php display_source_file("main.c") ?>
 
-<?php example_section("building") ?>
+<?php example_section("building", null, "sancus-examples") ?>
 <p>
 For the build process, we assume a Bash shell is being used.
 We first define some variables:
