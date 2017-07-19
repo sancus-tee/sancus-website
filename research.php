@@ -160,7 +160,7 @@ electricity meters.</p>
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
-            "src"       => "https://github.com/sancus-pma/sancus-examples",
+            "src"       => "https://github.com/sancus-pma/sancus-contiki",
             "bibtex"    => true
         ),
         array(
