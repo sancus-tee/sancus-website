@@ -187,6 +187,8 @@ Sancus' hardware-enforced security guarantees with availability and access
 control guarantees for shared system resources.
 Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
+Sancus has furthermore been used as the target platform for an automated reactive
+programming code generation framework.
 Ongoing work finally investigates hardware/software design trade-offs by
 implementing Sancus' cryptographic hardware primitives in a trusted kernel-like
 software module.
@@ -215,6 +217,15 @@ software module.
             "bibtex"    => true
         ),
         array(
+            "author"    => "Ben Calus",
+            "title"     => "Functional Reactive Programming on Embedded Devices",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2016",
+            "id"        => "calus16thesis",
+            "pdf"       => true,
+            "bibtex"    => false
+        ),
+        array(
             "author"    => "Alexandru - Madalin Ghenea",
             "title"     => "A Security Kernel for Protected Module Architectures",
             "publisher" => "Master thesis KU Leuven",
@@ -224,7 +235,7 @@ software module.
             "slides"    => false,
             "src"       => false,
             "bibtex"    => false
-        )
+        ),
     );
 
     publication_list($pubs);
