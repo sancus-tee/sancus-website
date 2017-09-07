@@ -189,9 +189,9 @@ Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
 Sancus has furthermore been used as the target platform for an automated reactive
 programming code generation framework.
-Ongoing work finally investigates hardware/software design trade-offs by
-implementing Sancus' cryptographic hardware primitives in a trusted kernel-like
-software module.
+Finally, a trusted kernel-like software module has been developed to
+investigate hardware/software design trade-offs for Sancus' cryptographic
+primitives.
 </p>
 
 <?php
@@ -223,18 +223,18 @@ software module.
             "date"   	=> "2016",
             "id"        => "calus16thesis",
             "pdf"       => true,
-            "bibtex"    => false
+            "bibtex"    => true
         ),
         array(
             "author"    => "Alexandru - Madalin Ghenea",
             "title"     => "A Security Kernel for Protected Module Architectures",
             "publisher" => "Master thesis KU Leuven",
-            "date"   	=> "2017 (ongoing)",
-            "id"        => "ext",
-            "pdf"       => false,
+            "date"   	=> "2017",
+            "id"        => "madalinghenea17thesis",
+            "pdf"       => true,
             "slides"    => false,
-            "src"       => false,
-            "bibtex"    => false
+            "src"       => "https://github.com/nighthawk017/sancus_kernel",
+            "bibtex"    => true
         ),
     );
 
