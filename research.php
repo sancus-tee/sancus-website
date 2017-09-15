@@ -232,7 +232,7 @@ primitives.
             "date"   	=> "2017",
             "id"        => "madalinghenea17thesis",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "src"       => "https://github.com/nighthawk017/sancus_kernel",
             "bibtex"    => true
         ),
