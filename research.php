@@ -134,8 +134,8 @@ isolation and authentication primitives to establish trust in distributed
 embedded application scenarios. These range from addressing specific
 requirements, such as securely multiplexing shared platform resources among
 distrusting clients, or establishing the integrity of an untrusted host
-operating system, to an extended case study in the context of emerging smart
-electricity meters.</p>
+operating system, to extended case studies in the context of emerging smart
+electricity meters or automotive control networks.</p>
 
 <?php
     $pubs = array(
@@ -172,6 +172,18 @@ electricity meters.</p>
             "pdf"       => true,
             "slides"    => false,
             "web"       => true,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "VulCAN: Efficient Component Authentication and Software Isolation for Automotive Control Networks",
+            "publisher" => "Proceedings of the 33th Annual Computer Security Applications Conference (ACSAC)",
+            "date"   	=> "2017",
+            "id"        => "acsac17",
+            "pdf"       => true,
+            "slides"    => false,
+            "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
+            "src"       => "https://github.com/sancus-pma/vulcan",
             "bibtex"    => true
         )
     );
