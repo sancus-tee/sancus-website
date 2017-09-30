@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/paper-authentic-execution/www/parking-sensors/sensor.c.html</title>
+<meta name="Generator" content="Vim/8.0">
+<meta name="plugin-version" content="vim7.4_v2">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,no_foldcolumn,expand_tabs,line_ids">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus/reactive.h&gt;</span>
+<span class="lnr"> 2 </span>
+<span class="lnr"> 3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 4 </span>
+<span class="lnr"> 5 </span>
+<span class="lnr"> 6 </span><span class="PreProc">#include </span><span class="Constant">&quot;sensor.h&quot;</span>
+<span class="lnr"> 7 </span>
+<span class="lnr"> 8 </span>SM_OUTPUT(SMNAME, output);
+<span class="lnr"> 9 </span>
+<span class="lnr">10 </span><span class="Type">static</span> <span class="Type">int</span>     SM_DATA(SMNAME) initialised;
+<span class="lnr">11 </span><span class="Type">static</span> <span class="Type">int</span>     SM_DATA(SMNAME) nonce;
+<span class="lnr">12 </span><span class="Type">static</span> <span class="Type">int</span>     SM_DATA(SMNAME) seq;
+<span class="lnr">13 </span><span class="Type">static</span> <span class="Type">uint8_t</span> SM_DATA(SMNAME) action;
+<span class="lnr">14 </span>
+<span class="lnr">15 </span><span class="PreProc">#define __stringify(arg) #arg</span>
+<span class="lnr">16 </span><span class="PreProc">#define STRINGIFY(ARG)   __stringify(ARG)</span>
+<span class="lnr">17 </span>
+<span class="lnr">18 </span>
+<span class="lnr">19 </span><span class="Type">void</span> SM_FUNC(SMNAME) init(<span class="Type">void</span>)
+<span class="lnr">20 </span>{
+<span class="lnr">21 </span>  <span class="cConditional">if</span> (! initialised) {
+<span class="lnr">22 </span>    nonce       = SNONCE;
+<span class="lnr">23 </span>    seq         = <span class="Constant">0</span>;
+<span class="lnr">24 </span>    action      = <span class="Constant">0</span>;
+<span class="lnr">25 </span>    initialised = <span class="Constant">1</span>;
+<span class="lnr">26 </span>  }
+<span class="lnr">27 </span>}
+<span class="lnr">28 </span>
+<span class="lnr">29 </span>SM_ENTRY(SMNAME) <span class="Type">void</span> produce_output(<span class="Type">void</span>)
+<span class="lnr">30 </span>{
+<span class="lnr">31 </span>    puts(<span class="Constant">&quot;* SM &quot;</span> STRINGIFY(SMNAME) <span class="Constant">&quot;: produce_output&quot;</span>);
+<span class="lnr">32 </span>
+<span class="lnr">33 </span>    <span class="cConditional">if</span> (! initialised) { init(); }
+<span class="lnr">34 </span>
+<span class="lnr">35 </span>    <span class="cConditional">if</span> (seq == <span class="Constant">0</span>) { action = SPOT_FREE; }
+<span class="lnr">36 </span>    <span class="cConditional">if</span> (seq == <span class="Constant">2</span>) { action = SPOT_OCCUPIED | CAR_ENTER; }
+<span class="lnr">37 </span>    <span class="cConditional">if</span> (seq == <span class="Constant">3</span>) { action = SPOT_OCCUPIED; }
+<span class="lnr">38 </span>    <span class="cConditional">if</span> (seq == <span class="Constant">5</span>) { action = SPOT_FREE | CAR_EXIT; }
+<span class="lnr">39 </span>    <span class="cConditional">if</span> (seq == <span class="Constant">6</span>) { action = SPOT_FREE; }
+<span class="lnr">40 </span>
+<span class="lnr">41 </span>    <span class="Type">uint8_t</span> data[] __attribute__((aligned(<span class="Constant">2</span>)))
+<span class="lnr">42 </span>                   = { (nonce &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr">43 </span>                       (nonce &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr">44 </span>                       (seq   &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr">45 </span>                       (seq   &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>)) &amp; <span class="Constant">0xff</span>,
+<span class="lnr">46 </span>                       action, <span class="Constant">0</span> };
+<span class="lnr">47 </span>    seq += <span class="Constant">1</span>;
+<span class="lnr">48 </span>
+<span class="lnr">49 </span>    output(data, <span class="Statement">sizeof</span>(data));
+<span class="lnr">50 </span>}
+<span class="lnr">51 </span>
+</pre>
+</body>
+</html>

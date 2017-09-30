@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/paper-authentic-execution/www/parking-sensors/display.c.html</title>
+<meta name="Generator" content="Vim/8.0">
+<meta name="plugin-version" content="vim7.4_v2">
+<meta name="syntax" content="c">
+<meta name="settings" content="number_lines,use_css,pre_wrap,no_foldcolumn,expand_tabs,line_ids">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+.cConditional { color: #ff6060; font-weight: bold; }
+.Type { color: #00ff00; font-weight: bold; }
+.cRepeat { color: #ff6060; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.PreProc { color: #8080ff; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="PreProc">#include </span><span class="Constant">&lt;sancus/reactive.h&gt;</span>
+<span class="lnr"> 2 </span>
+<span class="lnr"> 3 </span><span class="PreProc">#include </span><span class="Constant">&lt;stdio.h&gt;</span>
+<span class="lnr"> 4 </span>
+<span class="lnr"> 5 </span>
+<span class="lnr"> 6 </span><span class="PreProc">#include </span><span class="Constant">&quot;helpers.c&quot;</span>
+<span class="lnr"> 7 </span>
+<span class="lnr"> 8 </span><span class="PreProc">#define SMNAME display</span>
+<span class="lnr"> 9 </span><span class="PreProc">#define SNONCE </span><span class="Constant">0xffac</span>
+<span class="lnr">10 </span>
+<span class="lnr">11 </span>SM_INPUT(SMNAME, input, data, len)
+<span class="lnr">12 </span>{
+<span class="lnr">13 </span>    printf1(<span class="Constant">&quot;* SM display   : got input    -- &quot;</span>);
+<span class="lnr">14 </span>
+<span class="lnr">15 </span>    <span class="cRepeat">for</span> (<span class="Type">unsigned</span> i = <span class="Constant">0</span>; i &lt; len; i++) {
+<span class="lnr">16 </span>        print_byte(data[i]);
+<span class="lnr">17 </span>    }
+<span class="lnr">18 </span>
+<span class="lnr">19 </span>    printf1(<span class="Constant">&quot;- len: &quot;</span>);
+<span class="lnr">20 </span>    print_byte(len &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">0</span>));
+<span class="lnr">21 </span>    print_byte(len &gt;&gt; (<span class="Constant">8</span>*<span class="Constant">1</span>));
+<span class="lnr">22 </span>    printf1(<span class="Constant">&quot;  &quot;</span>);
+<span class="lnr">23 </span>
+<span class="lnr">24 </span>    <span class="cConditional">if</span> (len &gt;= <span class="Constant">5</span>) {
+<span class="lnr">25 </span>        printf1(<span class="Constant">&quot; DISPLAY: &quot;</span>);
+<span class="lnr">26 </span>        print_byte(data[<span class="Constant">4</span>]);
+<span class="lnr">27 </span>    }
+<span class="lnr">28 </span>
+<span class="lnr">29 </span>    printf1(<span class="Constant">&quot;</span><span class="Special">\n</span><span class="Constant">&quot;</span>);
+<span class="lnr">30 </span>}
+<span class="lnr">31 </span>
+</pre>
+</body>
+</html>

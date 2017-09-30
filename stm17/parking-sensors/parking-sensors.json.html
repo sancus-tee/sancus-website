@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/git/paper-authentic-execution/www/parking-sensors/parking-sensors.json.html</title>
+<meta name="Generator" content="Vim/8.0">
+<meta name="plugin-version" content="vim7.4_v2">
+<meta name="syntax" content="json">
+<meta name="settings" content="number_lines,use_css,pre_wrap,no_foldcolumn,expand_tabs,line_ids">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+.lnr { color: #ffff00; font-weight: bold; }
+.Constant { color: #ff40ff; font-weight: bold; }
+.Statement { color: #ffff00; font-weight: bold; }
+.Special { color: #ff6060; font-weight: bold; }
+-->
+</style>
+</head>
+<body>
+<pre>
+<span class="lnr"> 1 </span><span class="Special">{</span>
+<span class="lnr"> 2 </span>    &quot;<span class="Statement">nodes</span>&quot;: <span class="Special">[</span>
+<span class="lnr"> 3 </span>        <span class="Special">{</span>
+<span class="lnr"> 4 </span>            &quot;<span class="Statement">type</span>&quot;: &quot;<span class="Constant">sancus</span>&quot;,
+<span class="lnr"> 5 </span>            &quot;<span class="Statement">name</span>&quot;: &quot;<span class="Constant">node1</span>&quot;,
+<span class="lnr"> 6 </span>            &quot;<span class="Statement">ip_address</span>&quot;: &quot;<span class="Constant">192.168.0.2</span>&quot;,
+<span class="lnr"> 7 </span>            &quot;<span class="Statement">vendor_id</span>&quot;: <span class="Constant">4660</span>,
+<span class="lnr"> 8 </span>            &quot;<span class="Statement">vendor_key</span>&quot;: &quot;<span class="Constant">4078d505d82099ba</span>&quot;
+<span class="lnr"> 9 </span>        <span class="Special">}</span>
+<span class="lnr">10 </span>    <span class="Special">]</span>,
+<span class="lnr">11 </span>    &quot;<span class="Statement">modules</span>&quot; : <span class="Special">[</span>
+<span class="lnr">12 </span>        <span class="Special">{</span>
+<span class="lnr">13 </span>            &quot;<span class="Statement">type</span>&quot;: &quot;<span class="Constant">sancus</span>&quot;,
+<span class="lnr">14 </span>            &quot;<span class="Statement">name</span>&quot;: &quot;<span class="Constant">sensor1</span>&quot;,
+<span class="lnr">15 </span>            &quot;<span class="Statement">files</span>&quot;: <span class="Special">[</span>&quot;<span class="Constant">sensor1.c</span>&quot;<span class="Special">]</span>,
+<span class="lnr">16 </span>            &quot;<span class="Statement">node</span>&quot;: &quot;<span class="Constant">node1</span>&quot;
+<span class="lnr">17 </span>        <span class="Special">}</span>,
+<span class="lnr">18 </span>        <span class="Special">{</span>
+<span class="lnr">19 </span>            &quot;<span class="Statement">type</span>&quot;: &quot;<span class="Constant">sancus</span>&quot;,
+<span class="lnr">20 </span>            &quot;<span class="Statement">name</span>&quot;: &quot;<span class="Constant">sensor2</span>&quot;,
+<span class="lnr">21 </span>            &quot;<span class="Statement">files</span>&quot;: <span class="Special">[</span>&quot;<span class="Constant">sensor2.c</span>&quot;<span class="Special">]</span>,
+<span class="lnr">22 </span>            &quot;<span class="Statement">node</span>&quot;: &quot;<span class="Constant">node1</span>&quot;
+<span class="lnr">23 </span>        <span class="Special">}</span>,
+<span class="lnr">24 </span>        <span class="Special">{</span>
+<span class="lnr">25 </span>            &quot;<span class="Statement">type</span>&quot;: &quot;<span class="Constant">sancus</span>&quot;,
+<span class="lnr">26 </span>            &quot;<span class="Statement">name</span>&quot;: &quot;<span class="Constant">aggregator</span>&quot;,
+<span class="lnr">27 </span>            &quot;<span class="Statement">files</span>&quot;: <span class="Special">[</span>&quot;<span class="Constant">aggregator.c</span>&quot;<span class="Special">]</span>,
+<span class="lnr">28 </span>            &quot;<span class="Statement">node</span>&quot;: &quot;<span class="Constant">node1</span>&quot;
+<span class="lnr">29 </span>        <span class="Special">}</span>,
+<span class="lnr">30 </span>        <span class="Special">{</span>
+<span class="lnr">31 </span>            &quot;<span class="Statement">type</span>&quot;: &quot;<span class="Constant">sancus</span>&quot;,
+<span class="lnr">32 </span>            &quot;<span class="Statement">name</span>&quot;: &quot;<span class="Constant">display</span>&quot;,
+<span class="lnr">33 </span>            &quot;<span class="Statement">files</span>&quot;: <span class="Special">[</span>&quot;<span class="Constant">display.c</span>&quot;<span class="Special">]</span>,
+<span class="lnr">34 </span>            &quot;<span class="Statement">node</span>&quot;: &quot;<span class="Constant">node1</span>&quot;
+<span class="lnr">35 </span>        <span class="Special">}</span>
+<span class="lnr">36 </span>    <span class="Special">]</span>,
+<span class="lnr">37 </span>    &quot;<span class="Statement">connections</span>&quot;: <span class="Special">[</span>
+<span class="lnr">38 </span>        <span class="Special">{</span>
+<span class="lnr">39 </span>            &quot;<span class="Statement">from_module</span>&quot;: &quot;<span class="Constant">sensor1</span>&quot;,
+<span class="lnr">40 </span>            &quot;<span class="Statement">from_output</span>&quot;: &quot;<span class="Constant">output</span>&quot;,
+<span class="lnr">41 </span>            &quot;<span class="Statement">to_module</span>&quot;: &quot;<span class="Constant">aggregator</span>&quot;,
+<span class="lnr">42 </span>            &quot;<span class="Statement">to_input</span>&quot;: &quot;<span class="Constant">input1</span>&quot;
+<span class="lnr">43 </span>        <span class="Special">}</span>,
+<span class="lnr">44 </span>        <span class="Special">{</span>
+<span class="lnr">45 </span>            &quot;<span class="Statement">from_module</span>&quot;: &quot;<span class="Constant">sensor2</span>&quot;,
+<span class="lnr">46 </span>            &quot;<span class="Statement">from_output</span>&quot;: &quot;<span class="Constant">output</span>&quot;,
+<span class="lnr">47 </span>            &quot;<span class="Statement">to_module</span>&quot;: &quot;<span class="Constant">aggregator</span>&quot;,
+<span class="lnr">48 </span>            &quot;<span class="Statement">to_input</span>&quot;: &quot;<span class="Constant">input2</span>&quot;
+<span class="lnr">49 </span>        <span class="Special">}</span>,
+<span class="lnr">50 </span>        <span class="Special">{</span>
+<span class="lnr">51 </span>            &quot;<span class="Statement">from_module</span>&quot;: &quot;<span class="Constant">aggregator</span>&quot;,
+<span class="lnr">52 </span>            &quot;<span class="Statement">from_output</span>&quot;: &quot;<span class="Constant">output</span>&quot;,
+<span class="lnr">53 </span>            &quot;<span class="Statement">to_module</span>&quot;: &quot;<span class="Constant">display</span>&quot;,
+<span class="lnr">54 </span>            &quot;<span class="Statement">to_input</span>&quot;: &quot;<span class="Constant">input</span>&quot;
+<span class="lnr">55 </span>        <span class="Special">}</span>
+<span class="lnr">56 </span>    <span class="Special">]</span>
+<span class="lnr">57 </span><span class="Special">}</span>
+<span class="lnr">58 </span>
+</pre>
+</body>
+</html>

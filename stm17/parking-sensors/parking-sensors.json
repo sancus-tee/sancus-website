@@ -1,0 +1,58 @@
+{
+    "nodes": [
+        {
+            "type": "sancus",
+            "name": "node1",
+            "ip_address": "192.168.0.2",
+            "vendor_id": 4660,
+            "vendor_key": "4078d505d82099ba"
+        }
+    ],
+    "modules" : [
+        {
+            "type": "sancus",
+            "name": "sensor1",
+            "files": ["sensor1.c"],
+            "node": "node1"
+        },
+        {
+            "type": "sancus",
+            "name": "sensor2",
+            "files": ["sensor2.c"],
+            "node": "node1"
+        },
+        {
+            "type": "sancus",
+            "name": "aggregator",
+            "files": ["aggregator.c"],
+            "node": "node1"
+        },
+        {
+            "type": "sancus",
+            "name": "display",
+            "files": ["display.c"],
+            "node": "node1"
+        }
+    ],
+    "connections": [
+        {
+            "from_module": "sensor1",
+            "from_output": "output",
+            "to_module": "aggregator",
+            "to_input": "input1"
+        },
+        {
+            "from_module": "sensor2",
+            "from_output": "output",
+            "to_module": "aggregator",
+            "to_input": "input2"
+        },
+        {
+            "from_module": "aggregator",
+            "from_output": "output",
+            "to_module": "display",
+            "to_input": "input"
+        }
+    ]
+}
+

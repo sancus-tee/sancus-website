@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+ <title>
+  Noorman, M&uuml;hlberg and Piessens:
+  Authentic Execution of Distributed Event-Driven Applications with a
+  Small TCB
+ </title>
+ <style type="text/css">
+div.pre { font-family:monospace; font-size:12px; white-space:pre; }
+ </style>
+
+</head>
+<body bgcolor="#FFFFFF">
+
+<center><table width="85%"><tr><td>
+<br>
+<h2>Authentic Execution of Distributed Event-Driven Applications with a
+  Small TCB</h2>
+<p>Job Noorman,
+   <a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan
+   Tobias M&uuml;hlberg</a>,
+   and Frank Piessens</b><br>
+   imec-DistriNet, KU Leuven, Celestijnenlaan 200A, B-3001
+   Belgium
+</p><br>
+
+<hr>
+
+<p><b>
+This page contains suplementary material for STM 2017 submission 4:
+&quot;Authentic Execution of Distributed Event-Driven Applications with a
+Small TCB&quot;
+</b></p>
+
+<hr>
+
+<p><b>Abstract.</b>
+This paper presents an approach to provide strong assurance of the secure
+execution of distributed event-driven applications on shared
+infrastructures, while relying on a small Trusted Computing Base.  We build
+upon and extend security primitives provided by a Protected Module
+Architecture (PMA) to guarantee
+authenticity and integrity properties of applications, and to secure
+control of input and output devices used by these applications.  More
+specifically, we want to guarantee that <i>if</i> an output is produced by
+the application, it was allowed to be produced by the application's source
+code.  We present a prototype implementation as an extension of Sancus, a
+light-weight embedded PMA that extends the TI MSP430 CPU.  Our
+evaluation of  the security and performance aspects of our approach and the
+prototype show that PMA together with our programming model form a
+basis for powerful security architectures for dependable systems in domains
+such as Industrial Control Systems, the Internet of Things or Wireless
+Sensor Networks.
+Paper: <a href="paper.pdf">paper.pdf</a>
+</p>
+
+
+<p><b>Formal Definition and Proof of Security Properties.</b>
+This document can be seen as an extended appendix to the paper, in which
+we focus on defining a simple reactive
+programming language for our architecture, the formal semantics of that
+programming language, and the formal definition and proof of the security
+properties of our approach. We further
+provide background information on our performance evaluation
+and
+a more complete discussion
+of the related work, as the version in the paper is rather brief:
+<a href="secargument.pdf">secargument.pdf</a>
+</p>
+
+
+<p><b>Implementation and Demonstration Scenario.</b>
+Below we provide the source code for the paprking sensors demonstration
+scenario that we discuss in the paper. To compile the
+code you will need the <a
+href="http://distrinet.cs.kuleuven.be/software/sancus/">Sancus tools</a>
+and <a href="http://www.ti.com/tool/msp430-gcc-opensource">MSP430-GCC</a>
+installed on your system. Note that the demo scenario cannot be executed in
+the Sancus simulator (simulating the CPU behaviour at the gate level,
+the Sancus simulator is too slow to perform network operations) but must be
+run on an
+FPGA programmed with the Sancus core. In our experiments we used a Spartan
+6 FPGA: <a href="parking-sensors.tar.gz">parking-sensors.tar.gz</a> (2.3
+KiB)
+</p>
+
+<p>For convenience we provide quick links to the source code and the
+deployment descriptor, as described in the paper. Drivers, scheduler
+and module loader are part of recent Sancus distributions.</p>
+
+<center>
+<table rules="rows" width="60%">
+<tr>
+ <th colspan="2">File</th>
+ <th colspan="2">Description</th>
+</tr>
+<tr>
+ <td><a href="parking-sensors/parking-sensors.json.html">parking-sensors.json</a></td>
+ <td width="2%"></td>
+ <td>The deploymend descriptor.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="parking-sensors/sensor.c.html">sensor.c</a></td>
+ <td width="2%"></td>
+ <td>Implementation of the sensor nodes NP1 and NP2.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="parking-sensors/sensor1.c.html">sensor1.c</a>,
+     <a href="parking-sensors/sensor2.c.html">sensor2.c</a></td>
+ <td width="2%"></td>
+ <td>Node-specific code for NP1 and NP2 -- essentially an instantiation of
+     sensor.c</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="parking-sensors/aggregator.c.html">aggregator.c</a></td>
+ <td width="2%"></td>
+ <td>The aggregator node NAGG.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="parking-sensors/display.c.html">display.c</a></td>
+ <td width="2%"></td>
+ <td>Code deployed on the output node ND2.</td>
+ <td width="2%"></td>
+</tr>
+<tr>
+ <td><a href="parking-sensors/helpers.c.html">helpers.c</a>,
+     <a href="parking-sensors/sensor.h.html">sensor.h</a></td>
+ <td width="2%"></td>
+ <td>Helper functions and header files.</td>
+ <td width="2%"></td>
+</tr>
+</table>
+</center>
+
+
+<br>
+<hr>
+<p align="right"><a href="mailto:jantobias.muehlberg@cs.kuleuven.be">Jan
+ Tobias M&uuml;hlberg</a>, Wed, 23 Aug 2017 17:23:56 +0200
+</td></tr></table></center>
+</body>
+</html>
+
