@@ -37,33 +37,14 @@ publications on the Protected Module Architecture research field.
 <?php
     $pubs = array(
         array(
-            "author"    => "Job Noorman, Pieter Agten, Wilfried Daniels, Raoul Strackx, Anthony Van Herrewege, Christophe Huygens, Bart Preneel, Ingrid Verbauwhede, Frank Piessens",
-            "title"     => "Sancus: Low-Cost Trustworthy Extensible Networked Devices with a Zero-Software Trusted Computing Base",
-            "publisher" => "Proceedings of the 22nd USENIX Security Symposium",
-            "date"   	=> "2013",
-            "id"        => "usenix13",
+            "author"    => "Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling",
+            "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT devices",
+            "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
+            "date"   	=> "2017",
+            "id"        => "tops17",
             "pdf"       => true,
             "slides"    => true,
             "src"       => "https://github.com/sancus-pma",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Raoul Strackx, Job Noorman, Ingrid Verbauwhede, Bart Preneel, Frank Piessens",
-            "title"     => "Protected Software Module Architectures",
-            "publisher" => "Securing Electronic Business Processes (ISSE)",
-            "date"   	=> "2013",
-            "id"        => "isse13",
-            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/430320/1/ISSE-2013-paper.pdf",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Pieter Maene, Johannes Götzfried, Ruan De Clercq, Tilo Müller, Felix Freiling, Ingrid Verbauwhede",
-            "title"     => "Hardware-Based Trusted Computing Architectures for Isolation and Attestation",
-            "publisher" => "IEEE Transactions on Computers",
-            "date"   	=> "2017",
-            "id"        => "ieee17",
-            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
-            "slides"    => true,
             "bibtex"    => true
         ),
         array(
@@ -77,11 +58,30 @@ publications on the Protected Module Architecture research field.
             "bibtex"    => true
         ),
         array(
-            "author"    => "Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling",
-            "title"     => "Sancus 2.0: A Low-Cost Security Architecture for IoT devices",
-            "publisher" => "ACM Transactions on Privacy and Security (TOPS)",
+            "author"    => "Pieter Maene, Johannes Götzfried, Ruan De Clercq, Tilo Müller, Felix Freiling, Ingrid Verbauwhede",
+            "title"     => "Hardware-Based Trusted Computing Architectures for Isolation and Attestation",
+            "publisher" => "IEEE Transactions on Computers",
             "date"   	=> "2017",
-            "id"        => "tops17",
+            "id"        => "ieee17",
+            "pdf"       => "https://www.esat.kuleuven.be/cosic/publications/article-2750.pdf",
+            "slides"    => true,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Raoul Strackx, Job Noorman, Ingrid Verbauwhede, Bart Preneel, Frank Piessens",
+            "title"     => "Protected Software Module Architectures",
+            "publisher" => "Securing Electronic Business Processes (ISSE)",
+            "date"   	=> "2013",
+            "id"        => "isse13",
+            "pdf"       => "https://lirias.kuleuven.be/bitstream/123456789/430320/1/ISSE-2013-paper.pdf",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Job Noorman, Pieter Agten, Wilfried Daniels, Raoul Strackx, Anthony Van Herrewege, Christophe Huygens, Bart Preneel, Ingrid Verbauwhede, Frank Piessens",
+            "title"     => "Sancus: Low-Cost Trustworthy Extensible Networked Devices with a Zero-Software Trusted Computing Base",
+            "publisher" => "Proceedings of the 22nd USENIX Security Symposium",
+            "date"   	=> "2013",
+            "id"        => "usenix13",
             "pdf"       => true,
             "slides"    => true,
             "src"       => "https://github.com/sancus-pma",
@@ -114,6 +114,16 @@ compromised embedded platform.</p>
             "bibtex"    => true
         ),
         array(
+            "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Towards Availability and Real-Time Guarantees for Protected Module Architectures",
+            "publisher" => "Companion Proceedings of the 15th International Conference on Modularity (MASS)",
+            "date"   	=> "2016",
+            "id"        => "mass16",
+            "pdf"       => true,
+            "slides"    => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Johannes Götzfried, Tilo Müller, Ruan de Clercq, Pieter Maene, Felix Freiling, Ingrid Verbauwhede",
             "title"     => "Soteria: Offline Software Protection within Low-cost Embedded Devices",
             "publisher" => "Proceedings of the 31st Annual Computer Security Applications Conference (ACSAC)",
@@ -124,16 +134,6 @@ compromised embedded platform.</p>
             "slides"    => "https://www1.cs.fau.de/filepool/projects/soteria/soteria-talk.pdf",
             "bibtex"    => false
         ),
-        array(
-            "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
-            "title"     => "Towards Availability and Real-Time Guarantees for Protected Module Architectures",
-            "publisher" => "Companion Proceedings of the 15th International Conference on Modularity (MASS)",
-            "date"   	=> "2016",
-            "id"        => "mass16",
-            "pdf"       => true,
-            "slides"    => true,
-            "bibtex"    => true
-        )
     );
 
     publication_list($pubs);
@@ -152,15 +152,26 @@ electricity meters or automotive control networks.</p>
 <?php
     $pubs = array(
         array(
-            "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
-            "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
-            "publisher" => "9th WISTP International Conference on Information Security Theory and Practice (WISTP)",
-            "date"   	=> "2015",
-            "id"        => "wistp15",
+            "author"    => "Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "VulCAN: Efficient Component Authentication and Software Isolation for Automotive Control Networks",
+            "publisher" => "Proceedings of the 33th Annual Computer Security Applications Conference (ACSAC)",
+            "date"   	=> "2017",
+            "id"        => "acsac17",
+            "pdf"       => true,
+            "slides"    => false,
+            "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
+            "src"       => "https://github.com/sancus-pma/vulcan",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg, Sara Cleemput, Mustafa A. Mustafa, Jo Van Bulck, Bart Preneel, Frank Piessens",
+            "title"     => "An Implementation of a High Assurance Smart Meter using Protected Module Architectures",
+            "publisher" => "10th WISTP International Conference on Information Security Theory and Practice (WISTP)",
+            "date"   	=> "2016",
+            "id"        => "wistp16",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
-            "src"       => "https://github.com/sancus-pma/sm-access-control",
             "bibtex"    => true
         ),
         array(
@@ -176,28 +187,17 @@ electricity meters or automotive control networks.</p>
             "bibtex"    => true
         ),
         array(
-            "author"    => "Jan Tobias Mühlberg, Sara Cleemput, Mustafa A. Mustafa, Jo Van Bulck, Bart Preneel, Frank Piessens",
-            "title"     => "An Implementation of a High Assurance Smart Meter using Protected Module Architectures",
-            "publisher" => "10th WISTP International Conference on Information Security Theory and Practice (WISTP)",
-            "date"   	=> "2016",
-            "id"        => "wistp16",
+            "author"    => "Jo Van Bulck, Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
+            "publisher" => "9th WISTP International Conference on Information Security Theory and Practice (WISTP)",
+            "date"   	=> "2015",
+            "id"        => "wistp15",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
+            "src"       => "https://github.com/sancus-pma/sm-access-control",
             "bibtex"    => true
         ),
-        array(
-            "author"    => "Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens",
-            "title"     => "VulCAN: Efficient Component Authentication and Software Isolation for Automotive Control Networks",
-            "publisher" => "Proceedings of the 33th Annual Computer Security Applications Conference (ACSAC)",
-            "date"   	=> "2017",
-            "id"        => "acsac17",
-            "pdf"       => true,
-            "slides"    => false,
-            "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
-            "src"       => "https://github.com/sancus-pma/vulcan",
-            "bibtex"    => true
-        )
     );
 
     publication_list($pubs);
@@ -221,23 +221,14 @@ primitives.
 <?php
     $pubs = array(
         array(
-            "author"    => "Jo Van Bulck",
-            "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
+            "author"    => "Alexandru - Madalin Ghenea",
+            "title"     => "A Security Kernel for Protected Module Architectures",
             "publisher" => "Master thesis KU Leuven",
-            "date"   	=> "2015",
-            "id"        => "vanbulck15thesis",
+            "date"   	=> "2017",
+            "id"        => "madalinghenea17thesis",
             "pdf"       => true,
             "slides"    => true,
-            "src"       => "https://github.com/jovanbulck/thesis-src/",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Dennis Frett",
-            "title"     => "Extending Protected Module Architectures with a Secure I/O Framework",
-            "publisher" => "Master thesis KU Leuven",
-            "date"   	=> "2015",
-            "id"        => "frett15thesis",
-            "pdf"       => true,
+            "src"       => "https://github.com/nighthawk017/sancus_kernel",
             "bibtex"    => true
         ),
         array(
@@ -250,14 +241,23 @@ primitives.
             "bibtex"    => true
         ),
         array(
-            "author"    => "Alexandru - Madalin Ghenea",
-            "title"     => "A Security Kernel for Protected Module Architectures",
+            "author"    => "Dennis Frett",
+            "title"     => "Extending Protected Module Architectures with a Secure I/O Framework",
             "publisher" => "Master thesis KU Leuven",
-            "date"   	=> "2017",
-            "id"        => "madalinghenea17thesis",
+            "date"   	=> "2015",
+            "id"        => "frett15thesis",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jo Van Bulck",
+            "title"     => "Secure Resource Sharing for Embedded Protected Module Architectures",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2015",
+            "id"        => "vanbulck15thesis",
             "pdf"       => true,
             "slides"    => true,
-            "src"       => "https://github.com/nighthawk017/sancus_kernel",
+            "src"       => "https://github.com/jovanbulck/thesis-src/",
             "bibtex"    => true
         ),
     );
@@ -281,23 +281,23 @@ Sancus-based techniques to secure automotive control networks.
             "publisher" => "CAN newsleter, CAN in Automation (CiA)",
             "date"   	=> "September, 2017",
             "id"        => "ext",
-            "web"       => "https://can-newsletter.org/uploads/media/raw/3db5fe2a245956c04d3842a5ad3a8e27.pdf"
+            "pdf"       => "https://can-newsletter.org/uploads/media/raw/3db5fe2a245956c04d3842a5ad3a8e27.pdf"
         ),
         array(
             "author"    => "Jan Tobias Mühlberg",
-            "title"     => "Making Car Electronics Safe Again",
-            "publisher" => "imec Magazine",
-            "date"   	=> "March, 2017",
+            "title"     => "Isolate and Verify: Security for Embedded Control Systems",
+            "publisher" => "EuroSTAR Huddle",
+            "date"   	=> "July 12, 2017",
             "id"        => "ext",
-            "web"       => "http://magazine.imec.be/data/117/reader/reader.html?t=1499962475129#!preferred/1/package/117/pub/123/page/4"
+            "web"       => "https://huddle.eurostarsoftwaretesting.com/security-for-embedded-control-systems/"
         ),
         array(
             "author"    => "Jan Tobias Mühlberg",
-            "title"     => "A New Security Architecture for Networked Embedded Devices",
-            "publisher" => "eeNews Europe Automotive",
-            "date"   	=> "June 28, 2017",
+            "title"     => "Schwachpunkte Ausmerzen",
+            "publisher" => "Elektronik Automotive",
+            "date"   	=> "July 5, 2017",
             "id"        => "ext",
-            "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
+            "web"       => "http://www.elektroniknet.de/elektronik-automotive/sonstiges/schwachpunkte-ausmerzen-143239.html"
         ),
         array(
             "author"    => "Jan Tobias Mühlberg and Laura Reggiani",
@@ -309,19 +309,20 @@ Sancus-based techniques to secure automotive control networks.
         ),
         array(
             "author"    => "Jan Tobias Mühlberg",
-            "title"     => "Schwachpunkte Ausmerzen",
-            "publisher" => "Elektronik Automotive",
-            "date"   	=> "July 5, 2017",
+            "title"     => "A New Security Architecture for Networked Embedded Devices",
+            "publisher" => "eeNews Europe Automotive",
+            "date"   	=> "June 28, 2017",
             "id"        => "ext",
-            "web"       => "http://www.elektroniknet.de/elektronik-automotive/sonstiges/schwachpunkte-ausmerzen-143239.html"
+            "web"       => "http://www.eenewsautomotive.com/design-center/new-security-architecture-networked-embedded-devices"
         ),
         array(
             "author"    => "Jan Tobias Mühlberg",
-            "title"     => "Isolate and Verify: Security for Embedded Control Systems",
-            "publisher" => "EuroSTAR Huddle",
-            "date"   	=> "July 12, 2017",
+            "title"     => "Making Car Electronics Safe Again",
+            "publisher" => "imec Magazine",
+            "date"   	=> "March, 2017",
             "id"        => "ext",
-            "web"       => "https://huddle.eurostarsoftwaretesting.com/security-for-embedded-control-systems/"
+            "web"       => "https://www.imec-int.com/en/imec-magazine/imec-magazine-march-2017/making-car-electronics-safe-again",
+            "pdf"       => "https://www.imec-int.com/cache/pdfs/en/imec-magazine/imec-magazine-march-2017/making-car-electronics-safe-again.pdf"
         ),
     );
 
