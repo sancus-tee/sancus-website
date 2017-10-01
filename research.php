@@ -102,6 +102,18 @@ compromised embedded platform.</p>
 <?php
     $pubs = array(
         array(
+            "author"    => "Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Authentic Execution of Distributed Event-Driven Applications with a Small TCB",
+            "publisher" => "Proceedings of the 13th International Workshop on Security and Trust Management (STM)",
+            "date"   	=> "2017",
+            "id"        => "stm17",
+            "src"       => "https://github.com/sancus-pma/sancus-contiki",
+            "pdf"       => true,
+            "slides"    => true,
+            "web"       => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Johannes Götzfried, Tilo Müller, Ruan de Clercq, Pieter Maene, Felix Freiling, Ingrid Verbauwhede",
             "title"     => "Soteria: Offline Software Protection within Low-cost Embedded Devices",
             "publisher" => "Proceedings of the 31st Annual Computer Security Applications Conference (ACSAC)",
@@ -170,7 +182,7 @@ electricity meters or automotive control networks.</p>
             "date"   	=> "2016",
             "id"        => "wistp16",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "web"       => true,
             "bibtex"    => true
         ),
@@ -263,6 +275,14 @@ Sancus-based techniques to secure automotive control networks.
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "Security architecture for CAN",
+            "publisher" => "CAN newsleter, CAN in Automation (CiA)",
+            "date"   	=> "September, 2017",
+            "id"        => "ext",
+            "web"       => "https://can-newsletter.org/uploads/media/raw/3db5fe2a245956c04d3842a5ad3a8e27.pdf"
+        ),
         array(
             "author"    => "Jan Tobias Mühlberg",
             "title"     => "Making Car Electronics Safe Again",
