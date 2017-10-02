@@ -96,8 +96,9 @@ publications on the Protected Module Architecture research field.
 
 <p>The following papers propose extensions to the Sancus
 hardware and compiler infrastructure. Either to protect the confidentiality of
-security-critical code, or to preserve real-time deadlines on a partially
-compromised embedded platform.</p>
+security-critical code, to preserve real-time deadlines on a partially
+compromised embedded platform, or to provide authentic execution guarantees for
+distributed event-driven applications.</p>
 
 <?php
     $pubs = array(
