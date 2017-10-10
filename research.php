@@ -21,7 +21,7 @@ include("header.php");
 imec-DistriNet as well as by independent researchers. This page
 aims to give a comprehensive overview of academic publications on Sancus-based
 architectures and applications. Feel free to <a
-href="mailto:jo.vanbulck@cs.kuleuven.be">contact</a> us if you know of other
+href="https://aemail.com/MQ3">contact</a> us if you know of other
 relevant research results to be included here.
 </p>
 
