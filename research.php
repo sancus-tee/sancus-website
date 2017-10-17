@@ -6,7 +6,7 @@ $sections = array(
     "core"      => "Core Architecture",
     "ext"       => "Extensions",
     "apps"     	=> "Applications",
-    "theses"    => "Master Theses",
+    "student"   => "Student Projects",
     "media"     => "Media Coverage",
 );
 
@@ -204,23 +204,35 @@ electricity meters or automotive control networks.</p>
     publication_list($pubs);
 ?>
 
-<?php research_section("theses") ?>
+<?php research_section("student") ?>
 
-<p> Sancus has been used as the development platform for several master thesis
-projects. Specifically, one thesis explored the feasibility of supplementing
+<p> Sancus has been used as the development platform for several master theses
+and other student projects. Specifically, one thesis explored the feasibility of supplementing
 Sancus' hardware-enforced security guarantees with availability and access
 control guarantees for shared system resources.
 Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
 Sancus has furthermore been used as the target platform for an automated reactive
-programming code generation framework.
-Finally, a trusted kernel-like software module has been developed to
-investigate hardware/software design trade-offs for Sancus' cryptographic
-primitives.
+programming code generation framework, and
+a trusted kernel-like software module has been developed to
+investigate cryptographic hardware/software design trade-offs.
+primitives. Finally, one project looked into providing responsiveness
+for the secure world formed by Sancus modules loaded on the same device.
 </p>
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Michiel Van Beirendonck",
+            "title"     => "Responsiveness Guarantee for the Sancus Protected Module Architecture",
+            "publisher" => "Honours Programme KU Leuven",
+            "date"   	=> "2017",
+            "id"        => "vanbeirendonck17",
+            "pdf"       => true,
+            "slides"    => false,
+            "src"       => "https://github.com/Michielvb/sancus-availability",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Alexandru - Madalin Ghenea",
             "title"     => "A Security Kernel for Protected Module Architectures",
