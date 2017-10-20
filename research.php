@@ -103,6 +103,17 @@ distributed event-driven applications.</p>
 <?php
     $pubs = array(
         array(
+            "author"    => "Ben Calus, Bob Reynders, Dominique Devriese, Job Noorman, Frank Piessens",
+            "title"     => "FRP IoT Modules as a Scala DSL",
+            "publisher" => "Proceedings of 4th International Workshop on Reactive and Event-Based Languages and Systems (REBLS)",
+            "date"   	=> "2017",
+            "id"        => "rebls17",
+            "src"       => "https://github.com/tzbob/scala-iot-modules-for-frp",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Job Noorman, Jan Tobias Mühlberg, Frank Piessens",
             "title"     => "Authentic Execution of Distributed Event-Driven Applications with a Small TCB",
             "publisher" => "Proceedings of the 13th International Workshop on Security and Trust Management (STM)",
@@ -229,7 +240,7 @@ for the secure world formed by Sancus modules loaded on the same device.
             "date"   	=> "2017",
             "id"        => "vanbeirendonck17",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "src"       => "https://github.com/Michielvb/sancus-availability",
             "bibtex"    => true
         ),
