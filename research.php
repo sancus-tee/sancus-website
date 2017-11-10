@@ -110,7 +110,7 @@ distributed event-driven applications.</p>
             "id"        => "rebls17",
             "src"       => "https://github.com/tzbob/scala-iot-modules-for-frp",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "bibtex"    => true
         ),
         array(
