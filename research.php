@@ -7,7 +7,7 @@ $sections = array(
     "ext"       => "Extensions",
     "apps"     	=> "Applications",
     "student"   => "Student Projects",
-    "media"     => "Media Coverage",
+    "media"     => "Press Coverage",
 );
 
 include("header.php");
@@ -30,7 +30,7 @@ relevant research results to be included here.
 <p> The core Sancus security architecture was first presented at the 2013
 USENIX security symposium. More recent developments are described in the Sancus
 2.0 ACM TOPS journal paper, and in Job Noorman's PhD dissertation linked below.
-Furthermore, a higher-level description of Sancus is provided by two survey
+Furthermore, a higher-level description of Sancus 1.0 is provided by two survey
 publications on the Protected Module Architecture research field.
 </p>
 
@@ -170,7 +170,7 @@ electricity meters or automotive control networks.</p>
             "date"   	=> "2017",
             "id"        => "acsac17",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
             "src"       => "https://github.com/sancus-pma/vulcan",
             "bibtex"    => true
