@@ -30,7 +30,7 @@ $core_src = "sancus-core_2.0.tar.gz";
 $core_deb = "sancus-core_2.0_all.deb";
 $compiler_src = "sancus-compiler_2.0.tar.gz";
 $compiler_deb64 = "sancus-compiler_2.0_amd64.deb";
-$llvm_deb64 = "clang-sancus_4.0.0_amd64.deb";
+$llvm_deb64 = "clang-sancus_4.0.1-2_amd64.deb";
 $llvm_armhf = "clang-sancus_4.0.1-2_armhf.deb";
 
 include("header.php");
