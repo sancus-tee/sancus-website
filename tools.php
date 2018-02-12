@@ -112,6 +112,7 @@ EOF;
         $bibtex     = get_pub_opt($pub, "bibtex");
         $src        = get_pub_opt($pub, "src");
         $web        = get_pub_opt($pub, "web");
+        $video      = get_pub_opt($pub, "video");
 
         echo <<<EOF
         <li>$author. <strong>$title.</strong> <em>$publisher</em>, $date.
@@ -153,6 +154,14 @@ EOF;
             $url = ($web === true) ? "$id" : $web;
             echo <<<EOF
             <a href=$url><img alt="web" src="icons/web.png"></a>
+EOF;
+        }
+
+        if (!empty($video))
+        {
+            $url = ($video === true) ? "$id" : $video;
+            echo <<<EOF
+            <a href=$url><img alt="video" src="icons/video.png"></a>
 EOF;
         }
 

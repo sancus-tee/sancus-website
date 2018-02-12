@@ -173,6 +173,7 @@ electricity meters or automotive control networks.</p>
             "slides"    => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
             "src"       => "https://github.com/sancus-pma/vulcan",
+            "video"     => "https://youtu.be/gzxwiWfkl9g",
             "bibtex"    => true
         ),
         array(
@@ -293,12 +294,24 @@ for the secure world formed by Sancus modules loaded on the same device.
 
 <p>
 Sancus has recently been featured in a number of technology news website
-articles. Specifically, in the context of ongoing research that applies
+articles and at the 2018 Free and Open Source Software Developers' European Meeting (FOSDEM'18).
+Specifically, in the context of ongoing research that applies
 Sancus-based techniques to secure automotive control networks.
 </p>
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Jan Tobias Mühlberg",
+            "title"     => "Sancus 2.0: Open-Source Trusted Computing for the IoT",
+            "publisher" => "FOSDEM'18",
+            "date"   	=> "February, 2018",
+            "id"        => "fosdem18",
+            #"web"       => "https://fosdem.org/2018/interviews/jan-tobias-muehlberg/",
+            "web"       => "https://fosdem.org/2018/schedule/event/sancus/",
+            "video"     => "https://www.youtube.com/watch?v=b1Js-GasBZA",
+            "slides"    => true,
+        ),
         array(
             "author"    => "Jan Tobias Mühlberg",
             "title"     => "Security architecture for CAN",
