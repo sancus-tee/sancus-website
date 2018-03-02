@@ -23,9 +23,12 @@ include("header.php");
         <cite>Mischa Spiegelmock <a href=https://lwn.net/Articles/747564/>LWN.net</a></cite>
     </div>
 
-<div class="page-header">
+<!--div class="page-header">
     <h2 class="subsection-header">Security Objectives</h2>
-</div>
+</div-->
+
+<br>
+<br>
 
 <div class="row text-center" >
     <?php create_sancus_objective("Software Isolation", "shield",
@@ -86,11 +89,11 @@ include("header.php");
         scenarios, and discuss some important avenues of ongoing and future work.
     </p>
     </blockquote>
-    <p>
-        Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling.
+    <div class="well">
+    <p>Job Noorman, Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens, Pieter Maene, Bart Preneel, Ingrid Verbauwhede, Johannes Götzfried, Tilo Müller, Felix Freiling.
         <strong>Sancus 2.0: A Low-Cost Security Architecture for IoT Devices.</strong>
-        <em>ACM Transactions on Privacy and Security (TOPS)</em>, 2017.
-    </p>
+        <em>ACM Transactions on Privacy and Security (TOPS)</em>, 2017. </p>
+    </div>
 </div>
 
 <?php
