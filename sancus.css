@@ -1,4 +1,6 @@
-@import url("include/bootstrap/css/bootstrap.min.css");
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
+@import url("open-iconic/font/css/open-iconic-bootstrap.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 
 body
 {
@@ -15,20 +17,24 @@ h3
     padding-top: 40px;
 }
 
+/*
 .section-header
 {
     padding-top: 40px;
 }
+*/
 
 .section-header img
 {
     vertical-align: baseline;
 }
 
+/*
 .subsection-header
 {
-    padding-top: 10px;
+    padding-top: 5px;
 }
+*/
 
 
 .research-par
@@ -132,8 +138,94 @@ span.build-prereq
     text-align:center;
 }
 
+/*
 .abstract p + p
 {
     margin-top: 10px;
 }
+*/
 
+/* Remove the navbar's default margin-bottom and rounded borders */ 
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.main {
+  background-color: white;
+  padding-bottom: 25px;
+  min-height: 100%;
+}
+
+body {
+  background-color: #f1f1f1;
+}
+
+.sancus-em{
+  /*color:#5b5b5b;*/
+  color:#af2b03;
+}
+
+.sancus-keyword-em{
+  color:#5b5b5b;
+}
+
+.sancus-btn{
+    font-size:20px;
+}
+
+.sancus-objective h4{
+  text-transform: uppercase;
+  /*font-weight: bold;*/
+}
+
+.sancus-objective p{
+  color:gray;
+}
+
+p{
+  font-size:16px;
+}
+
+/* https://www.webmaster-source.com/2012/04/24/pure-css-blockquote-styling/ */
+.sancus-quote{
+    font-family: Georgia, Century Schoolbook L, Norasi, serif;
+    font-size: 20px;
+    font-style: italic;
+    /*width: 500px;*/
+    margin: 0.25em 0;
+    padding: 0.35em 40px;
+    line-height: 1.45;
+    position: relative;
+    color: #383838;
+    padding-top: 30px;
+    padding-left: 60px;
+}
+
+.sancus-quote:before {
+    display: block;
+    padding-left: 10px;
+    content: "\201C";
+    font-size: 80px;
+    position: absolute;
+    left: 0px;
+    top: -20px;
+    color: #7a7a7a;
+    padding-top: 25px;
+}
+
+.sancus-quote cite {
+    color: #999999;
+    font-size: 16px;
+    display: block;
+    margin-top: 5px;
+}
+
+.sancus-quote cite:before {
+    content: "\2014 \2009";
+}
+
+.oi {
+ /*color: #f4511e;*/
+ font-size: 35px;
+}

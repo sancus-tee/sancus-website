@@ -1,4 +1,6 @@
 </div>
+</div>
+</div>
 
 <!-- div class="span3">
     <div class="side-logos" data-spy="affix">

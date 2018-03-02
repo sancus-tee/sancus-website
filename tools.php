@@ -314,11 +314,30 @@ function research_section($id)
 function display_source_file($file)
 {
     echo <<<EOF
-<a href="code/$file" class="btn btn-primary src-button">$file</a>
 <pre class="prettyprint">
+<a href="code/$file" class="btn btn-primary src-button">$file</a>
 EOF;
     echo chop(htmlspecialchars(file_get_contents("code/$file")));
     echo "</pre>\n";
+}
+
+function create_sancus_button($href, $lbl, $icon)
+{
+    echo <<<EOF
+    <a href=$href class="btn btn-default sancus-btn" role="button">
+            $lbl <i class="fa fa-$icon" aria-hidden="true"></i></a>
+EOF;
+}
+
+function create_sancus_objective($title, $icon, $text)
+{
+    echo <<<EOF
+    <div class="col-sm-4 sancus-objective">
+      <span class="oi oi-$icon sancus-em"></span>
+      <h4>$title</h4>
+      <p>$text<p>
+    </div>
+EOF;
 }
 
 ?>
