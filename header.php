@@ -13,6 +13,7 @@ $navbar_links = array(
     "Installation"  => "install.php",
     "Documentation" => "doc.php",
     "Examples"      => "examples.php",
+    "Tutorial"      => "tutorial.php",
     "Research"      => "research.php"
 );
 
