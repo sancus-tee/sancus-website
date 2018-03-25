@@ -20,9 +20,10 @@ TODO: small intro mention <a href="https://dsn2018.uni.lu/">DSN 2018</a>
 </p>
 
 <br>
-<p align="center">
-<iframe width="840" height="473" src="https://www.youtube-nocookie.com/embed/5soMsk8JYN0?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</p>
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://www.youtube-nocookie.com/embed/5soMsk8JYN0?rel=0" allowfullscreen></iframe>
+</div>
+<br>
 
 <?php research_section("abstract") ?>
 

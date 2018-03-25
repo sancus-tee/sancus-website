@@ -26,6 +26,8 @@ include("tools.php");
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- title>Sancus: Low-cost trustworthy extensible networked devices with a zero-software Trusted Computing Base</title-->
     <!-- title>Sancus 2.0: A Low-Cost Security Architecture for IoT Devices</title -->
     <title>Sancus: Lightweight and Open-Source Trusted Computing for the IoT</title>
