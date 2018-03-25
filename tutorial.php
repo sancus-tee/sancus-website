@@ -15,10 +15,43 @@ include("header.php");
 <h1 class="section-header">Tutorial: Building Distributed Enclave Applications with Sancus and SGX</h1>
 </div>
 
-<p>
-TODO: small intro mention <a href="https://dsn2018.uni.lu/">DSN 2018</a>
-</p>
+<div class="row">
+  <div class="col-sm-2">
+    <p align="center"><a href="https://dsn2018.uni.lu/tutorials/">
+        <img class="img-responsive" src="https://dsn2018.uni.lu/wp-content/uploads/sites/35/2017/06/cropped-DSN-2018_Logo.png" alt="DSN logo">
+    </a></p>
+  </div>
+  <div class="col-sm-10">
+    <p>
+    This page collects background information and source code for the 3h
+    interactive tutorial
+    we will teach at the upcoming
+    IEEE/IFIP International Conference on Dependable Systems and Networks
+    <a href="https://dsn2018.uni.lu/">DSN 2018</a>,
+    on Monday, 25th June in Luxembourg City.
+    Please come along if you want to learn how to develop security-sensitive
+    networked applications based on Trusted Computing.
+    </p>
 
+    <p>
+    We will discuss how to write enclaved software
+    modules for both our open-source embedded Sancus architecture, as well as for
+    Intel SGX on off-the-shelf x86 platforms.
+    We will furthermore show how to make
+    Sancus/SGX enclaves interact securely in distributed applications. 
+    Our tutorial will cover lots of hands-on exercises where we can explore common pitfalls for
+    enclave development, and you will learn how to deploy, attest, and interact
+    with basic Sancus/SGX enclaves. And
+    no worries, we will provide convenient application libraries and
+    development environments that allow you to easily
+    setup secure communication channels, without having to dive into the details of
+    embedded systems programming or automotive bus systems.
+    </p>
+
+    </div>
+</div>
+
+<br>
 <br>
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="https://www.youtube-nocookie.com/embed/5soMsk8JYN0?rel=0" allowfullscreen></iframe>
@@ -106,9 +139,50 @@ The tutorial aims to fill about three hours with an equal split
 between lectures and practical exercises:
 </p>
 
-<p>
-TODO table
-</p>
+ <table class="table">
+    <thead>
+      <tr>
+        <th>Duration</th>
+        <th>Content</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>45 min</td>
+        <td><b>Introductory lecture:</b>
+            <ul>
+                <li>Trusted Computing and remote attestation</li>
+                <li>Authentic Execution on heterogeneous Trusted Computing infrastructure</li>
+            </ul>
+        </td>
+      </tr>
+
+      <tr>
+        <td>45 min</td>
+        <td><b>Hands-on:</b> Developing Sancus/SGX enclaves,
+            software deployment, remote attestation and
+            secure communication</td>
+      </tr>
+
+      <tr>
+        <td>45 min</td>
+        <td><b>Hands-on:</b> Secure I/O on Sancus, authentic
+            execution in a distributed setting</td>
+      </tr>
+
+      <tr>
+        <td>45 min</td>
+        <td><b>Pitfalls, advanced topics, wrap-up</b>
+            <ul>
+                <li>Pitfalls: untrusted pointers, function pointers, resource sharing, debugging</li>
+                <li> Compartmentalising applications</li>
+                <li> Side-channels and how to avoid them </li>
+                <li> Open research questions </li>
+            </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 <?php research_section("ref") ?>
 
