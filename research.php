@@ -302,13 +302,23 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
+            "author"    => "Jo Van Bulck",
+            "title"     => "Hardware-Based Trusted Computing Architectures From an Attack and Defense Perspective",
+            "publisher" => "Newline 0x08",
+            "date"   	=> "April, 2018",
+            "id"        => "newline18",
+            "web"       => "https://hackerspace.gent/landing/newline.php",
+            "pdf"       => true,
+        ),
+        array(
             "author"    => "Mischa Spiegelmock",
             "title"     => "Open-source trusted computing for IoT",
             "publisher" => "LWN.net",
             "date"   	=> "February, 2018",
             "id"        => "lwn18",
             "web"       => "https://lwn.net/Articles/747564/",
-        ),array(
+        ),
+        array(
             "author"    => "Jan Tobias Mühlberg",
             "title"     => "Sancus 2.0: Open-Source Trusted Computing for the IoT",
             "publisher" => "FOSDEM'18",
