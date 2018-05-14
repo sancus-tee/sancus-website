@@ -164,6 +164,17 @@ electricity meters or automotive control networks.</p>
 <?php
     $pubs = array(
         array(
+            "author"    => "Jan Tobias Mühlber, Jo Van Bulck",
+            "title"     => "Tutorial: Building Distributed Enclave Applications with Sancus and SGX",
+            "publisher" => "Proceedings of the 48th International Conference on Dependable Systems and Networks (DSN)",
+            "date"   	=> "2018",
+            "id"        => "dsn18",
+            "pdf"       => true,
+            "web"       => "https://distrinet.cs.kuleuven.be/software/sancus/tutorial.php",
+            "video"     => "https://www.youtube.com/watch?v=5soMsk8JYN0",
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Jo Van Bulck, Jan Tobias Mühlberg, Frank Piessens",
             "title"     => "VulCAN: Efficient Component Authentication and Software Isolation for Automotive Control Networks",
             "publisher" => "Proceedings of the 33th Annual Computer Security Applications Conference (ACSAC)",
