@@ -171,6 +171,7 @@ electricity meters or automotive control networks.</p>
             "id"        => "dsn18",
             "pdf"       => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/sancus/tutorial.php",
+            "src"       => "https://github.com/sancus-pma/tutorial-dsn18",
             "video"     => "https://www.youtube.com/watch?v=5soMsk8JYN0",
             "bibtex"    => true
         ),

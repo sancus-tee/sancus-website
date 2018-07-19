@@ -23,8 +23,9 @@ include("header.php");
   </div>
   <div class="col-sm-10">
     <p>
-    This page collects background information and source code for the 3h
-    interactive tutorial
+    This page collects background information and <a
+    href="https://github.com/sancus-pma/tutorial-dsn18">source code</a> for the
+    3-hour interactive tutorial
     we will teach at the upcoming
     IEEE/IFIP International Conference on Dependable Systems and Networks
     <a href="https://dsn2018.uni.lu/">DSN 2018</a>,
