@@ -6,8 +6,8 @@ $sections = array(
     "core"      => "Core Architecture",
     "ext"       => "Extensions",
     "apps"     	=> "Applications",
-    "student"   => "Student Projects",
-    "media"     => "Press Coverage",
+    "student"   => "Student Theses",
+    "media"     => "Press Coverage and Outreach",
 );
 
 include("header.php");
@@ -231,21 +231,60 @@ electricity meters or automotive control networks.</p>
 <?php research_section("student") ?>
 
 <p> Sancus has been used as the development platform for several master theses
-and other student projects. Specifically, one thesis explored the feasibility of supplementing
+and other student projects.
+</p>
+
+<p><b>2018.</b>
+One thesis redesigned the Sancus compiler infrastructure, and used
+Sancus as the target platform for a unified secure compilation framework.
+Another project investigated secure communication channel establishment for
+distributed enclave applications with Sancus and Intel SGX.
+</p>
+
+<p><b>2017.</b>
+A trusted kernel-like software module has been developed to investigate
+hardware/software design trade-offs for cryptographic primitives. Another
+student project looked into providing responsiveness for the secure world
+formed by Sancus modules loaded on the same device.
+</p>
+
+<p><b>2016.</b>
+Sancus was used as the target platform for an automated reactive
+programming code generation framework.
+</p>
+
+<p><b>2015.</b>
+One thesis explored the feasibility of supplementing
 Sancus' hardware-enforced security guarantees with availability and access
 control guarantees for shared system resources.
 Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
-Sancus has furthermore been used as the target platform for an automated reactive
-programming code generation framework, and
-a trusted kernel-like software module has been developed to
-investigate cryptographic hardware/software design trade-offs.
-primitives. Finally, one project looked into providing responsiveness
-for the secure world formed by Sancus modules loaded on the same device.
 </p>
-
 <?php
     $pubs = array(
+        array(
+            "author"    => "Hans Winderix",
+            "title"     => "Security Enhanced LLVM",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2018",
+            "id"        => "winderix18thesis",
+            "pdf"       => true,
+            "slides"    => "publications/winderix18thesis-slides/index.html",
+            "src"       => "https://github.com/hanswinderix/sllvm",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Sten Verbois",
+            "title"     => "Safe Interacting Enclaves for Heterogeneous Protected Module Architectures",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2018",
+            "id"        => "verbois18thesis",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "publications/verbois18thesis-demo.webm",
+            "src"       => "https://github.com/stenverbois/vulcan-rs",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Michiel Van Beirendonck",
             "title"     => "Responsiveness Guarantee for the Sancus Protected Module Architecture",
