@@ -15,13 +15,33 @@ include("header.php");
         <?php create_sancus_button("research.php", "Explore Research", "file") ?>
       </p>
 
-    <div class="sancus-quote well">
-        A project based on open-source building blocks and free-software ethos
-        that attempts to provide a layer of integrity and deterministic behavior to
-        microcontrollers should be lauded and considered by anyone building hardware
-        applications where security and reliability are strong requirements.
-        <cite>Mischa Spiegelmock <a href=https://lwn.net/Articles/747564/>LWN.net</a></cite>
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+  <ol class="carousel-indicators">
+    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+    <li data-target="#myCarousel" data-slide-to="1"></li>
+  </ol>
+
+  <div class="carousel-inner">
+    <div class="item active">
+        <div class="sancus-quote well">
+            A project based on open-source building blocks and free-software ethos
+            that attempts to provide a layer of integrity and deterministic behavior to
+            microcontrollers should be lauded and considered by anyone building hardware
+            applications where security and reliability are strong requirements.
+            <cite>Mischa Spiegelmock <a href=https://lwn.net/Articles/747564/>LWN.net</a></cite>
+        </div>
     </div>
+
+    <div class="item">
+        <div class="sancus-quote well">
+            We do have problems with security, ones that need to be dealt with,
+            not only with changes to software toolchains but also to the underlying
+            hardware. 
+            <cite>Rik Farrow <a href=https://www.usenix.org/publications/login/fall-2018-vol-43-no-2>USENIX ;login:</a></cite>
+        </div>
+    </div>
+  </div>
+</div>
 
 <!--div class="page-header">
     <h2 class="subsection-header">Security Objectives</h2>

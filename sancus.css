@@ -233,3 +233,14 @@ p{
 .table{
   font-size: 16px;
 }
+
+.carousel-indicators li {
+   background-color: gray; 
+   border-color: gray; 
+}
+
+.carousel-indicators .active {
+   /*background-color: #af2b03; */
+   background-color: black;
+   border-color: black; 
+}
