@@ -353,6 +353,17 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
+            "author"    => "Jan Tobias Mühlberg and Jo Van Bulck",
+            "title"     => "Reflections on post-Meltdown trusted computing:
+                            A case for open security processors",
+            "publisher" => ";login: the USENIX magazine, Fall 2018, Vol. 43, No. 3",
+            "date"   	=> "September, 2018",
+            "id"        => "login18",
+            "web"       => "https://www.usenix.org/publications/login/fall-2018-vol-43-no-2/muhlberg",
+            "pdf"       => true,
+            "bibtex"       => true,
+        ),
+        array(
             "author"    => "Jo Van Bulck",
             "title"     => "Hardware-Based Trusted Computing Architectures From an Attack and Defense Perspective",
             "publisher" => "Newline 0x08",
