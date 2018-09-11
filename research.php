@@ -98,10 +98,25 @@ publications on the Protected Module Architecture research field.
 hardware and compiler infrastructure. Either to protect the confidentiality of
 security-critical code, to preserve real-time deadlines on a partially
 compromised embedded platform, or to provide authentic execution guarantees for
-distributed event-driven applications.</p>
+distributed event-driven applications.
+Recent work has furthermore revealed subtle side-channel vulnerabilities
+when implementing secure interrupts on Sancus-like processors.
+</p>
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Jo Van Bulck, Frank Piessens, Raoul Strackx",
+            "title"     => "Nemesis: Studying Microarchitectural Timing Leaks in
+                            Rudimentary CPU Interrupt Logic",
+            "publisher" => "Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS)",
+            "date"   	=> "2018",
+            "id"        => "ccs18",
+            "src"       => "https://github.com/jovanbulck/nemesis",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Ben Calus, Bob Reynders, Dominique Devriese, Job Noorman, Frank Piessens",
             "title"     => "FRP IoT Modules as a Scala DSL",
