@@ -249,6 +249,12 @@ electricity meters or automotive control networks.</p>
 and other student projects.
 </p>
 
+<p><b>2019.</b>
+An enclave-aware Direct Memory Access (DMA) controller was developed to
+maintain Sancus's security properties in the presence of untrusted peripheral
+DMA devices.
+</p>
+
 <p><b>2018.</b>
 One thesis redesigned the Sancus compiler infrastructure, and used
 Sancus as the target platform for a unified secure compilation framework.
@@ -277,6 +283,17 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
+        array(
+            "author"    => "Sergio Seminara",
+            "title"     => "DMA Support for the Sancus Architecture",
+            "publisher" => "Master thesis Politecnico di Torino",
+            "date"   	=> "2019",
+            "id"        => "seminara19thesis",
+            "pdf"       => true,
+            "slides"    => false,
+            "src"       => "https://github.com/S3rg7o/sancus-core",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Hans Winderix",
             "title"     => "Security Enhanced LLVM",
