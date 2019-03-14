@@ -114,7 +114,7 @@ when implementing secure interrupts on Sancus-like processors.
             "id"        => "ccs18",
             "src"       => "https://github.com/jovanbulck/nemesis",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "bibtex"    => true
         ),
         array(
