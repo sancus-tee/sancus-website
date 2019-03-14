@@ -85,6 +85,7 @@ publications on the Protected Module Architecture research field.
             "pdf"       => true,
             "slides"    => true,
             "src"       => "https://github.com/sancus-pma",
+            "video"     => "https://www.usenix.org/conference/usenixsecurity13/technical-sessions/presentation/noorman",
             "bibtex"    => true
         ),
     );
@@ -115,6 +116,7 @@ when implementing secure interrupts on Sancus-like processors.
             "src"       => "https://github.com/jovanbulck/nemesis",
             "pdf"       => true,
             "slides"    => true,
+            "video"     => "https://youtu.be/njE9Vg8HOqk",
             "bibtex"    => true
         ),
         array(
