@@ -292,7 +292,7 @@ applications running on higher-end Protected Module Architectures.
             "date"   	=> "2019",
             "id"        => "seminara19thesis",
             "pdf"       => true,
-            "slides"    => false,
+            "slides"    => true,
             "src"       => "https://github.com/S3rg7o/sancus-core",
             "bibtex"    => true
         ),
