@@ -387,6 +387,15 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
+            "author"    => "Hans Winderix",
+            "title"     => "Security Enhanced LLVM",
+            "publisher" => "BELCLIV award lecture",
+            "date"   	=> "May 22, 2019",
+            "id"        => "winderix19belcliv",
+            "slides"    => "publications/winderix19belcliv-slides/index.html",
+            "web"       => "http://www.clusib.be/wp/price/?lang=nl"
+        ),
+        array(
             "author"    => "Jan Tobias Mühlberg and Jo Van Bulck",
             "title"     => "Reflections on post-Meltdown trusted computing:
                             A case for open security processors",
