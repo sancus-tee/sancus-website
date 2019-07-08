@@ -255,6 +255,7 @@ and other student projects.
 An enclave-aware Direct Memory Access (DMA) controller was developed to
 maintain Sancus's security properties in the presence of untrusted peripheral
 DMA devices.
+Another thesis developed an attack framework for single-stepping Sancus enclaves and investigated side-channel leakage in compiler-generated code.
 </p>
 
 <p><b>2018.</b>
@@ -285,6 +286,17 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
+        array(
+            "author"    => "Sven Cuyt",
+            "title"     => "A Security Analysis of Interrupts in Embedded Enclaved Execution",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2019",
+            "id"        => "cuyt19thesis",
+            "pdf"       => true,
+            "slides"    => true,
+            "src"       => "https://github.com/jovanbulck/nemesis/tree/master/sancus/stubs",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Sergio Seminara",
             "title"     => "DMA Support for the Sancus Architecture",
