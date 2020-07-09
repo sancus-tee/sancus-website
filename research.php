@@ -101,11 +101,23 @@ security-critical code, to preserve real-time deadlines on a partially
 compromised embedded platform, or to provide authentic execution guarantees for
 distributed event-driven applications.
 Recent work has furthermore revealed subtle side-channel vulnerabilities
-when implementing secure interrupts on Sancus-like processors.
+when implementing secure interrupts on Sancus-like processors and proposed
+hardware extensions to provably rule out this attack surface.
 </p>
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Matteo Busi, Job Noorman, Jo Van Bulck, Letterio
+                            Galletta, Pierpaolo Degano, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Provably Secure Isolation for Interruptible Enclaved Execution on Small Microprocessors",
+            "publisher" => "33rd IEEE Computer Security Foundations Symposium (CSF)",
+            "date"   	=> "2020",
+            "id"        => "csf20",
+            "src"       => "https://github.com/sancus-pma/sancus-core/tree/nemesis",
+            "pdf"       => "https://arxiv.org/pdf/2001.10881.pdf",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Jo Van Bulck, Frank Piessens, Raoul Strackx",
             "title"     => "Nemesis: Studying Microarchitectural Timing Leaks in
@@ -170,18 +182,33 @@ when implementing secure interrupts on Sancus-like processors.
 
 <?php research_section("apps") ?>
 
-<p>Recent and ongoing work leverages Sancus' lightweight
+<p>Ongoing work leverages Sancus's lightweight
 isolation and authentication primitives to establish trust in distributed
 embedded application scenarios. These range from addressing specific
 requirements, such as securely multiplexing shared platform resources among
 distrusting clients, or establishing the integrity of an untrusted host
 operating system, to extended case studies in the context of emerging smart
-electricity meters or automotive control networks.</p>
+electricity meters or automotive control networks.
+The Sancus runtime infrastructure was furthermore featured in a recent comprehensive
+enclave runtime vulnerability assessment study.
+</p>
 
 <?php
     $pubs = array(
         array(
-            "author"    => "Jan Tobias Mühlber, Jo Van Bulck",
+            "author"    => "Jo Van Bulck, David Oswald, Eduard Marin, Abdulla Aldoseri, Flavio D. Garcia, Frank Piessens",
+            "title"     => "A Tale of Two Worlds: Assessing the Vulnerability of Enclave Shielding Runtimes",
+            "publisher" => "26th ACM Conference on Computer and Communications Security (CCS)",
+            "date"   	=> "2019",
+            "id"        => "ccs19",
+            "pdf"       => "https://jovanbulck.github.io/files/ccs19-tale.pdf",
+            "slides"    => "https://jovanbulck.github.io/files/ccs19-tale-slides.pdf",
+            "video"     => "https://dl.acm.org/doi/abs/10.1145/3319535.3363206",
+            "src"       => "https://github.com/jovanbulck/0xbadc0de",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jan Tobias Mühlberg, Jo Van Bulck",
             "title"     => "Tutorial: Building Distributed Enclave Applications with Sancus and SGX",
             "publisher" => "Proceedings of the 48th International Conference on Dependable Systems and Networks (DSN)",
             "date"   	=> "2018",
@@ -279,7 +306,7 @@ programming code generation framework.
 
 <p><b>2015.</b>
 One thesis explored the feasibility of supplementing
-Sancus' hardware-enforced security guarantees with availability and access
+Sancus's hardware-enforced security guarantees with availability and access
 control guarantees for shared system resources.
 Another project leveraged Sancus to to establish secure I/O paths for
 applications running on higher-end Protected Module Architectures.
