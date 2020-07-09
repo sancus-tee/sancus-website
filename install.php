@@ -37,12 +37,21 @@ include("header.php");
 ?>
 
 <?php install_section("overview") ?>
-<p>
+
+<div class="alert alert-danger">
+    <p><strong>NOTE:</strong>
     Sancus is free software. The latest source code of the Sancus project is being actively
     maintained on <a href="https://github.com/sancus-pma">GitHub</a>. Please
     redirect all your bug reports, issues, and pull requests to the corresponding
-    GitHub repository.
-</p>
+    GitHub repository.</p>
+    <p>
+    The instructions and binary packages on this page are maintained here for
+    reference only and are severly <b>outdated.</b>
+    Please head over to <a href="https://github.com/sancus-pma/sancus-main">GitHub</a> for
+    up-to-date source code and installation instructions.
+    </p>
+</div>
+
 <p>
     This page provides installation instructions, source code and binary
     packages for the official Sancus 2.0 release: simulator, compiler and
