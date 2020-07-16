@@ -44,7 +44,7 @@ publications on the Protected Module Architecture research field.
             "id"        => "tops17",
             "pdf"       => true,
             "slides"    => true,
-            "src"       => "https://github.com/sancus-pma",
+            "src"       => "https://github.com/sancus-tee",
             "bibtex"    => true
         ),
         array(
@@ -84,7 +84,7 @@ publications on the Protected Module Architecture research field.
             "id"        => "usenix13",
             "pdf"       => true,
             "slides"    => true,
-            "src"       => "https://github.com/sancus-pma",
+            "src"       => "https://github.com/sancus-tee",
             "video"     => "https://www.usenix.org/conference/usenixsecurity13/technical-sessions/presentation/noorman",
             "bibtex"    => true
         ),
@@ -114,7 +114,7 @@ hardware extensions to provably rule out this attack surface.
             "publisher" => "33rd IEEE Computer Security Foundations Symposium (CSF)",
             "date"   	=> "2020",
             "id"        => "csf20",
-            "src"       => "https://github.com/sancus-pma/sancus-core/tree/nemesis",
+            "src"       => "https://github.com/sancus-tee/sancus-core/tree/nemesis",
             "pdf"       => "https://arxiv.org/pdf/2001.10881.pdf",
             "bibtex"    => true
         ),
@@ -148,7 +148,7 @@ hardware extensions to provably rule out this attack surface.
             "publisher" => "Proceedings of the 13th International Workshop on Security and Trust Management (STM)",
             "date"   	=> "2017",
             "id"        => "stm17",
-            "src"       => "https://github.com/sancus-pma/sancus-contiki",
+            "src"       => "https://github.com/sancus-tee/sancus-contiki",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
@@ -215,7 +215,7 @@ enclave runtime vulnerability assessment study.
             "id"        => "dsn18",
             "pdf"       => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/sancus/tutorial.php",
-            "src"       => "https://github.com/sancus-pma/tutorial-dsn18",
+            "src"       => "https://github.com/sancus-tee/tutorial-dsn18",
             "video"     => "https://www.youtube.com/watch?v=5soMsk8JYN0",
             "bibtex"    => true
         ),
@@ -228,7 +228,7 @@ enclave runtime vulnerability assessment study.
             "pdf"       => true,
             "slides"    => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
-            "src"       => "https://github.com/sancus-pma/vulcan",
+            "src"       => "https://github.com/sancus-tee/vulcan",
             "video"     => "https://youtu.be/gzxwiWfkl9g",
             "bibtex"    => true
         ),
@@ -252,7 +252,7 @@ enclave runtime vulnerability assessment study.
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
-            "src"       => "https://github.com/sancus-pma/sancus-contiki",
+            "src"       => "https://github.com/sancus-tee/sancus-contiki",
             "bibtex"    => true
         ),
         array(
@@ -264,7 +264,7 @@ enclave runtime vulnerability assessment study.
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,
-            "src"       => "https://github.com/sancus-pma/sm-access-control",
+            "src"       => "https://github.com/sancus-tee/sm-access-control",
             "bibtex"    => true
         ),
     );

@@ -1,7 +1,7 @@
 <?php
 
-define("GITHUB_URL", "https://github.com/sancus-pma");
-define("TRAVIS_URL", "https://travis-ci.org/sancus-pma");
+define("GITHUB_URL", "https://github.com/sancus-tee");
+define("TRAVIS_URL", "https://travis-ci.org/sancus-tee");
 
 function doc_ref($id, $title = null)
 {
@@ -298,7 +298,7 @@ EOF;
     {
         $url=TRAVIS_URL . "/" . $travis;
         echo <<<EOF
-        <small><a href=$url><img alt="status" src="https://travis-ci.org/sancus-pma/sancus-examples.svg?branch=master"></a></small>
+        <small><a href=$url><img alt="status" src="https://travis-ci.org/sancus-tee/sancus-examples.svg?branch=master"></a></small>
 EOF;
     }
 

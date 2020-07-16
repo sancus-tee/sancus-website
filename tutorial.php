@@ -24,7 +24,7 @@ include("header.php");
   <div class="col-sm-10">
     <p>
     This page collects background information and <a
-    href="https://github.com/sancus-pma/tutorial-dsn18">source code</a> for the
+    href="https://github.com/sancus-tee/tutorial-dsn18">source code</a> for the
     3-hour interactive tutorial
     we will teach at the upcoming
     IEEE/IFIP International Conference on Dependable Systems and Networks
@@ -197,7 +197,7 @@ between lectures and practical exercises:
             "id"        => "tops17",
             "pdf"       => true,
             "slides"    => true,
-            "src"       => "https://github.com/sancus-pma",
+            "src"       => "https://github.com/sancus-tee",
             "bibtex"    => true
         ),
        array(
@@ -217,7 +217,7 @@ between lectures and practical exercises:
             "pdf"       => true,
             "slides"    => true,
             "web"       => "https://distrinet.cs.kuleuven.be/software/vulcan",
-            "src"       => "https://github.com/sancus-pma/vulcan",
+            "src"       => "https://github.com/sancus-tee/vulcan",
             "video"     => "https://youtu.be/gzxwiWfkl9g",
             "bibtex"    => true
         ),
@@ -227,7 +227,7 @@ between lectures and practical exercises:
             "publisher" => "Proceedings of the 13th International Workshop on Security and Trust Management (STM)",
             "date"   	=> "2017",
             "id"        => "stm17",
-            "src"       => "https://github.com/sancus-pma/sancus-contiki",
+            "src"       => "https://github.com/sancus-tee/sancus-contiki",
             "pdf"       => true,
             "slides"    => true,
             "web"       => true,

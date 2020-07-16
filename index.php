@@ -10,7 +10,7 @@ include("header.php");
 </div>
       <p/> <p>
         <!-- ?php create_sancus_button("publications/tops17.pdf", "Get the paper", "download") ?-->
-        <?php create_sancus_button("https://github.com/sancus-pma", "View on GitHub", "github") ?>
+        <?php create_sancus_button("https://github.com/sancus-tee", "View on GitHub", "github") ?>
         <?php create_sancus_button("https://distrinet.cs.kuleuven.be/software/vulcan/demo.html", "Watch a demo", "video-camera") ?>
         <?php create_sancus_button("research.php", "Explore Research", "file") ?>
       </p>

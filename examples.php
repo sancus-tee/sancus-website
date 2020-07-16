@@ -25,7 +25,7 @@ official Sancus 2.0 release, as provided on the <a href="install.php">
 installation page</a>. An updated example scenario with an MMIO sensor module
 providing authenticated readings from a time stamp counter peripheral is
 available on <a href=
-"https://github.com/sancus-pma/sancus-examples/tree/master/sensor-reader">
+"https://github.com/sancus-tee/sancus-examples/tree/master/sensor-reader">
 GitHub </a>.
 </p>
 

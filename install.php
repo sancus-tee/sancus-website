@@ -41,13 +41,13 @@ include("header.php");
 <div class="alert alert-danger">
     <p><strong>NOTE:</strong>
     Sancus is free software. The latest source code of the Sancus project is being actively
-    maintained on <a href="https://github.com/sancus-pma">GitHub</a>. Please
+    maintained on <a href="https://github.com/sancus-tee">GitHub</a>. Please
     redirect all your bug reports, issues, and pull requests to the corresponding
     GitHub repository.</p>
     <p>
     The instructions and binary packages on this page are maintained here for
     reference only and are severly <b>outdated.</b>
-    Please head over to <a href="https://github.com/sancus-pma/sancus-main">GitHub</a> for
+    Please head over to <a href="https://github.com/sancus-tee/sancus-main">GitHub</a> for
     up-to-date source code and installation instructions.
     </p>
 </div>
