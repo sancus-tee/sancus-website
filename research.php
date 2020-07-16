@@ -196,6 +196,15 @@ enclave runtime vulnerability assessment study.
 <?php
     $pubs = array(
         array(
+            "author"    => "Jan Pennekamp, Fritz Alder, Roman Matzutt, Jan Tobias Mühlberg, Frank Piessens, and Klaus Wehrle",
+            "title"     => "Secure End-to-End Sensing in Supply Chains",
+            "publisher" => "5th International Workshop on Cyber-Physical Systems Security (CPS-Sec)",
+            "date"   	=> "2020",
+            "id"        => "cps-sec20",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Jo Van Bulck, David Oswald, Eduard Marin, Abdulla Aldoseri, Flavio D. Garcia, Frank Piessens",
             "title"     => "A Tale of Two Worlds: Assessing the Vulnerability of Enclave Shielding Runtimes",
             "publisher" => "26th ACM Conference on Computer and Communications Security (CCS)",
