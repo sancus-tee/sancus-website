@@ -108,6 +108,16 @@ hardware extensions to provably rule out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Sepideh Pouyanrad, Jan Tobias Mühlberg, Wouter Joosen",
+            "title"     => "SCF-MSP : Static Detection of Side Channels in MSP430 Programs",
+            "publisher" => "Proceedings of the 15th International Conference on Availability, Reliability and Security (ARES'20)",
+            "date"      => "2020",
+            "id"        => "ares2020",
+            "src"       => "https://github.com/sepidehpouyan/SCF-MSP430",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Matteo Busi, Job Noorman, Jo Van Bulck, Letterio
                             Galletta, Pierpaolo Degano, Jan Tobias Mühlberg, Frank Piessens",
             "title"     => "Provably Secure Isolation for Interruptible Enclaved Execution on Small Microprocessors",
@@ -322,6 +332,28 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
+        array(
+            "author"    => "Stien Vanderhallen",
+            "title"     => "Robust Authentication for Automotive Control Networks through Covert Bandwidth",
+            "publisher" => "Master thesis KU Leuven",
+            "date"   	=> "2020",
+            "id"        => "vanderhallen20thesis",
+            "pdf"       => true,
+            "slides"    => true,
+            "src"       => "https://github.com/Stienvdh/can-IAT-channel",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Gianluca Scopelliti",
+            "title"     => "Securing Smart Environments with Authentic Execution",
+            "publisher" => "Master thesis Politecnico Di Torino",
+            "date"   	=> "2020",
+            "id"        => "scopelliti20thesis",
+            "pdf"       => true,
+            "slides"    => true,
+            "src"       => "https://github.com/gianlu33/authentic-execution",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Sven Cuyt",
             "title"     => "A Security Analysis of Interrupts in Embedded Enclaved Execution",
