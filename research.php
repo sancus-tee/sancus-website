@@ -365,7 +365,7 @@ applications running on higher-end Protected Module Architectures.
             "date"   	=> "2020",
             "id"        => "scopelliti2020",
             "pdf"       => true,
-            "slides"    => true,
+            "slides"    => false,
             "src"       => "https://github.com/gianlu33/authentic-execution",
             "bibtex"    => true
         ),
