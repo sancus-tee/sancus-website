@@ -227,6 +227,19 @@ enclave runtime vulnerability assessment study.
             "bibtex"    => true
         ),
         array(
+            "author"    => "Timothy Werquin, Mathijs Hubrechtsen, Ashok Thangarajan, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "Automated Fuzzing of Automotive Control Units",
+            "publisher" => "International Workshop on Attacks and Defenses for
+Internet-of-Things (ADIoT) / International Workshop on the
+Secure Internet of Things (SIoT)",
+            "date"   	=> "2019",
+            "id"        => "siot19",
+            "pdf"       => true,
+            "slides"    => false,
+            "src"       => "https://github.com/timower/caringcaribou/tree/autoFuzz",
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Jan Tobias Mühlberg, Jo Van Bulck",
             "title"     => "Tutorial: Building Distributed Enclave Applications with Sancus and SGX",
             "publisher" => "Proceedings of the 48th International Conference on Dependable Systems and Networks (DSN)",
@@ -386,7 +399,7 @@ applications running on higher-end Protected Module Architectures.
             "id"        => "werquin19thesis",
             "pdf"       => true,
             "slides"    => false,
-            "src"       => "https://github.com/FrostTusk/CAN-Fuzzer",
+            "src"       => "https://github.com/timower/caringcaribou/tree/autoFuzz",
             "bibtex"    => true
         ),
         array(
