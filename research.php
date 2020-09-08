@@ -332,6 +332,7 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
+/*
         array(
             "author"    => "Stien Vanderhallen",
             "title"     => "Robust Authentication for Automotive Control Networks through Covert Bandwidth",
@@ -343,6 +344,7 @@ applications running on higher-end Protected Module Architectures.
             "src"       => "https://github.com/Stienvdh/can-IAT-channel",
             "bibtex"    => true
         ),
+*/
         array(
             "author"    => "Gianluca Scopelliti",
             "title"     => "Securing Smart Environments with Authentic Execution",
