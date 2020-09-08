@@ -378,6 +378,17 @@ applications running on higher-end Protected Module Architectures.
             "src"       => "https://github.com/S3rg7o/sancus-core",
             "bibtex"    => true
         ),
+	array(
+            "author"    => "Timothy Werquin",
+            "title"     => "Automated Reverse Engineering and Fuzzing of the CAN Bus",
+            "publisher" => "Master thesis KU Leuven",
+            "date"      => "2019",
+            "id"        => "werquin19thesis",
+            "pdf"       => true,
+            "slides"    => false,
+            "src"       => "https://github.com/FrostTusk/CAN-Fuzzer",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Hans Winderix",
             "title"     => "Security Enhanced LLVM",
