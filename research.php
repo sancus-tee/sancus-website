@@ -21,7 +21,7 @@ include("header.php");
 imec-DistriNet as well as by independent researchers. This page
 aims to give a comprehensive overview of academic publications on Sancus-based
 architectures and applications. Feel free to <a
-href="https://aemail.com/MQ3">contact</a> us if you know of other
+href="https://github.com/sancus-tee/sancus-website">open a pull request on GitHub</a> us if you know of other
 relevant research results to be included here.
 </p>
 
@@ -206,6 +206,17 @@ enclave runtime vulnerability assessment study.
 <?php
     $pubs = array(
         array(
+            "author"    => "Stien Vanderhallen, Jo Van Bulck, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "Robust Authentication for Automotive Control Networks through Covert Channels",
+            "publisher" => "Computer Networks",
+            "date"   	=> "2021",
+            "id"        => "comnet21-robust",
+            "pdf"       => true,
+            "slides"    => false,
+            "src"       => "https://github.com/Stienvdh/vulcan/tree/iat-nonce",
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Jan Pennekamp, Fritz Alder, Roman Matzutt, Jan Tobias Mühlberg, Frank Piessens, and Klaus Wehrle",
             "title"     => "Secure End-to-End Sensing in Supply Chains",
             "publisher" => "5th International Workshop on Cyber-Physical Systems Security (CPS-Sec)",
@@ -310,6 +321,11 @@ Secure Internet of Things (SIoT)",
 and other student projects.
 </p>
 
+<p><b>2020.</b>
+Two theses leveraged Sancus as a base platform to further extend uses cases for
+authentic execution and controller-area network authentication.
+</p>
+
 <p><b>2019.</b>
 An enclave-aware Direct Memory Access (DMA) controller was developed to
 maintain Sancus's security properties in the presence of untrusted peripheral
@@ -345,7 +361,6 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
-/*
         array(
             "author"    => "Stien Vanderhallen",
             "title"     => "Robust Authentication for Automotive Control Networks through Covert Bandwidth",
@@ -353,11 +368,10 @@ applications running on higher-end Protected Module Architectures.
             "date"   	=> "2020",
             "id"        => "vanderhallen2020",
             "pdf"       => true,
-            "slides"    => true,
+            "slides"    => false,
             "src"       => "https://github.com/Stienvdh/can-IAT-channel",
             "bibtex"    => true
         ),
-*/
         array(
             "author"    => "Gianluca Scopelliti",
             "title"     => "Securing Smart Environments with Authentic Execution",
