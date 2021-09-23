@@ -112,11 +112,11 @@ attack surface.
             "author"    => "Fritz Alder, Jo Van Bulck, Frank Piessens, Jan Tobias Mühlberg",
             "title"     => "Aion: Enabling Open Systems through Strong
                             Availability Guarantees for Enclaves",
-            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)"
+            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
             "date"      => "2021",
             "id"        => "ccs21",
             "src"       => "https://github.com/sancus-tee/sancus-riot",
-            "pdf"       => "https://falder.org/files/paper/2021_aion.pdf",
+            "pdf"       => true,
             "slides"    => false,
             "video"     => false,
             "bibtex"    => true
