@@ -248,7 +248,7 @@ enclave runtime vulnerability assessment study.
             "id"        => "ccs19",
             "pdf"       => "https://jovanbulck.github.io/files/ccs19-tale.pdf",
             "slides"    => "https://jovanbulck.github.io/files/ccs19-tale-slides.pdf",
-            "video"     => "https://dl.acm.org/doi/abs/10.1145/3319535.3363206",
+            "video"     => "https://www.youtube.com/watch?v=zjdUEKX1jlI",
             "src"       => "https://github.com/jovanbulck/0xbadc0de",
             "bibtex"    => true
         ),
