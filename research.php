@@ -102,7 +102,8 @@ compromised embedded platform, or to provide authentic execution guarantees for
 distributed event-driven applications.
 Recent work has furthermore revealed subtle side-channel vulnerabilities
 when implementing secure interrupts on Sancus-like processors and proposed
-hardware extensions to provably rule out this attack surface.
+a compiler-based defense and hardware extensions to provably rule out this
+attack surface.
 </p>
 
 <?php
@@ -118,6 +119,20 @@ hardware extensions to provably rule out this attack surface.
             "pdf"       => "https://falder.org/files/paper/2021_aion.pdf",
             "slides"    => false,
             "video"     => false,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Hans Winderix, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Compiler-Assisted Hardening of Embedded Software
+                            Against Interrupt Latency Side-Channel Attacks",
+            "publisher" => "Proceedings of the 6th IEEE European Symposium on
+                            Security and Privacy",
+            "date"   	=> "2021",
+            "id"        => "esp21",
+            "src"       => "https://github.com/hanswinderix/sllvm",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "https://youtu.be/L_OzePNKfFs",
             "bibtex"    => true
         ),
         array(
@@ -236,6 +251,7 @@ enclave runtime vulnerability assessment study.
             "date"   	=> "2020",
             "id"        => "cps-sec20",
             "pdf"       => true,
+            "video"     => "https://www.youtube.com/watch?v=UavQ54dO3kk",
             "bibtex"    => true
         ),
         array(
@@ -246,7 +262,7 @@ enclave runtime vulnerability assessment study.
             "id"        => "ccs19",
             "pdf"       => "https://jovanbulck.github.io/files/ccs19-tale.pdf",
             "slides"    => "https://jovanbulck.github.io/files/ccs19-tale-slides.pdf",
-            "video"     => "https://dl.acm.org/doi/abs/10.1145/3319535.3363206",
+            "video"     => "https://www.youtube.com/watch?v=zjdUEKX1jlI",
             "src"       => "https://github.com/jovanbulck/0xbadc0de",
             "bibtex"    => true
         ),
