@@ -238,6 +238,7 @@ enclave runtime vulnerability assessment study.
             "date"   	=> "2020",
             "id"        => "cps-sec20",
             "pdf"       => true,
+            "video"     => "https://www.youtube.com/watch?v=UavQ54dO3kk",
             "bibtex"    => true
         ),
         array(
