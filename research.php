@@ -102,11 +102,26 @@ compromised embedded platform, or to provide authentic execution guarantees for
 distributed event-driven applications.
 Recent work has furthermore revealed subtle side-channel vulnerabilities
 when implementing secure interrupts on Sancus-like processors and proposed
-hardware extensions to provably rule out this attack surface.
+a compiler-based defense and hardware extensions to provably rule out this
+attack surface.
 </p>
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Hans Winderix, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Compiler-Assisted Hardening of Embedded Software
+                            Against Interrupt Latency Side-Channel Attacks",
+            "publisher" => "Proceedings of the 6th IEEE European Symposium on
+                            Security and Privacy",
+            "date"   	=> "2021",
+            "id"        => "esp21",
+            "src"       => "https://github.com/hanswinderix/sllvm",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "https://youtu.be/L_OzePNKfFs",
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Sepideh Pouyanrad, Jan Tobias Mühlberg, Wouter Joosen",
             "title"     => "SCF-MSP : Static Detection of Side Channels in MSP430 Programs",
