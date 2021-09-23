@@ -108,6 +108,19 @@ hardware extensions to provably rule out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Fritz Alder, Jo Van Bulck, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "Aion: Enabling Open Systems through Strong
+                            Availability Guarantees for Enclaves",
+            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)"
+            "date"      => "2021",
+            "id"        => "ccs21",
+            "src"       => "https://github.com/sancus-tee/sancus-riot",
+            "pdf"       => "https://falder.org/files/paper/2021_aion.pdf",
+            "slides"    => false,
+            "video"     => false,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Sepideh Pouyanrad, Jan Tobias Mühlberg, Wouter Joosen",
             "title"     => "SCF-MSP : Static Detection of Side Channels in MSP430 Programs",
             "publisher" => "Proceedings of the 15th International Conference on Availability, Reliability and Security (ARES'20)",
