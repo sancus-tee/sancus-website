@@ -117,8 +117,8 @@ attack surface.
             "id"        => "ccs21",
             "src"       => "https://github.com/sancus-tee/sancus-riot",
             "pdf"       => true,
-            "slides"    => false,
-            "video"     => false,
+            "slides"    => true,
+            "video"     => "https://youtu.be/E_SbvA-txnQ",
             "bibtex"    => true
         ),
         array(
