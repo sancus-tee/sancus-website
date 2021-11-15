@@ -109,6 +109,18 @@ attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Gianluca Scopelliti, Sepideh Pouyanrad, Job Noorman, Fritz Alder, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "POSTER: An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
+            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
+            "date"      => "2021",
+            "id"        => "ccs21-poster",
+            "src"       => "https://github.com/AuthenticExecution",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "https://youtu.be/whJf6YgLPok",
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Fritz Alder, Jo Van Bulck, Frank Piessens, Jan Tobias Mühlberg",
             "title"     => "Aion: Enabling Open Systems through Strong
                             Availability Guarantees for Enclaves",
@@ -535,6 +547,17 @@ Sancus-based techniques to secure automotive control networks.
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Gianluca Scopelliti and Sepideh Pouyanrad",
+            "title"     => "An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
+            "publisher" => "FOSDEM'21",
+            "date"      => "February, 2021",
+            "id"        => "fosdem21",
+            "slides"    => true,
+            "src"       => "https://github.com/AuthenticExecution",
+            "web"       => "https://archive.fosdem.org/2021/schedule/event/tee_sancus/",
+            "video"     => "https://youtu.be/vLnRoNNwfDA"
+        ),
         array(
             "author"    => "Hans Winderix",
             "title"     => "Security Enhanced LLVM",
