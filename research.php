@@ -109,6 +109,18 @@ attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
+            "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures",
+            "publisher" => "Proceedings of the 43rd IEEE Symposium on Security and Privacy (S&P)",
+            "date"      => "2022",
+            "id"        => "bognar22gap",
+            "src"       => "https://github.com/martonbognar/gap-attacks",
+            "pdf"       => true,
+            "slides"    => false,
+            "video"     => "https://www.youtube.com/watch?v=5gQfDpDN4eU",
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Gianluca Scopelliti, Sepideh Pouyanrad, Job Noorman, Fritz Alder, Frank Piessens, Jan Tobias Mühlberg",
             "title"     => "POSTER: An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
             "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
@@ -548,6 +560,14 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
+            "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
+            "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures (Poster)",
+            "publisher" => "2022 Summer School on Security Testing & Verification",
+            "date"      => "2022",
+            "id"        => "bognar22poster",
+            "pdf"       => true,
+        ),
+        array(
             "author"    => "Gianluca Scopelliti and Sepideh Pouyanrad",
             "title"     => "An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
             "publisher" => "FOSDEM'21",
@@ -665,4 +685,3 @@ Sancus-based techniques to secure automotive control networks.
 <?php
 include("footer.php");
 ?>
-
