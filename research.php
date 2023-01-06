@@ -5,6 +5,7 @@ $page_title = "Research";
 $sections = array(
     "core"      => "Core Architecture",
     "ext"       => "Extensions",
+    "sca"       => "Side-Channel Attacks and Defenses",
     "apps"     	=> "Applications",
     "student"   => "Student Theses",
     "media"     => "Press Coverage and Outreach",
@@ -100,37 +101,19 @@ hardware and compiler infrastructure. Either to protect the confidentiality of
 security-critical code, to preserve real-time deadlines on a partially
 compromised embedded platform, or to provide authentic execution guarantees for
 distributed event-driven applications.
-Recent work has furthermore revealed subtle side-channel vulnerabilities
-when implementing secure interrupts on Sancus-like processors and proposed
-a compiler-based defense and hardware extensions to provably rule out this
-attack surface.
 </p>
 
 <?php
     $pubs = array(
         array(
-            "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
-            "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures",
-            "publisher" => "Proceedings of the 43rd IEEE Symposium on Security and Privacy (S&P)",
+            "author"    => "Gianluca Scopelliti, Sepideh Pouyanrad, Job Noorman, Fritz Alder, Christoph Baumann, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "End-to-End Security for Distributed Event-Driven Enclave Applications on Heterogeneous TEEs",
+            "publisher" => "arXiv preprint",
             "date"      => "2022",
-            "id"        => "bognar22gap",
-            "src"       => "https://github.com/martonbognar/gap-attacks",
-            "pdf"       => true,
+            "src"       => "https://github.com/AuthenticExecution/main",
+            "pdf"       => "https://arxiv.org/pdf/2206.01041.pdf",
             "slides"    => false,
-            "video"     => "https://www.youtube.com/watch?v=5gQfDpDN4eU",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Gianluca Scopelliti, Sepideh Pouyanrad, Job Noorman, Fritz Alder, Frank Piessens, Jan Tobias Mühlberg",
-            "title"     => "POSTER: An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
-            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
-            "date"      => "2021",
-            "id"        => "ccs21-poster",
-            "src"       => "https://github.com/AuthenticExecution",
-            "pdf"       => true,
-            "slides"    => true,
-            "video"     => "https://youtu.be/whJf6YgLPok",
-            "bibtex"    => true
+            "bibtex"    => false,
         ),
         array(
             "author"    => "Fritz Alder, Jo Van Bulck, Frank Piessens, Jan Tobias Mühlberg",
@@ -146,52 +129,24 @@ attack surface.
             "bibtex"    => true
         ),
         array(
-            "author"    => "Hans Winderix, Jan Tobias Mühlberg, Frank Piessens",
-            "title"     => "Compiler-Assisted Hardening of Embedded Software
-                            Against Interrupt Latency Side-Channel Attacks",
-            "publisher" => "Proceedings of the 6th IEEE European Symposium on
-                            Security and Privacy",
-            "date"   	=> "2021",
-            "id"        => "esp21",
-            "src"       => "https://github.com/hanswinderix/sllvm",
+            "author"    => "Gianluca Scopelliti, Sepideh Pouyanrad, Job Noorman, Fritz Alder, Frank Piessens, Jan Tobias Mühlberg",
+            "title"     => "POSTER: An Open-Source Framework for Developing Heterogeneous Distributed Enclave Applications",
+            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
+            "date"      => "2021",
+            "id"        => "ccs21-poster",
+            "src"       => "https://github.com/AuthenticExecution",
             "pdf"       => true,
             "slides"    => true,
-            "video"     => "https://youtu.be/L_OzePNKfFs",
+            "video"     => "https://youtu.be/whJf6YgLPok",
             "bibtex"    => true
         ),
         array(
-            "author"    => "Sepideh Pouyanrad, Jan Tobias Mühlberg, Wouter Joosen",
-            "title"     => "SCF-MSP : Static Detection of Side Channels in MSP430 Programs",
-            "publisher" => "Proceedings of the 15th International Conference on Availability, Reliability and Security (ARES'20)",
-            "date"      => "2020",
-            "id"        => "ares2020",
-            "src"       => "https://github.com/sepidehpouyan/SCF-MSP430",
-            "pdf"       => true,
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Matteo Busi, Job Noorman, Jo Van Bulck, Letterio
-                            Galletta, Pierpaolo Degano, Jan Tobias Mühlberg, Frank Piessens",
-            "title"     => "Provably Secure Isolation for Interruptible Enclaved Execution on Small Microprocessors",
-            "publisher" => "33rd IEEE Computer Security Foundations Symposium (CSF)",
-            "date"   	=> "2020",
-            "id"        => "csf20",
-            "src"       => "https://github.com/sancus-tee/sancus-core/tree/nemesis",
-            "pdf"       => "https://arxiv.org/pdf/2001.10881.pdf",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Jo Van Bulck, Frank Piessens, Raoul Strackx",
-            "title"     => "Nemesis: Studying Microarchitectural Timing Leaks in
-                            Rudimentary CPU Interrupt Logic",
-            "publisher" => "Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS)",
-            "date"   	=> "2018",
-            "id"        => "ccs18",
-            "src"       => "https://github.com/jovanbulck/nemesis",
-            "pdf"       => true,
-            "slides"    => true,
-            "video"     => "https://youtu.be/njE9Vg8HOqk",
-            "bibtex"    => true
+            "author"    => "Ivan De Oliveira Nunes, Sashidhar Jakkamsetti, Norrathep Rattanavipanon, Gene Tsudik",
+            "title"     => "On the TOCTOU Problem in Remote Attestation",
+            "publisher" => "Proceedings of the 28th ACM Conference on Computer and Communications Security (CCS)",
+            "date"      => "2021",
+            "src"       => "https://github.com/sprout-uci/RATA",
+            "pdf"       => "https://arxiv.org/pdf/2005.03873.pdf",
         ),
         array(
             "author"    => "Ben Calus, Bob Reynders, Dominique Devriese, Job Noorman, Frank Piessens",
@@ -242,6 +197,107 @@ attack surface.
     publication_list($pubs);
 ?>
 
+<?php research_section("sca") ?>
+
+<p>
+Sancus has been leveraged to study
+subtle side-channel vulnerabilities that may undermine enclave protection guarantees.
+Particularly, an innovative timing side channel has been revealed
+when implementing secure interrupts on Sancus-like processors,
+leading to compiler-based defenses and hardware extensions to provably rule
+out this attack surface.
+</p>
+
+<?php
+    $pubs = array(
+        array(
+            "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
+            "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures",
+            "publisher" => "Proceedings of the 43rd IEEE Symposium on Security and Privacy (S&P)",
+            "date"      => "2022",
+            "id"        => "bognar22gap",
+            "src"       => "https://github.com/martonbognar/gap-attacks",
+            "pdf"       => true,
+            "slides"    => false,
+            "video"     => "https://www.youtube.com/watch?v=5gQfDpDN4eU",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Hans Winderix, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Compiler-Assisted Hardening of Embedded Software
+                            Against Interrupt Latency Side-Channel Attacks",
+            "publisher" => "Proceedings of the 6th IEEE European Symposium on
+                            Security and Privacy (EuroS&P)",
+            "date"   	=> "2021",
+            "id"        => "esp21",
+            "src"       => "https://github.com/hanswinderix/sllvm",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "https://youtu.be/L_OzePNKfFs",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Matteo Busi, Job Noorman, Jo Van Bulck, Letterio
+                            Galletta, Pierpaolo Degano, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Securing Interruptible Enclaved Execution on Small Microprocessors",
+            "publisher" => "ACM Transactions on Programming Languages and Systems (TOPLAS)",
+            "date"   	=> "2021",
+            "id"        => "toplas21",
+            "pdf"       => "https://dl.acm.org/doi/abs/10.1145/3470534",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Sepideh Pouyanrad, Jan Tobias Mühlberg, Wouter Joosen",
+            "title"     => "SCF-MSP: Static Detection of Side Channels in MSP430 Programs",
+            "publisher" => "Proceedings of the 15th International Conference on Availability, Reliability and Security (ARES)",
+            "date"      => "2020",
+            "id"        => "ares2020",
+            "src"       => "https://github.com/sepidehpouyan/SCF-MSP430",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Matteo Busi, Job Noorman, Jo Van Bulck, Letterio
+                            Galletta, Pierpaolo Degano, Jan Tobias Mühlberg, Frank Piessens",
+            "title"     => "Provably Secure Isolation for Interruptible Enclaved Execution on Small Microprocessors",
+            "publisher" => "33rd IEEE Computer Security Foundations Symposium (CSF)",
+            "date"   	=> "2020",
+            "id"        => "csf20",
+            "src"       => "https://github.com/sancus-tee/sancus-core/tree/nemesis",
+            "pdf"       => "https://arxiv.org/pdf/2001.10881.pdf",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jo Van Bulck, David Oswald, Eduard Marin, Abdulla Aldoseri, Flavio D. Garcia, Frank Piessens",
+            "title"     => "A Tale of Two Worlds: Assessing the Vulnerability of Enclave Shielding Runtimes",
+            "publisher" => "26th ACM Conference on Computer and Communications Security (CCS)",
+            "date"   	=> "2019",
+            "id"        => "ccs19",
+            "pdf"       => "https://jovanbulck.github.io/files/ccs19-tale.pdf",
+            "slides"    => "https://jovanbulck.github.io/files/ccs19-tale-slides.pdf",
+            "video"     => "https://www.youtube.com/watch?v=zjdUEKX1jlI",
+            "src"       => "https://github.com/jovanbulck/0xbadc0de",
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Jo Van Bulck, Frank Piessens, Raoul Strackx",
+            "title"     => "Nemesis: Studying Microarchitectural Timing Leaks in
+                            Rudimentary CPU Interrupt Logic",
+            "publisher" => "Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS)",
+            "date"   	=> "2018",
+            "id"        => "ccs18",
+            "src"       => "https://github.com/jovanbulck/nemesis",
+            "pdf"       => true,
+            "slides"    => true,
+            "video"     => "https://youtu.be/njE9Vg8HOqk",
+            "bibtex"    => true
+        ),
+    );
+
+    publication_list($pubs);
+?>
+
+
 <?php research_section("apps") ?>
 
 <p>Ongoing work leverages Sancus's lightweight
@@ -251,8 +307,6 @@ requirements, such as securely multiplexing shared platform resources among
 distrusting clients, or establishing the integrity of an untrusted host
 operating system, to extended case studies in the context of emerging smart
 electricity meters or automotive control networks.
-The Sancus runtime infrastructure was furthermore featured in a recent comprehensive
-enclave runtime vulnerability assessment study.
 </p>
 
 <?php
@@ -276,18 +330,6 @@ enclave runtime vulnerability assessment study.
             "id"        => "cps-sec20",
             "pdf"       => true,
             "video"     => "https://www.youtube.com/watch?v=UavQ54dO3kk",
-            "bibtex"    => true
-        ),
-        array(
-            "author"    => "Jo Van Bulck, David Oswald, Eduard Marin, Abdulla Aldoseri, Flavio D. Garcia, Frank Piessens",
-            "title"     => "A Tale of Two Worlds: Assessing the Vulnerability of Enclave Shielding Runtimes",
-            "publisher" => "26th ACM Conference on Computer and Communications Security (CCS)",
-            "date"   	=> "2019",
-            "id"        => "ccs19",
-            "pdf"       => "https://jovanbulck.github.io/files/ccs19-tale.pdf",
-            "slides"    => "https://jovanbulck.github.io/files/ccs19-tale-slides.pdf",
-            "video"     => "https://www.youtube.com/watch?v=zjdUEKX1jlI",
-            "src"       => "https://github.com/jovanbulck/0xbadc0de",
             "bibtex"    => true
         ),
         array(
