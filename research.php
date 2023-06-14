@@ -645,12 +645,13 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
-            "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
-            "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures (Poster)",
-            "publisher" => "2022 Summer School on Security Testing & Verification",
-            "date"      => "2022",
-            "id"        => "bognar22poster",
-            "pdf"       => true,
+            "author"    => "Jo Van Bulck, Frank Piessens",
+            "title"     => "Happy Birthday Sancus! – Lessons from 10 Years of Maintaining a Trusted Computing Research Prototype",
+            "publisher" => "Keynote @ DRADS DistriNet Workshop, Rendeux, Belgium",
+            "date"      => "2023",
+            "id"        => "drads23",
+            "slides"    => true,
+            "video"     => "media/drads23-sancus-bday.mp4"
         ),
         array(
             "author"    => "Gianluca Scopelliti and Sepideh Pouyanrad",
