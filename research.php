@@ -484,6 +484,7 @@ applications running on higher-end Protected Module Architectures.
             "date"      => "2021",
             "id"        => "joosen21thesis",
             "pdf"       => true,
+            "src"       => "https://github.com/SteffieJoosen/sllvm/tree/DMADefender/test/sancus",
             "slides"    => false,
             "bibtex"    => true
         ),
@@ -493,6 +494,7 @@ applications running on higher-end Protected Module Architectures.
             "publisher" => "Master thesis KU Leuven",
             "date"      => "2020",
             "id"        => "bognar20thesis",
+            "src"       => "https://github.com/sancus-tee/sancus-core/pull/19",
             "pdf"       => true,
             "slides"    => false,
             "bibtex"    => true
