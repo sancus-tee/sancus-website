@@ -212,6 +212,17 @@ out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Marton Bognar, Hans Winderix, Jo Van Bulck, Frank Piessens",
+            "title"     => "MicroProfiler: Principled Side-Channel Mitigation through Microarchitectural Profiling",
+            "publisher" => "Proceedings of the 7th IEEE European Symposium on Security and Privacy (EuroS&P)",
+            "date"      => "2023",
+            "id"        => "bognar23microprofiler",
+            "src"       => "https://github.com/martonbognar/microprofiler/"
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Marton Bognar, Jo Van Bulck, Frank Piessens",
             "title"     => "Mind the Gap: Studying the Insecurity of Provably Secure Embedded Trusted Execution Architectures",
             "publisher" => "Proceedings of the 43rd IEEE Symposium on Security and Privacy (S&P)",
@@ -417,13 +428,22 @@ Secure Internet of Things (SIoT)",
 and other student projects.
 </p>
 
+<p><b>2021.</b>
+A Sancus compiler extension was developed that automatically balances
+conditional branches to protect against advanced side-channel adversaries
+exploiting fine-grained enclave memory-access patterns through Direct Memory
+Access (DMA) contention.
+</p>
+
 <p><b>2020.</b>
 Two theses leveraged Sancus as a base platform to further extend uses cases for
 authentic execution and controller-area network authentication.
+Another thesis, furthermore, explored a new type of side-channel attack on
+Sancus enclaves, exploiting memory contention from untrusted DMA devices.
 </p>
 
 <p><b>2019.</b>
-An enclave-aware Direct Memory Access (DMA) controller was developed to
+An enclave-aware DMA controller was developed to
 maintain Sancus's security properties in the presence of untrusted peripheral
 DMA devices.
 Another thesis developed an attack framework for single-stepping Sancus enclaves and investigated side-channel leakage in compiler-generated code.
@@ -457,6 +477,26 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
     $pubs = array(
+        array(
+            "author"    => "Steffie Joosen",
+            "title"     => "Hardening Enclave Programs against Side-Channel Vulnerabilities at Compile-Time",
+            "publisher" => "Master thesis KU Leuven",
+            "date"      => "2021",
+            "id"        => "joosen21thesis",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Marton Bognar",
+            "title"     => "Analyzing Side-Channel Leakage in Secure DMA Solutions",
+            "publisher" => "Master thesis KU Leuven",
+            "date"      => "2020",
+            "id"        => "bognar20thesis",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Stien Vanderhallen",
             "title"     => "Robust Authentication for Automotive Control Networks through Covert Bandwidth",
