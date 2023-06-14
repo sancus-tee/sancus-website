@@ -217,7 +217,7 @@ out this attack surface.
             "publisher" => "Proceedings of the 7th IEEE European Symposium on Security and Privacy (EuroS&P)",
             "date"      => "2023",
             "id"        => "bognar23microprofiler",
-            "src"       => "https://github.com/martonbognar/microprofiler/"
+            "src"       => "https://github.com/martonbognar/microprofiler/",
             "pdf"       => true,
             "slides"    => false,
             "bibtex"    => true
