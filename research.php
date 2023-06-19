@@ -214,7 +214,7 @@ out this attack surface.
         array(
             "author"    => "Marton Bognar, Hans Winderix, Jo Van Bulck, Frank Piessens",
             "title"     => "MicroProfiler: Principled Side-Channel Mitigation through Microarchitectural Profiling",
-            "publisher" => "Proceedings of the 7th IEEE European Symposium on Security and Privacy (EuroS&P)",
+            "publisher" => "Proceedings of the 8th IEEE European Symposium on Security and Privacy (EuroS&P)",
             "date"      => "2023",
             "id"        => "bognar23microprofiler",
             "src"       => "https://github.com/martonbognar/microprofiler/",
