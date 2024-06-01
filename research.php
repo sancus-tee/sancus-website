@@ -212,6 +212,17 @@ out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Matteo Busi, Riccardo Focardi, Flaminia Luccio",
+            "title"     => "Bridging the Gap: Automated Analysis of Sancus",
+            "publisher" => "37th IEEE Computer Security Foundations Symposium (CSF)",
+            "id"        => "alvie24",
+            "date"      => "2024",
+            "src"       => "https://github.com/matteobusi/alvie",
+            "pdf"       => "https://arxiv.org/pdf/2404.09518",
+            "slides"    => false,
+            "bibtex"    => false
+        ),
+        array(
             "author"    => "Marton Bognar, Hans Winderix, Jo Van Bulck, Frank Piessens",
             "title"     => "MicroProfiler: Principled Side-Channel Mitigation through Microarchitectural Profiling",
             "publisher" => "Proceedings of the 8th IEEE European Symposium on Security and Privacy (EuroS&P)",
