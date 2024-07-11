@@ -504,7 +504,7 @@ applications running on higher-end Protected Module Architectures.
 			"id" 		=> "goossens24thesis",
 			"pdf" 		=> true,
 			"slides" 	=> true,
-			"src" 		=> "https://distrinet.cs.kuleuven.be/software/sancus/publications/goossens24-slides.pdf",
+			"src" 		=> "https://github.com/Gert-JanG/pandora-sancus",
 			"bibtex" 	=> true
 		),
         array(
