@@ -684,10 +684,19 @@ Sancus-based techniques to secure automotive control networks.
 <?php
     $pubs = array(
         array(
+            "author"    => "Jo Van Bulck, Hans Winderix, Marton Bognar, Lesly-Ann Daniel, Daan Vanoverloop",
+            "title"     => "Open-Source Prototyping for Systems Security Research",
+            "publisher" => "Poster @ KU Leuven Open Science Day, Leuven, Belgium",
+            "date"      => "May 6, 2024",
+            "id"        => "kul24",
+            "slides"    => true,
+        ),
+
+        array(
             "author"    => "Jo Van Bulck, Frank Piessens",
             "title"     => "Happy Birthday Sancus! – Lessons from 10 Years of Maintaining a Trusted Computing Research Prototype",
             "publisher" => "Keynote @ DRADS DistriNet Workshop, Rendeux, Belgium",
-            "date"      => "2023",
+            "date"      => "March 24, 2023",
             "id"        => "drads23",
             "slides"    => true,
             "video"     => "media/drads23-sancus-bday.mp4"
