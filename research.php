@@ -356,7 +356,7 @@ electricity meters or automotive control networks.
             "bibtex"    => true
         ),
         array(
-            "author"    => "Timothy Werquin, Mathijs Hubrechtsen, Ashok Thangarajan, Frank Piessens, Jan Tobias Mühlberg",
+            "author"    => "Timothy Werquin, Roos Hubrechtsen, Ashok Thangarajan, Frank Piessens, Jan Tobias Mühlberg",
             "title"     => "Automated Fuzzing of Automotive Control Units",
             "publisher" => "International Workshop on Attacks and Defenses for
 Internet-of-Things (ADIoT) / International Workshop on the
@@ -364,6 +364,7 @@ Secure Internet of Things (SIoT)",
             "date"      => "2019",
             "id"        => "siot2019",
             "pdf"       => true,
+            "web"       => "http://doi.org/10.1109/SIOT48044.2019.9637090"
             "slides"    => false,
             "src"       => "https://github.com/timower/caringcaribou/tree/autoFuzz",
             "bibtex"    => true
