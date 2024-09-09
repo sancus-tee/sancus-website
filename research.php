@@ -212,6 +212,17 @@ out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Matteo Busi, Pierpaolo Degano, Riccardo Focardi, Letterio Galletta, Flaminia Luccio, Frank Piessens and Jo Van Bulck",
+            "title"     => "Exceptions Prove the Rule: Investigating and Resolving Residual Side Channels in Provably Secure Interrupt Handling",
+            "publisher" => "4th Program Analysis and Verification on Trusted Platforms (PAVeTrust) Workshop",
+            "id"        => "pavetrust24",
+            "date"      => "2024",
+            "src"       => false,
+            "pdf"       => true,
+            "slides"    => true,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Matteo Busi, Riccardo Focardi, Flaminia Luccio",
             "title"     => "Bridging the Gap: Automated Analysis of Sancus",
             "publisher" => "37th IEEE Computer Security Foundations Symposium (CSF)",
