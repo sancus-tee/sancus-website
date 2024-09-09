@@ -364,7 +364,6 @@ Secure Internet of Things (SIoT)",
             "date"      => "2019",
             "id"        => "siot2019",
             "pdf"       => true,
-            "web"       => "http://doi.org/10.1109/SIOT48044.2019.9637090"
             "slides"    => false,
             "src"       => "https://github.com/timower/caringcaribou/tree/autoFuzz",
             "bibtex"    => true
