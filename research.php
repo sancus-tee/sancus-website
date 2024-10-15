@@ -19,7 +19,7 @@ include("header.php");
 </div>
 
 <p> Sancus is an ongoing research project, being used both within
-imec-DistriNet as well as by independent researchers. This page
+DistriNet as well as by independent researchers. This page
 aims to give a comprehensive overview of academic publications on Sancus-based
 architectures and applications. Feel free to <a
 href="https://github.com/sancus-tee/sancus-website">open a pull request on GitHub</a> us if you know of other
@@ -211,6 +211,17 @@ out this attack surface.
 
 <?php
     $pubs = array(
+        array(
+            "author"    => "Marton Bognar, Cas Magnus, Jo Van Bulck, Frank Piessens",
+            "title"     => "Intellectual Property Exposure: Subverting and Securing Intellectual Property Encapsulation in Texas Instruments Microcontrollers",
+            "publisher" => "33rd USENIX Security Symposium",
+            "date"      => "2024",
+            "id"        => "bognar24exposure",
+            "src"       => "https://github.com/martonbognar/ipe-exposure",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
         array(
             "author"    => "Matteo Busi, Pierpaolo Degano, Riccardo Focardi, Letterio Galletta, Flaminia Luccio, Frank Piessens and Jo Van Bulck",
             "title"     => "Exceptions Prove the Rule: Investigating and Resolving Residual Side Channels in Provably Secure Interrupt Handling",
