@@ -212,6 +212,28 @@ out this attack surface.
 <?php
     $pubs = array(
         array(
+            "author"    => "Ruben Van Dijck, Marton Bognar, Jo Van Bulck",
+            "title"     => "Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels",
+            "publisher" => "8th Workshop on System Software for Trusted Execution (SysTEX)",
+            "date"      => "2025",
+            "id"        => "vandijck25wait",
+            "src"       => "https://github.com/dnet-tee/wait-a-cycle",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
+        array(
+            "author"    => "Gert-Jan Goossens, Jo Van Bulck",
+            "title"     => "Principled Symbolic Validation of Enclaves on Low-End Microcontrollers",
+            "publisher" => "8th Workshop on System Software for Trusted Execution (SysTEX)",
+            "date"      => "2025",
+            "src"       => "https://github.com/pandora-tee/",
+            "id"        => "goossens25principled",
+            "pdf"       => true,
+            "slides"    => false,
+            "bibtex"    => true
+        ),
+        array(
             "author"    => "Marton Bognar, Cas Magnus, Jo Van Bulck, Frank Piessens",
             "title"     => "Intellectual Property Exposure: Subverting and Securing Intellectual Property Encapsulation in Texas Instruments Microcontrollers",
             "publisher" => "33rd USENIX Security Symposium",
