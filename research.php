@@ -482,6 +482,12 @@ Secure Internet of Things (SIoT)",
 <p> Sancus has been used as the development platform for several master theses
 and other student projects.
 </p>
+
+<p><b>2025.</b>
+Timing vulnerabilities were identified in the Sancus cryptographic module and software libraries of related works.
+Mitigations were suggested in software and a fix to the hardware module has been proposed, evaluated, and integrated in the upstream repository.
+</p>
+
 <p><b>2024.</b>
 The automated vulnerability discovery tool 'Pandora' has been successfully ported from the high-end Intel SGX architecture to the low-end Sancus architecture. This adaptation enables automated discovery of control flow and pointer vulnerabilities within Sancus enclaves.
 </p>
@@ -540,6 +546,15 @@ applications running on higher-end Protected Module Architectures.
 </p>
 <?php
 	$pubs = array(
+        array(
+            "author"    => "Ruben Van Dijck",
+            "title"     => "Timing Leaks Across the Hardware-Software Stack in Low-End Trusted Execution Environments",
+            "publisher" => "Master thesis KU Leuven",
+            "date"      => "2025",
+            "id"        => "vandijck25thesis",
+            "pdf"       => true,
+            "bibtex"    => true
+        ),
 		array(
 			"author" 	=> "Gert-Jan Goossens",
 			"title" 	=> "Validating Sancus Enclaves using Symbolic Execution",
